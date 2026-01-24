@@ -429,7 +429,7 @@ function submitRegistration(isLogged) {
     const SUPABASE_URL = 'https://miupzfchvfbqbznfhvix.supabase.co';
 
     // 🔒 Troque pelo seu ANON KEY (Settings > API > anon public)
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pdXB6ZmNodmZicWJ6bmZodml4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxOTYwNzksImV4cCI6MjA4NDc3MjA3OX0.rz0W9qVovRvAeyBQ55LRewOAOM5a8pNJs1-UwWttATw';
+    const SUPABASE_ANON_KEY = 'COLOQUE_SUA_SUPABASE_ANON_KEY_AQUI';
 
     // (OpenAI key NÃO deve ficar no front-end. A Edge Function já usa OPENAI_API_KEY no servidor.)
     // const OPENAI_KEY = 'REMOVIDO_DO_FRONT';
