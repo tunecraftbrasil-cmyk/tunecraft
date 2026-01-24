@@ -16,7 +16,6 @@ function scrollToBottom() {
 }
 
 const elaboratedChatFlow = [
-    // ... (MANTENHA AS PERGUNTAS 1 ATE 16 IGUAIS AS ANTERIORES - REPETINDO ABAIXO PARA GARANTIR INTEGRIDADE) ...
     {
         step: 1, section: "DESTINATÁRIO",
         question: "Quem é a pessoa especial para quem você quer criar uma música? 👤",
@@ -72,6 +71,7 @@ const elaboratedChatFlow = [
         type: "textarea", placeholder: "Ex: Faz bolos incríveis, plantava suas próprias verduras...",
         minLength: 5, metadata: { fieldName: "recipient.specialCharacteristics", required: false }
     },
+
     // ===== SEÇÃO 2: OCASIÃO =====
     {
         step: 6, section: "OCASIÃO",
@@ -102,6 +102,7 @@ const elaboratedChatFlow = [
         type: "input", inputType: "date",
         metadata: { fieldName: "occasion.date", required: false }
     },
+
     // ===== SEÇÃO 3: ESTILO MUSICAL =====
     {
         step: 8, section: "ESTILO MUSICAL",
@@ -151,6 +152,7 @@ const elaboratedChatFlow = [
         ],
         metadata: { fieldName: "musicStyle.energy", required: true }
     },
+
     // ===== SEÇÃO 4: REFERÊNCIAS MUSICAIS =====
     {
         step: 11, section: "REFERÊNCIAS",
@@ -158,6 +160,7 @@ const elaboratedChatFlow = [
         type: "references", maxReferences: 3,
         metadata: { fieldName: "musicStyle.references", required: true }
     },
+
     // ===== SEÇÃO 5: MENSAGEM E EMOÇÃO =====
     {
         step: 12, section: "MENSAGEM",
@@ -184,6 +187,7 @@ const elaboratedChatFlow = [
         ],
         metadata: { fieldName: "lyricDetails.languageStyle", required: true }
     },
+
     // ===== SEÇÃO 6: PRODUÇÃO =====
     {
         step: 15, section: "PRODUÇÃO",
@@ -241,15 +245,12 @@ function initChat() {
 }
 
 function renderQuestion() {
-    const messagesContainer = document.getElementById("chatMessages");
     const inputContainer = document.getElementById("inputSection");
 
-    inputContainer.innerHTML = ""; 
+    inputContainer.innerHTML = "";
 
     const validSteps = elaboratedChatFlow.filter((step) => {
-        if (step.condition) {
-            return step.condition(formData);
-        }
+        if (step.condition) return step.condition(formData);
         return true;
     });
 
@@ -260,9 +261,10 @@ function renderQuestion() {
     }
 
     currentQuestion = validSteps[currentStep];
-    
+
     const progress = ((currentStep + 1) / (validSteps.length + 1)) * 100;
-    document.getElementById("progressFill").style.width = progress + "%";
+    const pf = document.getElementById("progressFill");
+    if (pf) pf.style.width = progress + "%";
 
     addMessage("bot", currentQuestion.question);
 
@@ -319,14 +321,14 @@ function renderInput(question, container) {
              </div>`;
 
     container.innerHTML = html;
-    
+
     const input = document.getElementById("chatInput");
-    if(input) input.focus();
+    if (input) input.focus();
 }
 
 function handleOption(val, label) {
     addMessage("user", label);
-    formData[`step${currentQuestion.step}`] = val; 
+    formData[`step${currentQuestion.step}`] = val;
     currentStep++;
     setTimeout(renderQuestion, 600);
 }
@@ -337,10 +339,10 @@ function handleInput() {
         document.querySelectorAll('.reference-item').forEach(item => {
             const artist = item.querySelector('.reference-artist').value.trim();
             const song = item.querySelector('.reference-song').value.trim();
-            if(artist || song) refs.push({ artist, song });
+            if (artist || song) refs.push({ artist, song });
         });
-        if(refs.length === 0) return alert("Adicione pelo menos uma referência");
-        
+        if (refs.length === 0) return alert("Adicione pelo menos uma referência");
+
         addMessage("user", `${refs.length} referências adicionadas`);
         formData[`step${currentQuestion.step}`] = refs;
         currentStep++;
@@ -350,7 +352,7 @@ function handleInput() {
 
     const val = document.getElementById("chatInput").value;
     if (!val.trim()) return;
-    
+
     if (currentQuestion.minLength && val.length < currentQuestion.minLength) {
         alert(`Por favor, escreva pelo menos ${currentQuestion.minLength} caracteres.`);
         return;
@@ -374,15 +376,12 @@ function prevStep() {
 // ============================================
 
 function renderRegistrationForm(container) {
-    // Se a UI do chat foi alterada (ex: durante loading), alguns elementos podem não existir.
     const pf = document.getElementById("progressFill");
     if (pf) pf.style.width = "100%";
-    
-    // Verifica se já tem usuário logado no localStorage
+
     const existingUser = JSON.parse(localStorage.getItem("tuneCraftUser"));
-    
+
     if (existingUser && existingUser.email) {
-        // MODO USUÁRIO LOGADO: Pula cadastro, mostra só botão de pagar
         addMessage("bot", `Olá, ${existingUser.name.split(' ')[0]}! Tudo pronto para criar sua nova música. Clique abaixo para confirmar o pagamento.`);
         container.innerHTML = `
             <div class="input-label">PAGAMENTO RÁPIDO</div>
@@ -390,7 +389,6 @@ function renderRegistrationForm(container) {
             <button class="btn-chat-action" onclick="submitRegistration(true)">Pagar e Criar (R$ 49,90)</button>
         `;
     } else {
-        // MODO VISITANTE: Mostra form completo
         addMessage("bot", "Incrível! Tenho tudo para criar sua música. Para finalizar e acessar o pagamento (Plano Único), preencha seus dados abaixo:");
         container.innerHTML = `
             <div class="input-label">CADASTRO RÁPIDO</div>
@@ -409,7 +407,6 @@ function submitRegistration(isLogged) {
     let name, email;
     let user_id = null;
 
-    // 1. Validação inicial dos campos (Se não estiver logado)
     if (!isLogged) {
         name = document.getElementById('regName').value;
         const cpf = document.getElementById('regCpf').value;
@@ -417,24 +414,26 @@ function submitRegistration(isLogged) {
         const pass = document.getElementById('regPass').value;
         const confirm = document.getElementById('regConfirmPass').value;
 
-        if (!name || !cpf || !email || !pass) { return alert("Por favor, preencha todos os campos."); }
-        if (pass !== confirm) { return alert("As senhas não coincidem."); }
+        if (!name || !cpf || !email || !pass) return alert("Por favor, preencha todos os campos.");
+        if (pass !== confirm) return alert("As senhas não coincidem.");
     } else {
-        // Se já está logado, pega os dados do localStorage
         const existing = JSON.parse(localStorage.getItem("tuneCraftUser"));
         name = existing.name;
         email = existing.email;
         user_id = existing.user_id || null;
     }
 
-    // ===== CREDENCIAIS (Idealmente usar variáveis de ambiente em produção) =====
+    // ===== CREDENCIAIS =====
+    // ✅ IMPORTANTE: No front-end (GitHub Pages), use SEMPRE a ANON KEY.
+    // Coloque sua ANON KEY aqui:
     const SUPABASE_URL = 'https://miupzfchvfbqbznfhvix.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pdXB6ZmNodmZicWJ6bmZodml4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTE5NjA3OSwiZXhwIjoyMDg0NzcyMDc5fQ.oUxtQHtVRzEzsRwiwCCWhva-ETK3hkyg8zXGxqZ8VDo';
-    const OPENAI_KEY = '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';
 
-    // 2. Tela de Carregamento (Feedback Visual)
-    // IMPORTANTÍSSIMO: não podemos destruir o HTML do chat-container, senão progressFill/inputSection somem
-    // e o catch acaba quebrando com "Cannot read properties of null (reading 'style')".
+    // 🔒 Troque pelo seu ANON KEY (Settings > API > anon public)
+    const SUPABASE_ANON_KEY = 'COLOQUE_SUA_SUPABASE_ANON_KEY_AQUI';
+
+    // (OpenAI key NÃO deve ficar no front-end. A Edge Function já usa OPENAI_API_KEY no servidor.)
+    // const OPENAI_KEY = 'REMOVIDO_DO_FRONT';
+
     const inputSectionEl = document.getElementById('inputSection');
     if (inputSectionEl) {
         inputSectionEl.innerHTML = `
@@ -447,18 +446,15 @@ function submitRegistration(isLogged) {
         `;
     }
 
-    // Timeout pequeno para garantir renderização da tela de loading
     setTimeout(async () => {
         try {
             // ===== 3. SALVAR PEDIDO INICIAL NO SUPABASE =====
-            // 1) Fazemos APENAS 1 POST (o código antigo fazia 2 POSTs e podia duplicar pedidos)
-            // 2) Usamos return=representation para pegar o id na hora
-            // 3) Mandamos user_id (muito provável ser NOT NULL / FK no seu schema)
             const responseWithId = await fetch(`${SUPABASE_URL}/rest/v1/musicas_pedidos`, {
                 method: 'POST',
                 headers: {
+                    // ✅ corrigido: usar a ANON KEY de forma consistente
                     'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
                     'Content-Type': 'application/json',
                     'Prefer': 'return=representation'
                 },
@@ -481,7 +477,7 @@ function submitRegistration(isLogged) {
             if (!pedidoId) throw new Error('Pedido criado, mas não retornou ID. Verifique o schema/colunas.');
             console.log('✅ Pedido iniciado. ID:', pedidoId);
 
-            // ===== 4. PREPARAÇÃO DO CONTEXTO PARA O GPT =====
+            // ===== 4. PREPARAÇÃO DO CONTEXTO (mantido, mas não enviado direto ao OpenAI aqui) =====
             const getLabel = (step, value) => {
                 const q = elaboratedChatFlow.find(q => q.step === step);
                 if (!q || !q.options) return value;
@@ -520,63 +516,49 @@ function submitRegistration(isLogged) {
                 }
             };
 
-           // ===== 5. CHAMADA À EDGE FUNCTION (GERAÇÃO INTELIGENTE) =====
-           const functionResponse = await fetch(
-                `${SUPABASE_URL}/functions/v1/generate-lyrics`,
-    {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`
-        },
-        body: JSON.stringify({ pedidoId })
-    }
-);
+            // (Opcional) Se você quiser salvar musicContext dentro do payload antes:
+            // formData.musicContext = musicContext;
 
-if (!functionResponse.ok) {
-    const errText = await functionResponse.text();
-    throw new Error(`Erro ao chamar generate-lyrics (${functionResponse.status}): ${errText}`);
-}
-
-const functionData = await functionResponse.json();
-
-// O conteúdo final agora vem da function
-const content = {
-    title: functionData.title,
-    lyrics: functionData.customer_lyrics,
-    suno_style_prompt: functionData.suno_payload?.style || ""
-};
-
-            
-            // ===== 6. ATUALIZA SUPABASE COM O RESULTADO DA IA =====
-            // Agora salvamos nas novas colunas title e ai_metadata
-            await fetch(`${SUPABASE_URL}/rest/v1/musicas_pedidos?id=eq.${pedidoId}`, {
-                method: 'PATCH',
+            // ===== 5. CHAMADA À EDGE FUNCTION (GERAÇÃO INTELIGENTE) =====
+            const functionResponse = await fetch(`${SUPABASE_URL}/functions/v1/generate-lyrics`, {
+                method: "POST",
                 headers: {
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    'Content-Type': 'application/json',
-                    'Prefer': 'return=minimal'
+                    "Content-Type": "application/json",
+                    // ✅ corrigido: usar ANON KEY (não service role) no front
+                    "apikey": SUPABASE_ANON_KEY,
+                    "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
                 },
-                body: JSON.stringify({ 
-                    lyrics: content.lyrics,
-                    title: content.title,
-                    ai_metadata: { 
-                        suno_prompt: content.suno_style_prompt, 
-                        full_gpt_response: content 
-                    } 
-                })
+                body: JSON.stringify({ pedidoId })
             });
 
-            // ===== 7. SALVA NO LOCALSTORAGE E REDIRECIONA =====
-            let userData = JSON.parse(localStorage.getItem("tuneCraftUser")) || { 
-                name: name, 
-                email: email, 
-                password: "123", 
-                orders: [] 
+            if (!functionResponse.ok) {
+                const errText = await functionResponse.text();
+                throw new Error(`Erro ao chamar generate-lyrics (${functionResponse.status}): ${errText}`);
+            }
+
+            const functionData = await functionResponse.json();
+
+            const content = {
+                title: functionData.title,
+                lyrics: functionData.customer_lyrics,
+                suno_style_prompt: functionData.suno_payload?.style || ""
             };
-            
+
+            // ===== 6. (REMOVIDO) PATCH AQUI =====
+            // ✅ A Edge Function já atualiza title/lyrics/status/ai_metadata no banco.
+            // (Evita sobrescrever / duplicar.)
+
+            // ===== 7. SALVA NO LOCALSTORAGE E REDIRECIONA =====
+            let userData = JSON.parse(localStorage.getItem("tuneCraftUser")) || {
+                name: name,
+                email: email,
+                password: "123",
+                orders: []
+            };
+
+            // ✅ corrigido: garantir orders como array antes do push
+            if (!Array.isArray(userData.orders)) userData.orders = [];
+
             if (!isLogged) {
                 userData.name = name;
                 userData.email = email;
@@ -593,14 +575,13 @@ const content = {
             });
 
             localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
-            
+
             console.log('✅ Tudo pronto! Redirecionando...');
             window.location.href = "dashboard.html";
 
         } catch (error) {
             console.error('Erro fatal:', error);
             alert('Ocorreu um erro ao processar. Veja o console para detalhes.');
-            // Volta pro formulário em caso de erro
             const inputEl = document.getElementById('inputSection');
             if (inputEl) {
                 renderRegistrationForm(inputEl);
@@ -608,7 +589,6 @@ const content = {
         }
     }, 100);
 }
-
 
 function generateMockLyrics(data, userName) {
     const homenageado = data.step2 || "Amor";
