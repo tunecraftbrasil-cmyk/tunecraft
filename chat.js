@@ -424,18 +424,27 @@ function submitRegistration(isLogged) {
     }
 
     // ===== CREDENCIAIS =====
-    // ✅ IMPORTANTE: No front-end (GitHub Pages), use SEMPRE a ANON KEY.
-    // Coloque sua ANON KEY aqui:
     const SUPABASE_URL = 'https://miupzfchvfbqbznfhvix.supabase.co';
 
-    // 🔒 Troque pelo seu ANON KEY (Settings > API > anon public)
+    // 🔒 ANON KEY
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pdXB6ZmNodmZicWJ6bmZodml4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxOTYwNzksImV4cCI6MjA4NDc3MjA3OX0.rz0W9qVovRvAeyBQ55LRewOAOM5a8pNJs1-UwWttATw';
 
+    // ===== DEBUG =====
     console.log("[TuneCraft] URL:", SUPABASE_URL);
     console.log("[TuneCraft] ANON prefix:", (SUPABASE_ANON_KEY || "").slice(0, 16));
     console.log("[TuneCraft] ANON length:", (SUPABASE_ANON_KEY || "").length);
-    // (OpenAI key NÃO deve ficar no front-end. A Edge Function já usa OPENAI_API_KEY no servidor.)
-    // const OPENAI_KEY = 'REMOVIDO_DO_FRONT';
+
+    // ===== HEADER HELPER (NOVO) =====
+    function sbHeaders({ prefer = true } = {}) {
+        const k = (SUPABASE_ANON_KEY || "").trim();
+        const h = {
+            apikey: k,
+            Authorization: `Bearer ${k}`,
+            "Content-Type": "application/json",
+        };
+        if (prefer) h.Prefer = "return=representation";
+        return h;
+    }
 
     const inputSectionEl = document.getElementById('inputSection');
     if (inputSectionEl) {
@@ -451,16 +460,26 @@ function submitRegistration(isLogged) {
 
     setTimeout(async () => {
         try {
-            // ===== 3. SALVAR PEDIDO INICIAL NO SUPABASE =====
+            // ===== 0) HEALTH CHECK (NOVO) =====
+            const health = await fetch(`${SUPABASE_URL}/rest/v1/`, {
+                method: "GET",
+                headers: {
+                    apikey: (SUPABASE_ANON_KEY || "").trim(),
+                    Authorization: `Bearer ${(SUPABASE_ANON_KEY || "").trim()}`
+                }
+            });
+
+            console.log("[TuneCraft] REST health status:", health.status);
+
+            // Se já der 401 aqui, nem adianta tentar o insert.
+            if (health.status === 401) {
+                throw new Error("401 no health check do REST (/rest/v1/). Isso indica ANON KEY inválida em runtime (ou cache/deploy carregando JS antigo).");
+            }
+
+            // ===== 3. SALVAR PEDIDO INICIAL NO SUPABASE (AGORA COM sbHeaders) =====
             const responseWithId = await fetch(`${SUPABASE_URL}/rest/v1/musicas_pedidos`, {
                 method: 'POST',
-                headers: {
-                    // ✅ corrigido: usar a ANON KEY de forma consistente
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                    'Content-Type': 'application/json',
-                    'Prefer': 'return=representation'
-                },
+                headers: sbHeaders({ prefer: true }),
                 body: JSON.stringify({
                     user_id: user_id,
                     user_email: email,
@@ -472,6 +491,8 @@ function submitRegistration(isLogged) {
 
             if (!responseWithId.ok) {
                 const errText = await responseWithId.text();
+                console.error("[TuneCraft] POST /musicas_pedidos status:", responseWithId.status);
+                console.error("[TuneCraft] POST /musicas_pedidos body:", errText);
                 throw new Error(`Erro ao salvar pedido inicial (${responseWithId.status}): ${errText}`);
             }
 
@@ -480,7 +501,7 @@ function submitRegistration(isLogged) {
             if (!pedidoId) throw new Error('Pedido criado, mas não retornou ID. Verifique o schema/colunas.');
             console.log('✅ Pedido iniciado. ID:', pedidoId);
 
-            // ===== 4. PREPARAÇÃO DO CONTEXTO (mantido, mas não enviado direto ao OpenAI aqui) =====
+            // ===== 4. PREPARAÇÃO DO CONTEXTO (mantido) =====
             const getLabel = (step, value) => {
                 const q = elaboratedChatFlow.find(q => q.step === step);
                 if (!q || !q.options) return value;
@@ -519,23 +540,17 @@ function submitRegistration(isLogged) {
                 }
             };
 
-            // (Opcional) Se você quiser salvar musicContext dentro do payload antes:
-            // formData.musicContext = musicContext;
-
-            // ===== 5. CHAMADA À EDGE FUNCTION (GERAÇÃO INTELIGENTE) =====
+            // ===== 5. CHAMADA À EDGE FUNCTION (AGORA COM sbHeaders) =====
             const functionResponse = await fetch(`${SUPABASE_URL}/functions/v1/generate-lyrics`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    // ✅ corrigido: usar ANON KEY (não service role) no front
-                    "apikey": SUPABASE_ANON_KEY,
-                    "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
-                },
+                headers: sbHeaders({ prefer: false }), // Prefer não é necessário em functions
                 body: JSON.stringify({ pedidoId })
             });
 
             if (!functionResponse.ok) {
                 const errText = await functionResponse.text();
+                console.error("[TuneCraft] POST /functions/v1/generate-lyrics status:", functionResponse.status);
+                console.error("[TuneCraft] POST /functions/v1/generate-lyrics body:", errText);
                 throw new Error(`Erro ao chamar generate-lyrics (${functionResponse.status}): ${errText}`);
             }
 
@@ -547,10 +562,6 @@ function submitRegistration(isLogged) {
                 suno_style_prompt: functionData.suno_payload?.style || ""
             };
 
-            // ===== 6. (REMOVIDO) PATCH AQUI =====
-            // ✅ A Edge Function já atualiza title/lyrics/status/ai_metadata no banco.
-            // (Evita sobrescrever / duplicar.)
-
             // ===== 7. SALVA NO LOCALSTORAGE E REDIRECIONA =====
             let userData = JSON.parse(localStorage.getItem("tuneCraftUser")) || {
                 name: name,
@@ -559,7 +570,6 @@ function submitRegistration(isLogged) {
                 orders: []
             };
 
-            // ✅ corrigido: garantir orders como array antes do push
             if (!Array.isArray(userData.orders)) userData.orders = [];
 
             if (!isLogged) {
@@ -592,6 +602,7 @@ function submitRegistration(isLogged) {
         }
     }, 100);
 }
+
 
 function generateMockLyrics(data, userName) {
     const homenageado = data.step2 || "Amor";
