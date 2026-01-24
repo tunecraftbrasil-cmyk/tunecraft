@@ -457,7 +457,7 @@ function submitRegistration(isLogged) {
             const responseWithId = await fetch(`${SUPABASE_URL}/rest/v1/musicas_pedidos`, {
                 method: 'POST',
                 headers: {
-                    'apikey': SUPABASE_KEY,
+                    'apikey': SUPABASE_ANON_KEY,
                     'Authorization': `Bearer ${SUPABASE_KEY}`,
                     'Content-Type': 'application/json',
                     'Prefer': 'return=representation'
