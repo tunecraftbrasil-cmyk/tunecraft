@@ -431,6 +431,9 @@ function submitRegistration(isLogged) {
     // 🔒 Troque pelo seu ANON KEY (Settings > API > anon public)
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pdXB6ZmNodmZicWJ6bmZodml4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxOTYwNzksImV4cCI6MjA4NDc3MjA3OX0.rz0W9qVovRvAeyBQ55LRewOAOM5a8pNJs1-UwWttATw';
 
+    console.log("[TuneCraft] URL:", SUPABASE_URL);
+    console.log("[TuneCraft] ANON prefix:", (SUPABASE_ANON_KEY || "").slice(0, 16));
+    console.log("[TuneCraft] ANON length:", (SUPABASE_ANON_KEY || "").length);
     // (OpenAI key NÃO deve ficar no front-end. A Edge Function já usa OPENAI_API_KEY no servidor.)
     // const OPENAI_KEY = 'REMOVIDO_DO_FRONT';
 
