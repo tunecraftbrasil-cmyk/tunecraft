@@ -418,33 +418,19 @@ function submitRegistration(isLogged) {
         if (pass !== confirm) return alert("As senhas não coincidem.");
     } else {
         const existing = JSON.parse(localStorage.getItem("tuneCraftUser"));
-        name = existing.name;
-        email = existing.email;
-        user_id = existing.user_id || null;
+        name = existing?.name;
+        email = existing?.email;
+        user_id = existing?.user_id || null;
     }
 
     // ===== CREDENCIAIS =====
     const SUPABASE_URL = 'https://miupzfchvfbqbznfhvix.supabase.co';
-
-    // 🔒 ANON KEY
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pdXB6ZmNodmZicWJ6bmZodml4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxOTYwNzksImV4cCI6MjA4NDc3MjA3OX0.rz0W9qVovRvAeyBQ55LRewOAOM5a8pNJs1-UwWttATw';
 
     // ===== DEBUG =====
     console.log("[TuneCraft] URL:", SUPABASE_URL);
     console.log("[TuneCraft] ANON prefix:", (SUPABASE_ANON_KEY || "").slice(0, 16));
     console.log("[TuneCraft] ANON length:", (SUPABASE_ANON_KEY || "").length);
-
-    // ===== HEADER HELPER (NOVO) =====
-    function sbHeaders({ prefer = true } = {}) {
-        const k = (SUPABASE_ANON_KEY || "").trim();
-        const h = {
-            apikey: k,
-            Authorization: `Bearer ${k}`,
-            "Content-Type": "application/json",
-        };
-        if (prefer) h.Prefer = "return=representation";
-        return h;
-    }
 
     const inputSectionEl = document.getElementById('inputSection');
     if (inputSectionEl) {
@@ -460,28 +446,70 @@ function submitRegistration(isLogged) {
 
     setTimeout(async () => {
         try {
-            // ===== 0) HEALTH CHECK (NOVO) =====
+            // =========================================================
+            // 0) GARANTE SUPABASE AUTH (isso é o que você removeu sem querer)
+            // =========================================================
+            if (!window.supabase) {
+                throw new Error("supabase-js não carregado. Verifique se o script do supabase está no HTML antes do chat.js.");
+            }
+
+            // Reaproveita client se já existir
+            window.sb = window.sb || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            // Pega sessão REAL do usuário (token válido para auth.uid())
+            const { data: sessionData, error: sessionErr } = await window.sb.auth.getSession();
+            if (sessionErr) console.warn("[TuneCraft] getSession error:", sessionErr);
+
+            const session = sessionData?.session;
+
+            // Se não existe sessão, não tem como passar na RLS -> redireciona login
+            if (!session?.access_token || !session?.user?.id) {
+                alert("Você precisa estar logado para criar a música. Faça login e tente novamente.");
+                window.location.href = "login.html";
+                return;
+            }
+
+            // força user_id correto (RLS exige auth.uid() = user_id)
+            user_id = session.user.id;
+            email = session.user.email || email;
+
+            console.log("[TuneCraft] session user:", user_id);
+            console.log("[TuneCraft] token prefix:", session.access_token.slice(0, 16));
+            console.log("[TuneCraft] token length:", session.access_token.length);
+
+            // =========================================================
+            // 1) HEADERS CORRETOS (Bearer = ACCESS TOKEN do usuário)
+            // =========================================================
+            function sbHeaders({ prefer = true } = {}) {
+                const anon = (SUPABASE_ANON_KEY || "").trim();
+                const token = (session.access_token || "").trim();
+                const h = {
+                    apikey: anon,
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                };
+                if (prefer) h.Prefer = "return=representation";
+                return h;
+            }
+
+            // ===== 2) HEALTH CHECK (opcional) =====
             const health = await fetch(`${SUPABASE_URL}/rest/v1/`, {
                 method: "GET",
                 headers: {
                     apikey: (SUPABASE_ANON_KEY || "").trim(),
-                    Authorization: `Bearer ${(SUPABASE_ANON_KEY || "").trim()}`
+                    Authorization: `Bearer ${(session.access_token || "").trim()}`
                 }
             });
-
             console.log("[TuneCraft] REST health status:", health.status);
 
-            // Se já der 401 aqui, nem adianta tentar o insert.
-            if (health.status === 401) {
-                throw new Error("401 no health check do REST (/rest/v1/). Isso indica ANON KEY inválida em runtime (ou cache/deploy carregando JS antigo).");
-            }
-
-            // ===== 3. SALVAR PEDIDO INICIAL NO SUPABASE (AGORA COM sbHeaders) =====
+            // =========================================================
+            // 3) INSERT (AGORA PASSA NO RLS)
+            // =========================================================
             const responseWithId = await fetch(`${SUPABASE_URL}/rest/v1/musicas_pedidos`, {
                 method: 'POST',
                 headers: sbHeaders({ prefer: true }),
                 body: JSON.stringify({
-                    user_id: user_id,
+                    user_id: user_id,        // ✅ obrigatório
                     user_email: email,
                     user_name: name,
                     payload: formData,
@@ -501,49 +529,12 @@ function submitRegistration(isLogged) {
             if (!pedidoId) throw new Error('Pedido criado, mas não retornou ID. Verifique o schema/colunas.');
             console.log('✅ Pedido iniciado. ID:', pedidoId);
 
-            // ===== 4. PREPARAÇÃO DO CONTEXTO (mantido) =====
-            const getLabel = (step, value) => {
-                const q = elaboratedChatFlow.find(q => q.step === step);
-                if (!q || !q.options) return value;
-                const opt = q.options.find(o => o.value === value);
-                return opt ? opt.label : value;
-            };
-
-            const musicContext = {
-                destinatario: {
-                    nome: formData.step2,
-                    relacao: getLabel(1, formData.step1) + (formData.step1_5 ? ` (${formData.step1_5})` : ""),
-                    idade: getLabel(3, formData.step3),
-                    personalidade: formData.step4,
-                    detalhes_unicos: formData.step5 || "Nenhum detalhe extra."
-                },
-                ocasiao: {
-                    tipo: getLabel(6, formData.step6),
-                    descricao: formData.step6_5 || "",
-                    data: formData.step7 || "Data não informada"
-                },
-                estilo_musical: {
-                    genero_principal: getLabel(8, formData.step8),
-                    detalhe_genero: formData.step8_5 || "",
-                    tempo: getLabel(9, formData.step9),
-                    energia: getLabel(10, formData.step10),
-                    referencias: JSON.stringify(formData.step11) || "Sem referências"
-                },
-                conteudo_lirico: {
-                    mensagem_principal: formData.step12,
-                    historias_obrigatorias: formData.step13 || "",
-                    tom_linguagem: getLabel(14, formData.step14)
-                },
-                producao: {
-                    tipo_voz: getLabel(15, formData.step15),
-                    estilo_producao: getLabel(16, formData.step16)
-                }
-            };
-
-            // ===== 5. CHAMADA À EDGE FUNCTION (AGORA COM sbHeaders) =====
+            // =========================================================
+            // 4) CHAMADA À EDGE FUNCTION (com token do usuário)
+            // =========================================================
             const functionResponse = await fetch(`${SUPABASE_URL}/functions/v1/generate-lyrics`, {
                 method: "POST",
-                headers: sbHeaders({ prefer: false }), // Prefer não é necessário em functions
+                headers: sbHeaders({ prefer: false }),
                 body: JSON.stringify({ pedidoId })
             });
 
@@ -562,20 +553,22 @@ function submitRegistration(isLogged) {
                 suno_style_prompt: functionData.suno_payload?.style || ""
             };
 
-            // ===== 7. SALVA NO LOCALSTORAGE E REDIRECIONA =====
+            // =========================================================
+            // 5) SALVA NO LOCALSTORAGE (agora com user_id real)
+            // =========================================================
             let userData = JSON.parse(localStorage.getItem("tuneCraftUser")) || {
                 name: name,
                 email: email,
-                password: "123",
+                user_id: user_id,
                 orders: []
             };
 
             if (!Array.isArray(userData.orders)) userData.orders = [];
 
-            if (!isLogged) {
-                userData.name = name;
-                userData.email = email;
-            }
+            // garante persistência do user_id (isso é crucial)
+            userData.name = name || userData.name;
+            userData.email = email || userData.email;
+            userData.user_id = user_id;
 
             userData.orders.push({
                 id: Date.now(),
@@ -602,6 +595,7 @@ function submitRegistration(isLogged) {
         }
     }, 100);
 }
+
 
 
 function generateMockLyrics(data, userName) {
