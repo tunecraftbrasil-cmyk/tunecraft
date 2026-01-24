@@ -190,19 +190,93 @@
         const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // Lógica da Dashboard
-        let userData = JSON.parse(localStorage.getItem("tuneCraftUser")) || { name: "Visitante", email: "teste@email.com", orders: [] };
+        // ⚠️ Importante: após relogar, o login.html grava apenas {name,email,user_id} no localStorage
+        // e NÃO traz os pedidos. Então aqui a dashboard precisa buscar os pedidos no Supabase.
+        let userData = JSON.parse(localStorage.getItem("tuneCraftUser")) || { name: "Visitante", email: "", user_id: null, orders: [] };
 
-        // Inicializa Tela
-        document.getElementById("userName").innerText = userData.name.split(' ')[0];
-        document.querySelector(".avatar").innerText = userData.name.charAt(0);
-        
-        // Preenche Perfil
-        document.getElementById("profName").value = userData.name;
-        document.getElementById("profEmail").value = userData.email;
+        // Helpers
+        function normalizeStatus(s) {
+            const v = (s || "").toLowerCase().replace(/\s+/g, "");
+            // Banco/edge podem variar entre: pendingapproval, pending_approval, waiting_user_approval
+            if (v === "pendingapproval" || v === "pending_approval" || v === "waiting_user_approval" || v === "waitinguserapproval") return "pending_approval";
+            if (v === "production" || v === "inproduction") return "production";
+            if (v === "completed" || v === "done" || v === "received") return "completed";
+            return v || "pending_approval";
+        }
 
-        renderSections();
+        async function getSessionOrRedirect() {
+            const { data, error } = await sb.auth.getSession();
+            if (error) console.warn("getSession error:", error);
 
-        function showSection(id, element) {
+            const session = data?.session;
+            if (!session?.access_token || !session?.user?.id) {
+                // Sem sessão: volta pro login
+                window.location.href = "login.html";
+                return null;
+            }
+            return session;
+        }
+
+        function restHeaders(session, { prefer = false } = {}) {
+            const h = {
+                apikey: (SUPABASE_ANON_KEY || "").trim(),
+                Authorization: `Bearer ${(session.access_token || "").trim()}`,
+                "Content-Type": "application/json"
+            };
+            if (prefer) h.Prefer = "return=representation";
+            return h;
+        }
+
+        async function loadOrdersFromSupabase(session) {
+            // Busca pedidos do usuário logado (RLS deve permitir pelo user_id)
+            const url = `${SUPABASE_URL}/rest/v1/musicas_pedidos?select=id,title,lyrics,status,created_at&user_id=eq.${session.user.id}&order=created_at.desc`;
+            const resp = await fetch(url, { method: "GET", headers: restHeaders(session) });
+            if (!resp.ok) {
+                const t = await resp.text();
+                console.error("Erro ao buscar pedidos:", resp.status, t);
+                return [];
+            }
+            const rows = await resp.json();
+            return (rows || []).map(r => ({
+                id: r.id,                 // usamos o UUID do Supabase como ID principal
+                supabase_id: r.id,
+                title: r.title || "Sem título",
+                lyrics: r.lyrics || "",
+                status: normalizeStatus(r.status),
+                created_at: r.created_at
+            }));
+        }
+
+        async function initDashboard() {
+            const session = await getSessionOrRedirect();
+            if (!session) return;
+
+            // Atualiza userData a partir da sessão (fonte da verdade)
+            const fullName = session.user.user_metadata?.full_name || userData.name || "Usuário";
+            userData.name = fullName;
+            userData.email = session.user.email || userData.email || "";
+            userData.user_id = session.user.id;
+
+            // 🔥 Carrega pedidos do banco e substitui a lista local
+            const orders = await loadOrdersFromSupabase(session);
+            userData.orders = orders;
+
+            // Persistir snapshot (opcional)
+            localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
+
+            // Inicializa UI (agora com dados reais)
+            document.getElementById("userName").innerText = userData.name.split(' ')[0];
+            document.querySelector(".avatar").innerText = userData.name.charAt(0);
+
+            document.getElementById("profName").value = userData.name;
+            document.getElementById("profEmail").value = userData.email;
+
+            renderSections();
+        }
+
+        // 🚀 Start
+        initDashboard();
+function showSection(id, element) {
             if(element) {
                 document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
                 element.classList.add('active');
@@ -271,15 +345,35 @@
         }
 
         function approveOrder(id) {
-            if(confirm("Tem certeza? A produção iniciará imediatamente.")) {
-                const order = userData.orders.find(o => o.id === id);
-                if (order) {
-                    order.status = 'production';
-                    localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
-                    renderSections();
-                    showSection('approved', document.querySelectorAll('.menu-item')[1]);
+            if (!confirm("Tem certeza? A produção iniciará imediatamente.")) return;
+
+            (async () => {
+                const session = await getSessionOrRedirect();
+                if (!session) return;
+
+                // Atualiza no banco
+                const url = `${SUPABASE_URL}/rest/v1/musicas_pedidos?id=eq.${id}`;
+                const resp = await fetch(url, {
+                    method: "PATCH",
+                    headers: restHeaders(session, { prefer: true }),
+                    body: JSON.stringify({ status: "production" })
+                });
+
+                if (!resp.ok) {
+                    const t = await resp.text();
+                    console.error("Erro ao aprovar no banco:", resp.status, t);
+                    alert("Não consegui aprovar no banco. Veja o console.");
+                    return;
                 }
-            }
+
+                // Atualiza UI local
+                const order = userData.orders.find(o => o.id === id);
+                if (order) order.status = "production";
+
+                localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
+                renderSections();
+                showSection('approved', document.querySelectorAll('.menu-item')[1]);
+            })();
         }
 
         function saveProfile() {
