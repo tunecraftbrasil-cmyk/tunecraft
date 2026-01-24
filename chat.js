@@ -520,39 +520,34 @@ function submitRegistration(isLogged) {
                 }
             };
 
-            // ===== 5. CHAMADA À API DO GPT (GERAÇÃO INTELIGENTE) =====
-            const systemPrompt = `
-            Você é um compositor de elite e produtor musical especializado em criar hits para a IA 'Suno AI'.
-            Sua tarefa é receber dados de um pedido de música e gerar um JSON contendo:
-            1. 'title': Um título criativo e curto.
-            2. 'suno_style_prompt': Uma string em INGLÊS otimizada para o Suno gerar o áudio. Deve conter Gênero, Instrumentos principais, BPM aproximado e Vibe. (Ex: "Upbeat Acoustic Pop, Piano, Female Vocals, 120bpm, Happy").
-            3. 'lyrics': A letra completa em PORTUGUÊS.
-            
-            REGRAS DA LETRA:
-            - Use tags obrigatórias: [Verse], [Chorus], [Bridge], [Outro].
-            - O Refrão deve ser cativante e repetir a mensagem central.
-            - Rimas ricas e métrica consistente.
-            `;
+           // ===== 5. CHAMADA À EDGE FUNCTION (GERAÇÃO INTELIGENTE) =====
+           const functionResponse = await fetch(
+                `${SUPABASE_URL}/functions/v1/generate-lyrics`,
+    {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`
+        },
+        body: JSON.stringify({ pedidoId })
+    }
+);
 
-            const gptResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${OPENAI_KEY}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    model: 'gpt-4o-mini',
-                    response_format: { type: "json_object" },
-                    messages: [
-                        { role: 'system', content: systemPrompt },
-                        { role: 'user', content: JSON.stringify(musicContext) }
-                    ],
-                    temperature: 0.7
-                })
-            });
+if (!functionResponse.ok) {
+    const errText = await functionResponse.text();
+    throw new Error(`Erro ao chamar generate-lyrics (${functionResponse.status}): ${errText}`);
+}
 
-            const gptData = await gptResponse.json();
-            const content = JSON.parse(gptData.choices[0].message.content);
+const functionData = await functionResponse.json();
+
+// O conteúdo final agora vem da function
+const content = {
+    title: functionData.title,
+    lyrics: functionData.customer_lyrics,
+    suno_style_prompt: functionData.suno_payload?.style || ""
+};
+
             
             // ===== 6. ATUALIZA SUPABASE COM O RESULTADO DA IA =====
             // Agora salvamos nas novas colunas title e ai_metadata
