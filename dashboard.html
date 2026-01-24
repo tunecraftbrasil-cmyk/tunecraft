@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Cliente | TuneCraft</title>
+    <link rel="stylesheet" href="chat.css">
+
+    <!-- ✅ ADICIONADO: Supabase JS para poder deslogar a sessão persistida -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f1f5f9; color: #1e293b;
+            display: flex; height: 100vh; overflow: hidden;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 260px; background: #0a0e27; color: white;
+            display: flex; flex-direction: column;
+            padding: 20px; flex-shrink: 0;
+        }
+        
+        /* Ajuste para acomodar a logo */
+        .logo-container {
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .menu-item {
+            padding: 15px; margin-bottom: 5px; border-radius: 8px; cursor: pointer;
+            transition: 0.3s; display: flex; align-items: center; gap: 10px; color: #94a3b8;
+        }
+        .menu-item:hover, .menu-item.active { background: rgba(255,255,255,0.1); color: white; }
+        .menu-item.active { border-left: 3px solid #00d9ff; }
+        
+        .new-music-btn {
+            margin-top: auto; background: linear-gradient(135deg, #00d9ff, #6366f1);
+            color: white; padding: 15px; border-radius: 10px; text-align: center;
+            text-decoration: none; font-weight: 700; transition: 0.3s;
+            display: flex; justify-content: center; align-items: center; gap: 8px; cursor: pointer;
+        }
+        .new-music-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 217, 255, 0.3); }
+
+        /* MAIN CONTENT */
+        .main-content { flex: 1; overflow-y: auto; padding: 30px; position: relative; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .user-profile { display: flex; align-items: center; gap: 10px; }
+        .avatar { width: 40px; height: 40px; background: #e2e8f0; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; color: #64748b; }
+        
+        .section { display: none; animation: fadeIn 0.3s; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* CARDS */
+        .card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0; }
+        .card-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        
+        .status-pending { background: #fff7ed; color: #c2410c; }
+        .status-production { background: #eff6ff; color: #1d4ed8; }
+        .status-completed { background: #f0fdf4; color: #15803d; }
+
+        .lyrics-box {
+            font-family: 'Courier New', monospace; background: #f8fafc; padding: 20px;
+            border-radius: 8px; border: 1px solid #cbd5e1; white-space: pre-wrap; margin: 15px 0; max-height: 300px; overflow-y: auto;
+        }
+
+        .action-row { display: flex; gap: 10px; }
+        .btn { padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .btn-approve { background: #10b981; color: white; }
+        .btn-approve:hover { background: #059669; }
+        .btn-revise { background: white; border: 1px solid #cbd5e1; color: #64748b; }
+        .btn-revise:hover { border-color: #f59e0b; color: #f59e0b; }
+        .btn-download { background: #0f172a; color: white; display: flex; align-items: center; gap: 5px; text-decoration: none;}
+
+        /* PROFILE SECTION STYLES */
+        .profile-form label { display: block; margin-top: 15px; font-weight: 600; font-size: 0.9rem; }
+        .profile-form input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; margin-top: 5px; max-width: 400px; }
+        .btn-save-profile { margin-top: 20px; background: #00d9ff; color: white; border:none; padding: 10px 25px; border-radius: 6px; cursor: pointer; font-weight: bold;}
+
+        .empty-state { text-align: center; padding: 50px; color: #94a3b8; }
+        .empty-icon { font-size: 3rem; margin-bottom: 10px; display: block; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; height: auto; }
+            .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 10px; align-items: center; justify-content: space-between;}
+            .menu-item span { display: none; }
+            .new-music-btn { margin-top: 0; padding: 8px 15px; font-size: 0.8rem; }
+            .main-content { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-modal" id="chatModal">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2>🎵 Criar Nova Música</h2>
+                <button class="close-chat" onclick="closeChat()">×</button>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-section" id="inputSection"></div>
+        </div>
+    </div>
+
+    <aside class="sidebar">
+        <div class="logo-container">
+            <img src="https://i.ibb.co/wFFzDMy9/tunecraft-logo-transparente.png" alt="TuneCraft" style="height: 50px;">
+        </div>
+        
+        <nav style="flex: 1;">
+            <div class="menu-item active" onclick="showSection('pending', this)">
+                📝 <span>Aprovar Letra</span>
+            </div>
+            <div class="menu-item" onclick="showSection('approved', this)">
+                🎹 <span>Letras Aprovadas</span>
+            </div>
+            <div class="menu-item" onclick="showSection('received', this)">
+                🎵 <span>Músicas Recebidas</span>
+            </div>
+            <div class="menu-item" onclick="showSection('profile', this)">
+                👤 <span>Minha Conta</span>
+            </div>
+        </nav>
+
+        <button class="new-music-btn" onclick="openChat()">
+            + Nova Música
+        </button>
+    </aside>
+
+    <main class="main-content">
+        <div class="header">
+            <h2 id="pageTitle">Aprovar Letra</h2>
+            <div class="user-profile">
+                <span id="userName">Usuário</span>
+                <div class="avatar">U</div>
+                <button onclick="logout()" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:0.9rem; margin-left:10px;">Sair</button>
+            </div>
+        </div>
+
+        <div id="pending" class="section active">
+            </div>
+
+        <div id="approved" class="section">
+            <h2>Em Produção</h2>
+            <p style="color:#64748b; margin-bottom: 20px;">Nossos artistas estão gravando essas músicas agora.</p>
+            <div id="approved-list"></div>
+        </div>
+
+        <div id="received" class="section">
+            <h2>Músicas Prontas</h2>
+            <p style="color:#64748b; margin-bottom: 20px;">Baixe e compartilhe suas criações.</p>
+            <div id="received-list"></div>
+        </div>
+
+        <div id="profile" class="section">
+            <h2>Meus Dados</h2>
+            <div class="card profile-form">
+                <label>Nome Completo</label>
+                <input type="text" id="profName">
+                
+                <label>Email</label>
+                <input type="email" id="profEmail" readonly style="background:#f1f5f9; color:#64748b;">
+                
+                <label>Nova Senha (deixe em branco para manter)</label>
+                <input type="password" id="profPass" placeholder="••••••">
+                
+                <button class="btn-save-profile" onclick="saveProfile()">Salvar Alterações</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="chat.js"></script>
+    <script>
+        // ✅ ADICIONADO: Cliente Supabase apenas para deslogar a sessão persistida
+        // (Use a MESMA ANON KEY do seu login.html)
+        const SUPABASE_URL = "https://miupzfchvfbqbznfhvix.supabase.co";
+        const SUPABASE_ANON_KEY = "SeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pdXB6ZmNodmZicWJ6bmZodml4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxOTYwNzksImV4cCI6MjA4NDc3MjA3OX0.rz0W9qVovRvAeyBQ55LRewOAOM5a8pNJs1-UwWttATw";
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Lógica da Dashboard
+        let userData = JSON.parse(localStorage.getItem("tuneCraftUser")) || { name: "Visitante", email: "teste@email.com", orders: [] };
+
+        // Inicializa Tela
+        document.getElementById("userName").innerText = userData.name.split(' ')[0];
+        document.querySelector(".avatar").innerText = userData.name.charAt(0);
+        
+        // Preenche Perfil
+        document.getElementById("profName").value = userData.name;
+        document.getElementById("profEmail").value = userData.email;
+
+        renderSections();
+
+        function showSection(id, element) {
+            if(element) {
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                element.classList.add('active');
+            }
+
+            const titles = { 'pending': 'Aprovar Letra', 'approved': 'Letras Aprovadas', 'received': 'Músicas Recebidas', 'profile': 'Minha Conta' };
+            document.getElementById('pageTitle').innerText = titles[id];
+
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function renderSections() {
+            const pendingContainer = document.getElementById('pending');
+            const approvedContainer = document.getElementById('approved-list');
+            const receivedContainer = document.getElementById('received-list');
+
+            pendingContainer.innerHTML = '';
+            approvedContainer.innerHTML = '';
+            receivedContainer.innerHTML = '';
+
+            let hasPending = false;
+
+            if (userData.orders && userData.orders.length > 0) {
+                userData.orders.forEach(order => {
+                    if (order.status === 'pending_approval') {
+                        hasPending = true;
+                        pendingContainer.innerHTML += `
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>${order.title}</h3>
+                                    <span class="status-badge status-pending">Aguardando Aprovação</span>
+                                </div>
+                                <p style="font-size:0.9rem; color:#64748b;">Leia a letra gerada abaixo.</p>
+                                <div class="lyrics-box">${order.lyrics}</div>
+                                <div class="action-row">
+                                    <button class="btn btn-revise" onclick="alert('Solicitação enviada!')">Solicitar Ajuste</button>
+                                    <button class="btn btn-approve" onclick="approveOrder(${order.id})">Aprovar Letra</button>
+                                </div>
+                            </div>
+                        `;
+                    } else if (order.status === 'production') {
+                        approvedContainer.innerHTML += `
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>${order.title}</h3>
+                                    <span class="status-badge status-production">Em Produção</span>
+                                </div>
+                                <p>Letra aprovada! Estamos trabalhando no áudio.</p>
+                            </div>
+                        `;
+                    }
+                });
+            }
+
+            if (!hasPending) {
+                pendingContainer.innerHTML = `
+                    <div class="empty-state">
+                        <span class="empty-icon">✨</span>
+                        <h3>Tudo em dia!</h3>
+                        <p>Você não tem letras pendentes.</p>
+                        <button class="btn btn-approve" onclick="openChat()" style="margin-top:20px;">Criar Nova Música</button>
+                    </div>
+                `;
+            }
+        }
+
+        function approveOrder(id) {
+            if(confirm("Tem certeza? A produção iniciará imediatamente.")) {
+                const order = userData.orders.find(o => o.id === id);
+                if (order) {
+                    order.status = 'production';
+                    localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
+                    renderSections();
+                    showSection('approved', document.querySelectorAll('.menu-item')[1]);
+                }
+            }
+        }
+
+        function saveProfile() {
+            const newName = document.getElementById("profName").value;
+            const newPass = document.getElementById("profPass").value;
+            
+            userData.name = newName;
+            if(newPass) userData.password = newPass; // Simulação
+            
+            localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
+            
+            document.getElementById("userName").innerText = newName.split(' ')[0];
+            document.querySelector(".avatar").innerText = newName.charAt(0);
+            
+            alert("Perfil atualizado com sucesso!");
+        }
+
+        // ✅ ALTERADO: agora desloga de verdade do Supabase (remove sessão persistida)
+        async function logout() {
+            try {
+                await sb.auth.signOut();
+            } catch (e) {
+                console.error("Erro ao deslogar do Supabase:", e);
+            }
+
+            localStorage.removeItem("tuneCraftUser");
+            window.location.href = "login.html";
+        }
+    </script>
+</body>
+</html>
