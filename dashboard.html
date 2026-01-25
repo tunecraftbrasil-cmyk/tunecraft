@@ -75,6 +75,7 @@
     .btn { padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; transition: 0.2s; }
     .btn-approve { background: #10b981; color: white; }
     .btn-approve:hover { background: #059669; }
+    .btn-approve:disabled { background: #cbd5e1; cursor: not-allowed; }
     .btn-revise { background: white; border: 1px solid #cbd5e1; color: #64748b; }
     .btn-revise:hover { border-color: #f59e0b; color: #f59e0b; }
     .btn-download { background: #0f172a; color: white; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; padding: 10px 14px; border-radius: 6px; }
@@ -86,6 +87,33 @@
 
     .empty-state { text-align: center; padding: 50px; color: #94a3b8; }
     .empty-icon { font-size: 3rem; margin-bottom: 10px; display: block; }
+
+    .toast-message {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #10b981;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: none;
+      z-index: 9999;
+      animation: slideIn 0.3s;
+    }
+
+    .toast-message.error {
+      background: #ef4444;
+    }
+
+    .toast-message.info {
+      background: #3b82f6;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(400px); }
+      to { transform: translateX(0); }
+    }
 
     @media (max-width: 768px) {
       body { flex-direction: column; height: auto; }
@@ -178,6 +206,9 @@
     </div>
   </main>
 
+  <!-- Toast de notificações -->
+  <div class="toast-message" id="toastMessage"></div>
+
   <script src="chat.js?v=2026-01-24-01"></script>
 
   <script>
@@ -189,12 +220,23 @@
     // Local snapshot
     let userData = JSON.parse(localStorage.getItem("tuneCraftUser")) || { name: "Visitante", email: "", user_id: null, orders: [] };
 
+    // ✅ Função para mostrar notificações
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toastMessage');
+      toast.innerText = message;
+      toast.className = `toast-message ${type}`;
+      toast.style.display = 'block';
+      
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 4000);
+    }
+
     // ✅ helpers
     function normalizeStatus(s) {
       const v = (s || "").toLowerCase().replace(/\s+/g, "");
-      // Banco/edge podem variar entre: pendingapproval, pending_approval, waiting_user_approval
       if (v === "pendingapproval" || v === "pending_approval" || v === "waiting_user_approval" || v === "waitinguserapproval") return "pending_approval";
-      if (v === "production" || v === "inproduction") return "production";
+      if (v === "production" || v === "inproduction" || v === "generatingaudio") return "production";
       if (v === "completed" || v === "done" || v === "received") return "completed";
       return v || "pending_approval";
     }
@@ -205,7 +247,7 @@
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+        .replaceAll("'", "'");
     }
 
     async function getSessionOrRedirect() {
@@ -220,8 +262,6 @@
       return session;
     }
 
-    // ✅ IMPORTANTE: parar de usar REST manual (/rest/v1 + apikey) para evitar "Invalid API key"
-    // e deixar o client do Supabase gerenciar token e headers.
     async function loadOrdersFromSupabase() {
       const { data, error } = await sb
         .from("musicas_pedidos")
@@ -246,19 +286,16 @@
       const session = await getSessionOrRedirect();
       if (!session) return;
 
-      // Fonte da verdade: sessão
       const fullName = session.user.user_metadata?.full_name || userData.name || "Usuário";
       userData.name = fullName;
       userData.email = session.user.email || userData.email || "";
       userData.user_id = session.user.id;
 
-      // Carrega pedidos do banco
       const orders = await loadOrdersFromSupabase();
       userData.orders = orders;
 
       localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
 
-      // UI
       document.getElementById("userName").innerText = userData.name.split(" ")[0];
       document.querySelector(".avatar").innerText = userData.name.charAt(0);
 
@@ -319,8 +356,7 @@
                 <div class="lyrics-box">${lyrics}</div>
                 <div class="action-row">
                   <button class="btn btn-revise" onclick="alert('Solicitação enviada!')">Solicitar Ajuste</button>
-                  <!-- ✅ UUID precisa ir como string -->
-                  <button class="btn btn-approve" onclick="approveOrder('${order.id}')">Aprovar Letra</button>
+                  <button class="btn btn-approve" id="btn-${order.id}" onclick="approveOrder('${order.id}')">Aprovar Letra</button>
                 </div>
               </div>
             `;
@@ -336,37 +372,36 @@
               </div>
             `;
           } else if (order.status === "completed") {
-  hasReceived = true;
+            hasReceived = true;
 
-  const urls = Array.isArray(order.audio_urls) ? order.audio_urls : [];
+            const urls = Array.isArray(order.audio_urls) ? order.audio_urls : [];
 
-  receivedContainer.innerHTML += `
-    <div class="card">
-      <div class="card-header">
-        <h3>${title}</h3>
-        <span class="status-badge status-completed">Pronta</span>
-      </div>
+            receivedContainer.innerHTML += `
+              <div class="card">
+                <div class="card-header">
+                  <h3>${title}</h3>
+                  <span class="status-badge status-completed">Pronta</span>
+                </div>
 
-      ${
-        urls.length >= 2
-          ? `
-            <strong>🎧 Versão A</strong>
-            <audio controls src="${urls[0]}"></audio>
+                ${
+                  urls.length >= 2
+                    ? `
+                      <strong>🎧 Versão A</strong>
+                      <audio controls src="${urls[0].audio_url || urls[0]}"></audio>
 
-            <strong>🎧 Versão B</strong>
-            <audio controls src="${urls[1]}"></audio>
+                      <strong>🎧 Versão B</strong>
+                      <audio controls src="${urls[1].audio_url || urls[1]}"></audio>
 
-            <div class="action-row" style="margin-top:10px">
-              <a class="btn btn-download" href="${urls[0]}" download>⬇️ Baixar A</a>
-              <a class="btn btn-download" href="${urls[1]}" download>⬇️ Baixar B</a>
-            </div>
-          `
-          : `<p>Sua música foi finalizada e está sendo preparada para audição.</p>`
-      }
-    </div>
-  `;
-}
-
+                      <div class="action-row" style="margin-top:10px">
+                        <a class="btn btn-download" href="${urls[0].audio_url || urls[0]}" download>⬇️ Baixar A</a>
+                        <a class="btn btn-download" href="${urls[1].audio_url || urls[1]}" download>⬇️ Baixar B</a>
+                      </div>
+                    `
+                    : `<p>Sua música foi finalizada e está sendo preparada para audição.</p>`
+                }
+              </div>
+            `;
+          }
         });
       }
 
@@ -398,49 +433,108 @@
       }
     }
 
-    // ✅ Aprovar: agora atualiza via sb.from (sem REST manual)
+    // ✅ CORRIGIDO: Aprovar agora com Authorization header correto
     async function approveOrder(id) {
       if (!confirm("Tem certeza? A produção iniciará imediatamente.")) return;
 
       const session = await getSessionOrRedirect();
       if (!session) return;
 
-      const { error } = await sb
-  .from("musicas_pedidos")
-  .update({ status: "production" })
-  .eq("id", id);
+      // Desabilitar botão durante a requisição
+      const btn = document.getElementById(`btn-${id}`);
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = "Processando...";
+      }
 
-if (error) {
-  console.error("Erro ao aprovar no banco:", error);
-  alert("Não consegui aprovar no banco. Veja o console.");
-  return;
-}
+      try {
+        // ✅ PASSO 1: Atualizar status no banco
+        console.log("📝 Atualizando status no banco...");
+        const { error: updateError } = await sb
+          .from("musicas_pedidos")
+          .update({ status: "production" })
+          .eq("id", id);
 
-/* 🔹 PATCH: dispara geração de áudio (melhor via invoke) */
-try {
-  const { data, error: fnError } = await sb.functions.invoke("generate-audio", {
-    body: { pedido_id: id }
-  });
+        if (updateError) {
+          console.error("❌ Erro ao atualizar status:", updateError);
+          showToast("❌ Erro ao atualizar status no banco", "error");
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = "Aprovar Letra";
+          }
+          return;
+        }
 
-  if (fnError) {
-    console.error("Erro ao chamar generate-audio (invoke):", fnError);
-    alert("Não consegui iniciar a geração do áudio. Veja o console.");
-    return;
-  }
+        console.log("✅ Status atualizado com sucesso");
+        showToast("✅ Status atualizado! Iniciando geração de áudio...", "info");
 
-  console.log("generate-audio ok:", data);
-} catch (err) {
-  console.error("Erro ao chamar generate-audio (invoke):", err);
-}
+        // ✅ PASSO 2: Chamar edge function COM o token
+        console.log("🎵 Chamando edge function generate-audio...");
+        
+        // Obter o token da sessão (IMPORTANTE!)
+        const { data: { session: currentSession } } = await sb.auth.getSession();
+        
+        if (!currentSession?.access_token) {
+          console.error("❌ Token não encontrado");
+          showToast("❌ Erro: Token de autenticação não encontrado", "error");
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = "Aprovar Letra";
+          }
+          return;
+        }
 
+        // Chamar a edge function com o token no Authorization header
+        const response = await fetch(
+          'https://miupzfchvfbqbznfhvix.supabase.co/functions/v1/generate-audio',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${currentSession.access_token}`,  // ✅ TOKEN AQUI!
+            },
+            body: JSON.stringify({
+              pedido_id: id,
+            }),
+          }
+        );
 
+        console.log("📤 Response status:", response.status);
 
-      const order = userData.orders.find(o => o.id === id);
-      if (order) order.status = "production";
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("❌ Erro da edge function:", response.status, errorText);
+          showToast(`❌ Erro ao gerar áudio (${response.status})`, "error");
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = "Aprovar Letra";
+          }
+          return;
+        }
 
-      localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
-      renderSections();
-      showSection("approved", document.querySelectorAll(".menu-item")[1]);
+        const result = await response.json();
+        console.log("✅ generate-audio retornou:", result);
+
+        if (result.success) {
+          showToast(`✅ Áudio em geração! Task ID: ${result.task_id}`, "");
+        }
+
+        // Atualizar UI local
+        const order = userData.orders.find(o => o.id === id);
+        if (order) order.status = "production";
+
+        localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
+        renderSections();
+        showSection("approved", document.querySelectorAll(".menu-item")[1]);
+
+      } catch (err) {
+        console.error("❌ Erro na requisição:", err);
+        showToast(`❌ Erro: ${err.message}`, "error");
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = "Aprovar Letra";
+        }
+      }
     }
 
     function saveProfile() {
@@ -448,17 +542,16 @@ try {
       const newPass = document.getElementById("profPass").value;
 
       userData.name = newName;
-      if (newPass) userData.password = newPass; // Simulação
+      if (newPass) userData.password = newPass;
 
       localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
 
       document.getElementById("userName").innerText = newName.split(" ")[0];
       document.querySelector(".avatar").innerText = newName.charAt(0);
 
-      alert("Perfil atualizado com sucesso!");
+      showToast("✅ Perfil atualizado com sucesso!", "");
     }
 
-    // ✅ Logout real do Supabase (remove sessão persistida)
     async function logout() {
       try {
         await sb.auth.signOut();
@@ -472,5 +565,3 @@ try {
   </script>
 </body>
 </html>
-
-
