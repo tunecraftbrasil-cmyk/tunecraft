@@ -263,24 +263,41 @@
     }
 
     async function loadOrdersFromSupabase() {
-      const { data, error } = await sb
-        .from("musicas_pedidos")
-        .select("id,title,lyrics,status,created_at,audio_urls")
-        .order("created_at", { ascending: false });
+  const { data, error } = await sb
+    .from("musicas_pedidos")
+    .select("id,title,lyrics,status,created_at,audio_urls")
+    .order("created_at", { ascending: false });
 
-      if (error) {
-        console.error("Erro sb.from(musicas_pedidos):", error);
-        return [];
+  if (error) {
+    console.error("Erro sb.from(musicas_pedidos):", error);
+    return [];
+  }
+
+  return (data || []).map(r => {
+    let audioUrls = r.audio_urls;
+
+    // ✅ FIX: Se audio_urls for array de strings, faz parse
+    if (Array.isArray(audioUrls) && audioUrls.length > 0 && typeof audioUrls[0] === 'string') {
+      console.log("🔄 audio_urls são strings, fazendo parse...");
+      try {
+        audioUrls = audioUrls.map(url => JSON.parse(url));
+      } catch (e) {
+        console.error("❌ Erro ao fazer parse de audio_urls:", e);
+        audioUrls = [];
       }
-
-      return (data || []).map(r => ({
-        id: r.id,
-        title: r.title || "Sem título",
-        lyrics: r.lyrics || "",
-        status: normalizeStatus(r.status),
-        created_at: r.created_at
-      }));
     }
+
+    return {
+      id: r.id,
+      title: r.title || "Sem título",
+      lyrics: r.lyrics || "",
+      status: normalizeStatus(r.status),
+      created_at: r.created_at,
+      audio_urls: audioUrls  // ✅ Agora é array de objetos
+    };
+  });
+}
+
 
     async function initDashboard() {
       const session = await getSessionOrRedirect();
@@ -374,34 +391,42 @@
           } else if (order.status === "completed") {
             hasReceived = true;
 
-            const urls = Array.isArray(order.audio_urls) ? order.audio_urls : [];
+           const urls = Array.isArray(order.audio_urls) ? order.audio_urls : [];
 
-            receivedContainer.innerHTML += `
-              <div class="card">
-                <div class="card-header">
-                  <h3>${title}</h3>
-                  <span class="status-badge status-completed">Pronta</span>
-                </div>
+  console.log("🎵 URLs da música:", urls);  // Debug
 
-                ${
-                  urls.length >= 2
-                    ? `
-                      <strong>🎧 Versão A</strong>
-                      <audio controls src="${urls[0].audio_url || urls[0]}"></audio>
+  receivedContainer.innerHTML += `
+    <div class="card">
+      <div class="card-header">
+        <h3>${title}</h3>
+        <span class="status-badge status-completed">Pronta</span>
+      </div>
 
-                      <strong>🎧 Versão B</strong>
-                      <audio controls src="${urls[1].audio_url || urls[1]}"></audio>
+      ${
+        urls.length >= 2
+          ? `
+            <strong>🎧 Versão A</strong>
+            <audio controls src="${urls[0].audio_url || urls[0]}" style="width:100%; margin:10px 0;"></audio>
 
-                      <div class="action-row" style="margin-top:10px">
-                        <a class="btn btn-download" href="${urls[0].audio_url || urls[0]}" download>⬇️ Baixar A</a>
-                        <a class="btn btn-download" href="${urls[1].audio_url || urls[1]}" download>⬇️ Baixar B</a>
-                      </div>
-                    `
-                    : `<p>Sua música foi finalizada e está sendo preparada para audição.</p>`
-                }
-              </div>
-            `;
-          }
+            <strong>🎧 Versão B</strong>
+            <audio controls src="${urls[1].audio_url || urls[1]}" style="width:100%; margin:10px 0;"></audio>
+
+            <div class="action-row" style="margin-top:10px">
+              <a class="btn btn-download" href="${urls[0].audio_url || urls[0]}" download>⬇️ Baixar A</a>
+              <a class="btn btn-download" href="${urls[1].audio_url || urls[1]}" download>⬇️ Baixar B</a>
+            </div>
+          `
+          : urls.length === 1
+          ? `
+            <strong>🎧 Áudio</strong>
+            <audio controls src="${urls[0].audio_url || urls[0]}" style="width:100%; margin:10px 0;"></audio>
+            <a class="btn btn-download" href="${urls[0].audio_url || urls[0]}" download>⬇️ Baixar</a>
+          `
+          : `<p>Sua música foi finalizada e está sendo preparada para audição.</p>`
+      }
+    </div>
+  `;
+}
         });
       }
 
@@ -549,6 +574,7 @@
   </script>
 </body>
 </html>
+
 
 
 
