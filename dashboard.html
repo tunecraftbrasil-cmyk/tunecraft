@@ -433,110 +433,115 @@
       }
     }
 
-    // ✅ CORRIGIDO: Aprovar agora com Authorization header correto
     async function approveOrder(id) {
-      if (!confirm("Tem certeza? A produção iniciará imediatamente.")) return;
+  if (!confirm("Tem certeza? A produção iniciará imediatamente.")) return;
 
-      const session = await getSessionOrRedirect();
-      if (!session) return;
+  const session = await getSessionOrRedirect();
+  if (!session) return;
 
-      // Desabilitar botão durante a requisição
-      const btn = document.getElementById(`btn-${id}`);
+  const btn = document.getElementById(`btn-${id}`);
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = "Processando...";
+  }
+
+  try {
+    console.log("📝 Atualizando status no banco...");
+    const { error: updateError } = await sb
+      .from("musicas_pedidos")
+      .update({ status: "production" })
+      .eq("id", id);
+
+    if (updateError) {
+      console.error("❌ Erro ao atualizar status:", updateError);
+      showToast("❌ Erro ao atualizar status no banco", "error");
       if (btn) {
-        btn.disabled = true;
-        btn.innerText = "Processando...";
+        btn.disabled = false;
+        btn.innerText = "Aprovar Letra";
       }
-
-      try {
-        // ✅ PASSO 1: Atualizar status no banco
-        console.log("📝 Atualizando status no banco...");
-        const { error: updateError } = await sb
-          .from("musicas_pedidos")
-          .update({ status: "production" })
-          .eq("id", id);
-
-        if (updateError) {
-          console.error("❌ Erro ao atualizar status:", updateError);
-          showToast("❌ Erro ao atualizar status no banco", "error");
-          if (btn) {
-            btn.disabled = false;
-            btn.innerText = "Aprovar Letra";
-          }
-          return;
-        }
-
-        console.log("✅ Status atualizado com sucesso");
-        showToast("✅ Status atualizado! Iniciando geração de áudio...", "info");
-
-        // ✅ PASSO 2: Chamar edge function COM o token
-        console.log("🎵 Chamando edge function generate-audio...");
-        
-        // Obter o token da sessão (IMPORTANTE!)
-        const { data: { session: currentSession } } = await sb.auth.getSession();
-        
-        if (!currentSession?.access_token) {
-          console.error("❌ Token não encontrado");
-          showToast("❌ Erro: Token de autenticação não encontrado", "error");
-          if (btn) {
-            btn.disabled = false;
-            btn.innerText = "Aprovar Letra";
-          }
-          return;
-        }
-
-        // Chamar a edge function com o token no Authorization header
-        const response = await fetch(
-          'https://miupzfchvfbqbznfhvix.supabase.co/functions/v1/generate-audio',
-          {
-            method: 'POST',
-            mode: 'cors',  // ✅ ADICIONE ESTA LINHA!
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${currentSession.access_token}`,  // ✅ TOKEN AQUI!
-            },
-            body: JSON.stringify({
-              pedido_id: id,
-            }),
-          }
-        );
-
-        console.log("📤 Response status:", response.status);
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error("❌ Erro da edge function:", response.status, errorText);
-          showToast(`❌ Erro ao gerar áudio (${response.status})`, "error");
-          if (btn) {
-            btn.disabled = false;
-            btn.innerText = "Aprovar Letra";
-          }
-          return;
-        }
-
-        const result = await response.json();
-        console.log("✅ generate-audio retornou:", result);
-
-        if (result.success) {
-          showToast(`✅ Áudio em geração! Task ID: ${result.task_id}`, "");
-        }
-
-        // Atualizar UI local
-        const order = userData.orders.find(o => o.id === id);
-        if (order) order.status = "production";
-
-        localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
-        renderSections();
-        showSection("approved", document.querySelectorAll(".menu-item")[1]);
-
-      } catch (err) {
-        console.error("❌ Erro na requisição:", err);
-        showToast(`❌ Erro: ${err.message}`, "error");
-        if (btn) {
-          btn.disabled = false;
-          btn.innerText = "Aprovar Letra";
-        }
-      }
+      return;
     }
+
+    console.log("✅ Status atualizado com sucesso");
+    showToast("✅ Status atualizado! Iniciando geração de áudio...", "info");
+
+    console.log("🎵 Chamando edge function generate-audio...");
+    
+    // ✅ IMPORTANTE: Renovar o token ANTES de usar
+    console.log("🔄 Renovando token...");
+    const { data: refreshData, error: refreshError } = await sb.auth.refreshSession();
+    
+    if (refreshError || !refreshData?.session?.access_token) {
+      console.error("❌ Erro ao renovar token:", refreshError);
+      showToast("❌ Sua sessão expirou. Faça login novamente.", "error");
+      window.location.href = "login.html";
+      return;
+    }
+    
+    const currentSession = refreshData.session;
+    console.log("✅ Token renovado:", currentSession.access_token.substring(0, 30) + "...");
+    
+    if (!currentSession?.access_token) {
+      console.error("❌ Token não encontrado");
+      showToast("❌ Erro: Token de autenticação não encontrado", "error");
+      if (btn) {
+        btn.disabled = false;
+        btn.innerText = "Aprovar Letra";
+      }
+      return;
+    }
+
+    const response = await fetch(
+      'https://miupzfchvfbqbznfhvix.supabase.co/functions/v1/generate-audio',
+      {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${currentSession.access_token}`,  // ✅ Usar token renovado
+        },
+        body: JSON.stringify({
+          pedido_id: id,
+        }),
+      }
+    );
+
+    console.log("📤 Response status:", response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("❌ Erro da edge function:", response.status, errorText);
+      showToast(`❌ Erro ao gerar áudio (${response.status}): ${errorText}`, "error");
+      if (btn) {
+        btn.disabled = false;
+        btn.innerText = "Aprovar Letra";
+      }
+      return;
+    }
+
+    const result = await response.json();
+    console.log("✅ generate-audio retornou:", result);
+
+    if (result.success) {
+      showToast(`✅ Áudio em geração! Task ID: ${result.task_id}`, "");
+    }
+
+    const order = userData.orders.find(o => o.id === id);
+    if (order) order.status = "production";
+
+    localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
+    renderSections();
+    showSection("approved", document.querySelectorAll(".menu-item")[1]);
+
+  } catch (err) {
+    console.error("❌ Erro na requisição:", err);
+    showToast(`❌ Erro: ${err.message}`, "error");
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = "Aprovar Letra";
+    }
+  }
+}
 
     function saveProfile() {
       const newName = document.getElementById("profName").value;
@@ -566,4 +571,5 @@
   </script>
 </body>
 </html>
+
 
