@@ -418,7 +418,7 @@
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let userData = JSON.parse(localStorage.getItem("tuneCraftUser")) || { name: "Visitante", email: "", user_id: null, orders: [] };
-    let currentAlterandoId = null;
+    let currentAlterandoId = null; // ✅ ID do pedido sendo alterado
 
     function showToast(message, type = 'info') {
       const toast = document.getElementById('toastMessage');
@@ -562,6 +562,7 @@
           const title = escapeHtml(order.title);
           const lyrics = escapeHtml(order.lyrics);
 
+          // ✅ PENDING: Aguardando aprovação inicial
           if (order.status === "pending_approval" && !order.versao_modificada) {
             hasPending = true;
             const podeAlterar = !order.alteracao_usada;
@@ -589,6 +590,7 @@
               </div>
             `;
           }
+          // ✅ AGUARDANDO ESCOLHA: Comparar versões
           else if (order.status === "aguardando_aprovacao" && order.versao_modificada) {
             hasPending = true;
             
@@ -619,7 +621,7 @@
                     <div class="lyrics-box" style="max-height: 250px;">
                       ${escapeHtml(versaoOriginal.customer_lyrics || versaoOriginal.lyrics)}
                     </div>
-                    <button class="btn btn-select" onclick="aprovarVersao('${order.id}', 'original')">
+                    <button class="btn btn-select" onclick="escolherVersao('${order.id}', 'original')">
                       ✅ Escolher Esta
                     </button>
                   </div>
@@ -629,7 +631,7 @@
                     <div class="lyrics-box" style="max-height: 250px;">
                       ${escapeHtml(versaoModificada.customer_lyrics)}
                     </div>
-                    <button class="btn btn-select" onclick="aprovarVersao('${order.id}', 'modificada')">
+                    <button class="btn btn-select" onclick="escolherVersao('${order.id}', 'modificada')">
                       ✅ Escolher Esta
                     </button>
                   </div>
@@ -637,6 +639,7 @@
               </div>
             `;
           }
+          // ✅ PRODUCTION
           else if (order.status === "production") {
             hasApproved = true;
             approvedContainer.innerHTML += `
@@ -649,6 +652,7 @@
               </div>
             `;
           }
+          // ✅ COMPLETED
           else if (order.status === "completed") {
             hasReceived = true;
             const urls = Array.isArray(order.audio_urls) ? order.audio_urls : [];
@@ -716,10 +720,12 @@
       }
     }
 
+    // ✅ MODAL DE ALTERAÇÃO
     function abrirModalAlteracao(pedidoId) {
       currentAlterandoId = pedidoId;
       document.getElementById('alterarModal').classList.add('active');
       
+      // Limpar campos
       document.getElementById('mudancasDesejadas').value = '';
       document.getElementById('manterElementos').value = '';
       document.getElementById('observacoesFinais').value = '';
@@ -789,6 +795,7 @@ ${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
         showToast("✅ Versão modificada criada! Compare as versões.", "");
         fecharAlterarModal();
 
+        // Recarregar dados
         userData.orders = await loadOrdersFromSupabase();
         localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
         renderSections();
@@ -800,6 +807,7 @@ ${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
       }
     }
 
+    // ✅ APROVAR VERSÃO ORIGINAL (sem alteração)
     async function aprovarLetraOriginal(id) {
       if (!confirm("Aprovar esta letra e iniciar geração de áudio?")) return;
 
@@ -810,6 +818,7 @@ ${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
       }
 
       try {
+        // Atualizar status direto para production
         const { error: updateError } = await sb
           .from("musicas_pedidos")
           .update({ 
@@ -830,6 +839,7 @@ ${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
 
         showToast("✅ Letra aprovada! Iniciando geração...", "info");
 
+        // Chamar generate-audio
         const response = await fetch(`${SUPABASE_URL}/functions/v1/generate-audio`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -857,51 +867,59 @@ ${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
       }
     }
 
-    // ✅ ÚNICA ALTERAÇÃO: Corrigir o nome dos parâmetros
-    async function aprovarVersao(pedidoId, tipoVersao) {
-      if (!confirm(`Aprovar versão ${tipoVersao} e iniciar geração de áudio?`)) return;
+    // ✅ Função para escolher entre versão original e modificada
+    async function escolherVersao(orderId, tipoVersao) {
+      if (!confirm(`Confirma a escolha da versão ${tipoVersao}? A produção iniciará em seguida.`)) {
+        return;
+      }
 
       showToast("⏳ Salvando escolha...", "info");
 
       try {
-        console.log("📤 Enviando:", { pedidoId, versaoEscolhida: tipoVersao });
+        const { data: sessionData } = await sb.auth.getSession();
+        const token = sessionData?.session?.access_token;
+
+        if (!token) {
+          throw new Error("Sessão expirada. Faça login novamente.");
+        }
+
+        console.log("📤 Enviando para aprovar-versao:", {
+          pedidoId: orderId,
+          versaoEscolhida: tipoVersao
+        });
 
         const response = await fetch(`${SUPABASE_URL}/functions/v1/aprovar-versao`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
           body: JSON.stringify({
-            pedidoId: pedidoId,           // ✅ Corrigido
-            versaoEscolhida: tipoVersao   // ✅ Corrigido
+            pedidoId: orderId,           // ✅ Enviando como pedidoId
+            versaoEscolhida: tipoVersao  // ✅ "original" ou "modificada"
           })
         });
 
+        const result = await response.json();
+
         if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.error || 'Erro ao aprovar versão');
+          throw new Error(result.error || 'Erro ao aprovar versão');
         }
 
-        showToast("✅ Versão aprovada! Iniciando áudio...", "");
+        console.log("✅ Versão aprovada:", result);
+        showToast(`✅ ${result.mensagem || 'Versão aprovada!'}`, "");
 
-        const audioResponse = await fetch(`${SUPABASE_URL}/functions/v1/generate-audio`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pedido_id: pedidoId })
-        });
-
-        if (!audioResponse.ok) {
-          throw new Error('Erro ao iniciar geração de áudio');
-        }
-
-        const audioResult = await audioResponse.json();
-        showToast(`✅ Áudio em geração! Task: ${audioResult.task_id}`, "");
-
+        // Recarregar dados
         userData.orders = await loadOrdersFromSupabase();
         localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
         renderSections();
+
+        // Redirecionar para a aba "Em Produção"
         showSection("approved", document.querySelectorAll(".menu-item")[1]);
 
       } catch (error) {
-        showToast(`❌ ${error.message}`, "error");
+        console.error("❌ Erro ao escolher versão:", error);
+        showToast(`❌ Erro: ${error.message}`, "error");
       }
     }
 
