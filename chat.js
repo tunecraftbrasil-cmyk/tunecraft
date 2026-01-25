@@ -22,8 +22,8 @@ function scrollToBottom() {
 // IMPORTANTE: a página que usa esse JS precisa carregar:
 // <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-const SUPABASE_URL = "https://SEU_PROJECT_REF.supabase.co";
-const SUPABASE_ANON_KEY = "SUA_ANON_KEY";
+// const SUPABASE_URL = "https://SEU_PROJECT_REF.supabase.co";
+// const SUPABASE_ANON_KEY = "SUA_ANON_KEY";
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
