@@ -1,6 +1,6 @@
 // ============================================
 // LÓGICA DO CHAT (chat-stripe.js) 
-// VERSÃO COMPLETA COM STRIPE + CHECKOUT
+// VERSÃO COMPLETA (SEM STRIPE) -> SALVA PEDIDO NO SUPABASE
 // ============================================
 
 // Função para rolar o chat para o final
@@ -15,6 +15,21 @@ function scrollToBottom() {
         }, 100);
     }
 }
+
+// ============================================
+// ✅ SUPABASE CLIENT (AJUSTE AQUI)
+// ============================================
+// IMPORTANTE: a página que usa esse JS precisa carregar:
+// <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+const SUPABASE_URL = "https://SEU_PROJECT_REF.supabase.co";
+const SUPABASE_ANON_KEY = "SUA_ANON_KEY";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============================================
+// FLUXO DO CHAT
+// ============================================
 
 const elaboratedChatFlow = [
     {
@@ -376,18 +391,17 @@ function prevStep() {
 }
 
 // ============================================
-// CHECKOUT COM STRIPE ✅ COMPLETO
+// ✅ FINALIZAÇÃO: SALVAR PEDIDO NO SUPABASE
 // ============================================
 
 function renderCheckoutForm(container) {
     const pf = document.getElementById("progressFill");
     if (pf) pf.style.width = "100%";
 
-    addMessage("bot", "🎵 Perfeito! Sua música está pronta para ser criada. Clique abaixo para ir ao pagamento seguro.");
+    addMessage("bot", "🎵 Perfeito! Agora vou salvar seu pedido para criar sua música.");
 
-    // Mostra formulário para coletar nome e email
     container.innerHTML = `
-        <div class="input-label">DADOS PARA O PAGAMENTO</div>
+        <div class="input-label">DADOS PARA O PEDIDO</div>
         <div class="reg-form-group">
             <label class="reg-label">👤 Nome Completo</label>
             <input type="text" class="reg-input" id="checkoutName" placeholder="Seu nome completo">
@@ -396,9 +410,11 @@ function renderCheckoutForm(container) {
             <label class="reg-label">📧 Email</label>
             <input type="email" class="reg-input" id="checkoutEmail" placeholder="seu@email.com">
         </div>
-        <button class="btn-chat-action" onclick="irParaPagamento()" style="background: linear-gradient(135deg, #00d9ff, #6366f1); border:none; color:white; font-weight:700;">
-            💳 Ir para Pagamento (R$ 39,90)
+
+        <button class="btn-chat-action" id="btnFinalizarPedido" onclick="finalizarPedido()" style="background: linear-gradient(135deg, #00d9ff, #6366f1); border:none; color:white; font-weight:700;">
+            ✅ Finalizar Pedido
         </button>
+
         <button class="btn-chat-action" onclick="closeChat()" style="margin-top:10px; background:#f3f4f6; color:#64748b; border:none;">
             ← Voltar
         </button>
@@ -408,10 +424,10 @@ function renderCheckoutForm(container) {
 }
 
 // ============================================
-// FUNÇÃO PRINCIPAL: IR PARA PAGAMENTO ✅
+// ✅ FUNÇÃO PRINCIPAL: INSERIR ROW EM musicas_pedidos
 // ============================================
 
-function irParaPagamento() {
+async function finalizarPedido() {
     const name = document.getElementById('checkoutName').value.trim();
     const email = document.getElementById('checkoutEmail').value.trim();
 
@@ -425,16 +441,46 @@ function irParaPagamento() {
         return;
     }
 
-    console.log("✅ Salvando dados do chat...", { name, email, formData });
+    const btn = document.getElementById("btnFinalizarPedido");
+    if (btn) {
+        btn.disabled = true;
+        btn.innerText = "Salvando pedido...";
+    }
 
-    // ✅ Salvar dados DO CHAT no localStorage
-    localStorage.setItem('tuneCraftFormData', JSON.stringify({
-        name: name,
-        email: email,
-        formData: formData,
-        timestamp: new Date().toISOString()
-    }));
+    try {
+        console.log("✅ Salvando pedido no Supabase...", { name, email, formData });
 
-    // ✅ Redirecionar para checkout.html
-    window.location.href = 'checkout.html';
+        // 🔥 Ajuste os nomes das colunas conforme sua tabela
+        const payload = {
+            customer_name: name,
+            customer_email: email,
+            form_data: formData,
+            status: "novo",
+            source: "chat",
+            created_at: new Date().toISOString()
+        };
+
+        const { data, error } = await supabase
+            .from("musicas_pedidos")
+            .insert([payload])
+            .select("id")
+            .single();
+
+        if (error) throw error;
+
+        addMessage("bot", `✅ Pedido salvo com sucesso! Nº do pedido: <b>${data.id}</b><br>Agora vamos gerar sua música em seguida.`);
+
+        // opcional: limpar e fechar
+        // closeChat();
+
+    } catch (err) {
+        console.error("❌ Erro ao salvar pedido:", err);
+        alert("Não foi possível salvar seu pedido. Verifique o console e tente novamente.");
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerText = "✅ Finalizar Pedido";
+        }
+        scrollToBottom();
+    }
 }
