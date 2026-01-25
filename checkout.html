@@ -234,7 +234,7 @@
 <body>
 
 <div class="container">
-  <a href="javascript:voltarChat()" class="back-link">← Voltar</a>
+  <a href="javascript:voltarDashboard()" class="back-link">← Voltar</a>
 
   <div class="header">
     <div class="logo">🎵</div>
@@ -255,12 +255,12 @@
   <form id="payment-form">
     <div class="form-section">
       <label class="form-label">Nome Completo *</label>
-      <input type="text" id="customer-name" class="form-input" placeholder="João Silva" required disabled>
+      <input type="text" id="customer-name" class="form-input" placeholder="João Silva" required>
     </div>
 
     <div class="form-section">
       <label class="form-label">Email *</label>
-      <input type="email" id="customer-email" class="form-input" placeholder="joao@example.com" required disabled>
+      <input type="email" id="customer-email" class="form-input" placeholder="joao@example.com" required>
     </div>
 
     <div class="form-section">
@@ -297,9 +297,11 @@
 
   // ✅ Carregar dados do localStorage ao abrir página
   function loadCheckoutData() {
-    const tuneCraftData = localStorage.getItem('tuneCraftFormData');
+    const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
+    const email = localStorage.getItem('tuneCraft_checkoutEmail');
+    const name = localStorage.getItem('tuneCraft_checkoutName');
     
-    if (!tuneCraftData) {
+    if (!pedidoId || !email || !name) {
       showInfo("❌ Nenhum pagamento pendente. Redirecionando...");
       setTimeout(() => {
         window.location.href = "index.html";
@@ -307,21 +309,11 @@
       return;
     }
 
-    const data = JSON.parse(tuneCraftData);
-    
-    if (!data.name || !data.email) {
-      showInfo("❌ Dados incompletos. Redirecionando...");
-      setTimeout(() => {
-        window.location.href = "index.html";
-      }, 2000);
-      return;
-    }
-
     // ✅ Pré-preencher campos
-    document.getElementById('customer-name').value = data.name;
-    document.getElementById('customer-email').value = data.email;
+    document.getElementById('customer-name').value = name;
+    document.getElementById('customer-email').value = email;
     
-    console.log("✅ Dados carregados:", { name: data.name, email: data.email });
+    console.log("✅ Dados carregados:", { pedidoId, name, email });
   }
 
   function showInfo(message) {
@@ -342,11 +334,13 @@
     }
   });
 
-  // ✅ Função para voltar ao chat
-  function voltarChat() {
+  // ✅ Função para voltar ao dashboard
+  function voltarDashboard() {
     if (confirm("Descartar esta compra e voltar?")) {
-      localStorage.removeItem('tuneCraftFormData');
-      window.location.href = "index.html";
+      localStorage.removeItem('tuneCraft_pendingOrderId');
+      localStorage.removeItem('tuneCraft_checkoutEmail');
+      localStorage.removeItem('tuneCraft_checkoutName');
+      window.location.href = "dashboard.html#pendentes-pagamento";
     }
   }
 
@@ -356,6 +350,7 @@
 
     const name = document.getElementById('customer-name').value.trim();
     const email = document.getElementById('customer-email').value.trim();
+    const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
 
     if (!name || !email) {
       alert("Preencha nome e email!");
@@ -366,15 +361,9 @@
     document.getElementById('pay-button').disabled = true;
 
     try {
-      // ✅ 1. Obter dados completos do chat do localStorage
-      const tuneCraftData = JSON.parse(localStorage.getItem('tuneCraftFormData'));
-
-      console.log("📝 Dados do formulário completo:", tuneCraftData);
-
-      // ✅ 2. Criar Payment Intent na Edge Function do Supabase
+      // ✅ 1. Criar Payment Intent na Edge Function do Supabase
       console.log("📤 Chamando Edge Function: create-payment-intent");
       
-      // ✅ NÃO enviar formData (muito grande para Stripe metadata)
       const piResponse = await fetch(`${SUPABASE_URL}/functions/v1/create-payment-intent`, {
         method: 'POST',
         headers: { 
@@ -385,9 +374,8 @@
           amount: 3990, // R$ 39,90 em centavos
           currency: 'brl',
           customerName: name,
-          customerEmail: email
-          // ❌ Não enviar formData (Stripe metadata tem limite de 500 chars)
-          // Os dados já estão no localStorage e serão salvos no webhook
+          customerEmail: email,
+          orderId: pedidoId  // ← Enviar o ID do pedido para rastrear no webhook
         })
       });
 
@@ -405,7 +393,7 @@
 
       console.log("✅ Payment Intent criado:", piData.clientSecret);
 
-      // ✅ 3. Confirmar pagamento com Stripe usando confirmCardPayment
+      // ✅ 2. Confirmar pagamento com Stripe usando confirmCardPayment
       console.log("💳 Confirmando pagamento com Stripe...");
       
       const result = await stripe.confirmCardPayment(piData.clientSecret, {
@@ -430,17 +418,19 @@
         throw new Error(`Pagamento ${result.paymentIntent.status}`);
       }
 
-      // ✅ 4. Pagamento aprovado!
+      // ✅ 3. Pagamento aprovado!
       console.log("✅ Pagamento aprovado!", result.paymentIntent);
 
       showToast("✅ Pagamento aprovado! Redirecionando para o painel...", "success");
 
-      // ✅ 5. Limpar localStorage
-      localStorage.removeItem('tuneCraftFormData');
+      // ✅ 4. Limpar localStorage
+      localStorage.removeItem('tuneCraft_pendingOrderId');
+      localStorage.removeItem('tuneCraft_checkoutEmail');
+      localStorage.removeItem('tuneCraft_checkoutName');
 
-      // ✅ 6. Redirecionar para dashboard após 2s
+      // ✅ 5. Redirecionar para dashboard após 2s (para aba Aguardando Aprovação)
       setTimeout(() => {
-        window.location.href = "dashboard.html";
+        window.location.href = "dashboard.html#aguardando-aprovacao";
       }, 2000);
 
     } catch (error) {
