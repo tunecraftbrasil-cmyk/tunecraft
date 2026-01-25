@@ -19,7 +19,7 @@ function scrollToBottom() {
 const elaboratedChatFlow = [
     {
         step: 1, section: "DESTINATÁRIO",
-        question: "Quem é a pessoa especial para quem você quer criar uma música? 👤",
+        question: "Quem é a pessoa especial para quem você quer criar uma música?? 👤",
         type: "select",
         options: [
             { label: "Namorada/Namorado 💕", value: "romantic" },
