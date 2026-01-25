@@ -225,7 +225,7 @@
     async function loadOrdersFromSupabase() {
       const { data, error } = await sb
         .from("musicas_pedidos")
-        .select("id,title,lyrics,status,created_at")
+        .select("id,title,lyrics,status,created_at,audio_urls")
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -336,17 +336,37 @@
               </div>
             `;
           } else if (order.status === "completed") {
-            hasReceived = true;
-            receivedContainer.innerHTML += `
-              <div class="card">
-                <div class="card-header">
-                  <h3>${title}</h3>
-                  <span class="status-badge status-completed">Pronta</span>
-                </div>
-                <p>Sua música foi finalizada. (Quando você tiver o link do áudio, podemos colocar aqui.)</p>
-              </div>
-            `;
-          }
+  hasReceived = true;
+
+  const urls = Array.isArray(order.audio_urls) ? order.audio_urls : [];
+
+  receivedContainer.innerHTML += `
+    <div class="card">
+      <div class="card-header">
+        <h3>${title}</h3>
+        <span class="status-badge status-completed">Pronta</span>
+      </div>
+
+      ${
+        urls.length >= 2
+          ? `
+            <strong>🎧 Versão A</strong>
+            <audio controls src="${urls[0]}"></audio>
+
+            <strong>🎧 Versão B</strong>
+            <audio controls src="${urls[1]}"></audio>
+
+            <div class="action-row" style="margin-top:10px">
+              <a class="btn btn-download" href="${urls[0]}" download>⬇️ Baixar A</a>
+              <a class="btn btn-download" href="${urls[1]}" download>⬇️ Baixar B</a>
+            </div>
+          `
+          : `<p>Sua música foi finalizada e está sendo preparada para audição.</p>`
+      }
+    </div>
+  `;
+}
+
         });
       }
 
@@ -386,15 +406,30 @@
       if (!session) return;
 
       const { error } = await sb
-        .from("musicas_pedidos")
-        .update({ status: "production" })
-        .eq("id", id);
+  .from("musicas_pedidos")
+  .update({ status: "production" })
+  .eq("id", id);
 
-      if (error) {
-        console.error("Erro ao aprovar no banco:", error);
-        alert("Não consegui aprovar no banco. Veja o console.");
-        return;
-      }
+if (error) {
+  console.error("Erro ao aprovar no banco:", error);
+  alert("Não consegui aprovar no banco. Veja o console.");
+  return;
+}
+
+/* 🔹 PATCH: dispara geração de áudio */
+try {
+  await fetch(`${SUPABASE_URL}/functions/v1/generate-audio`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + session.access_token
+    },
+    body: JSON.stringify({ pedido_id: id })
+  });
+} catch (err) {
+  console.error("Erro ao chamar generate-audio:", err);
+}
+
 
       const order = userData.orders.find(o => o.id === id);
       if (order) order.status = "production";
