@@ -1,5 +1,6 @@
 // ============================================
-// LÓGICA DO CHAT (chat.js) - VERSÃO INTELIGENTE
+// LÓGICA DO CHAT (chat-stripe.js) 
+// VERSÃO COMPLETA COM STRIPE + CHECKOUT
 // ============================================
 
 // Função para rolar o chat para o final
@@ -223,7 +224,10 @@ let currentStep = 0;
 let formData = {};
 let currentQuestion = null;
 
-// Funções de Controle
+// ============================================
+// CONTROLE DO CHAT
+// ============================================
+
 function openChat() {
     document.getElementById("chatModal").classList.add("active");
     initChat();
@@ -255,7 +259,7 @@ function renderQuestion() {
     });
 
     if (currentStep >= validSteps.length) {
-        renderRegistrationForm(inputContainer);
+        renderCheckoutForm(inputContainer);
         scrollToBottom();
         return;
     }
@@ -372,234 +376,65 @@ function prevStep() {
 }
 
 // ============================================
-// LOGICA DE CADASTRO / PAGAMENTO / ATUALIZAÇÃO
+// CHECKOUT COM STRIPE ✅ COMPLETO
 // ============================================
 
-function renderRegistrationForm(container) {
+function renderCheckoutForm(container) {
     const pf = document.getElementById("progressFill");
     if (pf) pf.style.width = "100%";
 
-    const existingUser = JSON.parse(localStorage.getItem("tuneCraftUser"));
+    addMessage("bot", "🎵 Perfeito! Sua música está pronta para ser criada. Clique abaixo para ir ao pagamento seguro.");
 
-    if (existingUser && existingUser.email) {
-        addMessage("bot", `Olá, ${existingUser.name.split(' ')[0]}! Tudo pronto para criar sua nova música. Clique abaixo para confirmar o pagamento.`);
-        container.innerHTML = `
-            <div class="input-label">PAGAMENTO RÁPIDO</div>
-            <p style="margin-bottom:10px; font-size:0.9rem; color:#64748b;">Cartão final 4242 (Salvo)</p>
-            <button class="btn-chat-action" onclick="submitRegistration(true)">Pagar e Criar (R$ 49,90)</button>
-        `;
-    } else {
-        addMessage("bot", "Incrível! Tenho tudo para criar sua música. Para finalizar e acessar o pagamento (Plano Único), preencha seus dados abaixo:");
-        container.innerHTML = `
-            <div class="input-label">CADASTRO RÁPIDO</div>
-            <div class="reg-form-group"><label class="reg-label">Nome Completo</label><input type="text" class="reg-input" id="regName" placeholder="Seu nome completo"></div>
-            <div class="reg-form-group"><label class="reg-label">CPF</label><input type="text" class="reg-input" id="regCpf" placeholder="000.000.000-00"></div>
-            <div class="reg-form-group"><label class="reg-label">Email</label><input type="email" class="reg-input" id="regEmail" placeholder="seu@email.com"></div>
-            <div class="reg-form-group"><label class="reg-label">Senha</label><input type="password" class="reg-input" id="regPass"></div>
-            <div class="reg-form-group"><label class="reg-label">Confirmar Senha</label><input type="password" class="reg-input" id="regConfirmPass"></div>
-            <button class="btn-chat-action" onclick="submitRegistration(false)">Finalizar e Pagar</button>
-        `;
-    }
+    // Mostra formulário para coletar nome e email
+    container.innerHTML = `
+        <div class="input-label">DADOS PARA O PAGAMENTO</div>
+        <div class="reg-form-group">
+            <label class="reg-label">👤 Nome Completo</label>
+            <input type="text" class="reg-input" id="checkoutName" placeholder="Seu nome completo">
+        </div>
+        <div class="reg-form-group">
+            <label class="reg-label">📧 Email</label>
+            <input type="email" class="reg-input" id="checkoutEmail" placeholder="seu@email.com">
+        </div>
+        <button class="btn-chat-action" onclick="irParaPagamento()" style="background: linear-gradient(135deg, #00d9ff, #6366f1); border:none; color:white; font-weight:700;">
+            💳 Ir para Pagamento (R$ 39,90)
+        </button>
+        <button class="btn-chat-action" onclick="closeChat()" style="margin-top:10px; background:#f3f4f6; color:#64748b; border:none;">
+            ← Voltar
+        </button>
+    `;
+
     scrollToBottom();
 }
 
-function submitRegistration(isLogged) {
-    let name, email;
-    let user_id = null;
+// ============================================
+// FUNÇÃO PRINCIPAL: IR PARA PAGAMENTO ✅
+// ============================================
 
-    if (!isLogged) {
-        name = document.getElementById('regName').value;
-        const cpf = document.getElementById('regCpf').value;
-        email = document.getElementById('regEmail').value;
-        const pass = document.getElementById('regPass').value;
-        const confirm = document.getElementById('regConfirmPass').value;
+function irParaPagamento() {
+    const name = document.getElementById('checkoutName').value.trim();
+    const email = document.getElementById('checkoutEmail').value.trim();
 
-        if (!name || !cpf || !email || !pass) return alert("Por favor, preencha todos os campos.");
-        if (pass !== confirm) return alert("As senhas não coincidem.");
-    } else {
-        const existing = JSON.parse(localStorage.getItem("tuneCraftUser"));
-        name = existing?.name;
-        email = existing?.email;
-        user_id = existing?.user_id || null;
+    if (!name || !email) {
+        alert("Por favor, preencha seu nome e email!");
+        return;
     }
 
-    // ===== CREDENCIAIS =====
-    const SUPABASE_URL = 'https://miupzfchvfbqbznfhvix.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pdXB6ZmNodmZicWJ6bmZodml4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxOTYwNzksImV4cCI6MjA4NDc3MjA3OX0.rz0W9qVovRvAeyBQ55LRewOAOM5a8pNJs1-UwWttATw';
-
-    // ===== DEBUG =====
-    console.log("[TuneCraft] URL:", SUPABASE_URL);
-    console.log("[TuneCraft] ANON prefix:", (SUPABASE_ANON_KEY || "").slice(0, 16));
-    console.log("[TuneCraft] ANON length:", (SUPABASE_ANON_KEY || "").length);
-
-    const inputSectionEl = document.getElementById('inputSection');
-    if (inputSectionEl) {
-        inputSectionEl.innerHTML = `
-            <div class="api-mock-screen" style="margin-top: 10px;">
-                <div class="spinner"></div>
-                <h3>Criando sua obra-prima...</h3>
-                <p style="font-size: 0.9rem; margin-top: 10px; color: #64748b;">A IA está compondo a letra e o arranjo.</p>
-                <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 20px;">Isso pode levar alguns segundos.</p>
-            </div>
-        `;
+    if (!email.includes('@')) {
+        alert("Email inválido!");
+        return;
     }
 
-    setTimeout(async () => {
-        try {
-            // =========================================================
-            // 0) GARANTE SUPABASE AUTH (isso é o que você removeu sem querer)
-            // =========================================================
-            if (!window.supabase) {
-                throw new Error("supabase-js não carregado. Verifique se o script do supabase está no HTML antes do chat.js.");
-            }
+    console.log("✅ Salvando dados do chat...", { name, email, formData });
 
-            // Reaproveita client se já existir
-            window.sb = window.sb || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // ✅ Salvar dados DO CHAT no localStorage
+    localStorage.setItem('tuneCraftFormData', JSON.stringify({
+        name: name,
+        email: email,
+        formData: formData,
+        timestamp: new Date().toISOString()
+    }));
 
-            // Pega sessão REAL do usuário (token válido para auth.uid())
-            const { data: sessionData, error: sessionErr } = await window.sb.auth.getSession();
-            if (sessionErr) console.warn("[TuneCraft] getSession error:", sessionErr);
-
-            const session = sessionData?.session;
-
-            // Se não existe sessão, não tem como passar na RLS -> redireciona login
-            if (!session?.access_token || !session?.user?.id) {
-                alert("Você precisa estar logado para criar a música. Faça login e tente novamente.");
-                window.location.href = "login.html";
-                return;
-            }
-
-            // força user_id correto (RLS exige auth.uid() = user_id)
-            user_id = session.user.id;
-            email = session.user.email || email;
-
-            console.log("[TuneCraft] session user:", user_id);
-            console.log("[TuneCraft] token prefix:", session.access_token.slice(0, 16));
-            console.log("[TuneCraft] token length:", session.access_token.length);
-
-            // =========================================================
-            // 1) HEADERS CORRETOS (Bearer = ACCESS TOKEN do usuário)
-            // =========================================================
-            function sbHeaders({ prefer = true } = {}) {
-                const anon = (SUPABASE_ANON_KEY || "").trim();
-                const token = (session.access_token || "").trim();
-                const h = {
-                    apikey: anon,
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                };
-                if (prefer) h.Prefer = "return=representation";
-                return h;
-            }
-
-            // ===== 2) HEALTH CHECK (opcional) =====
-            const health = await fetch(`${SUPABASE_URL}/rest/v1/`, {
-                method: "GET",
-                headers: {
-                    apikey: (SUPABASE_ANON_KEY || "").trim(),
-                    Authorization: `Bearer ${(session.access_token || "").trim()}`
-                }
-            });
-            console.log("[TuneCraft] REST health status:", health.status);
-
-            // =========================================================
-            // 3) INSERT (AGORA PASSA NO RLS)
-            // =========================================================
-            const responseWithId = await fetch(`${SUPABASE_URL}/rest/v1/musicas_pedidos`, {
-                method: 'POST',
-                headers: sbHeaders({ prefer: true }),
-                body: JSON.stringify({
-                    user_id: user_id,        // ✅ obrigatório
-                    user_email: email,
-                    user_name: name,
-                    payload: formData,
-                    status: 'pending_approval'
-                })
-            });
-
-            if (!responseWithId.ok) {
-                const errText = await responseWithId.text();
-                console.error("[TuneCraft] POST /musicas_pedidos status:", responseWithId.status);
-                console.error("[TuneCraft] POST /musicas_pedidos body:", errText);
-                throw new Error(`Erro ao salvar pedido inicial (${responseWithId.status}): ${errText}`);
-            }
-
-            const data = await responseWithId.json();
-            const pedidoId = data?.[0]?.id;
-            if (!pedidoId) throw new Error('Pedido criado, mas não retornou ID. Verifique o schema/colunas.');
-            console.log('✅ Pedido iniciado. ID:', pedidoId);
-
-            // =========================================================
-            // 4) CHAMADA À EDGE FUNCTION (com token do usuário)
-            // =========================================================
-            const functionResponse = await fetch(`${SUPABASE_URL}/functions/v1/generate-lyrics`, {
-                method: "POST",
-                headers: sbHeaders({ prefer: false }),
-                body: JSON.stringify({ pedidoId })
-            });
-
-            if (!functionResponse.ok) {
-                const errText = await functionResponse.text();
-                console.error("[TuneCraft] POST /functions/v1/generate-lyrics status:", functionResponse.status);
-                console.error("[TuneCraft] POST /functions/v1/generate-lyrics body:", errText);
-                throw new Error(`Erro ao chamar generate-lyrics (${functionResponse.status}): ${errText}`);
-            }
-
-            const functionData = await functionResponse.json();
-
-            const content = {
-                title: functionData.title,
-                lyrics: functionData.customer_lyrics,
-                suno_style_prompt: functionData.suno_payload?.style || ""
-            };
-
-            // =========================================================
-            // 5) SALVA NO LOCALSTORAGE (agora com user_id real)
-            // =========================================================
-            let userData = JSON.parse(localStorage.getItem("tuneCraftUser")) || {
-                name: name,
-                email: email,
-                user_id: user_id,
-                orders: []
-            };
-
-            if (!Array.isArray(userData.orders)) userData.orders = [];
-
-            // garante persistência do user_id (isso é crucial)
-            userData.name = name || userData.name;
-            userData.email = email || userData.email;
-            userData.user_id = user_id;
-
-            userData.orders.push({
-                id: Date.now(),
-                supabase_id: pedidoId,
-                status: 'pending_approval',
-                title: content.title,
-                payload: formData,
-                lyrics: content.lyrics,
-                suno_prompt: content.suno_style_prompt
-            });
-
-            localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
-
-            console.log('✅ Tudo pronto! Redirecionando...');
-            window.location.href = "dashboard.html";
-
-        } catch (error) {
-            console.error('Erro fatal:', error);
-            alert('Ocorreu um erro ao processar. Veja o console para detalhes.');
-            const inputEl = document.getElementById('inputSection');
-            if (inputEl) {
-                renderRegistrationForm(inputEl);
-            }
-        }
-    }, 100);
-}
-
-
-
-function generateMockLyrics(data, userName) {
-    const homenageado = data.step2 || "Amor";
-    const estilo = data.step8 || "Pop";
-    return `(Estilo: ${estilo})\n\n[Verso 1]\nHoje o sol nasceu pensando em você\n${homenageado}, a razão do meu viver\nCada história, cada momento bom\nTransformo agora em som\n\n[Refrão]\nÉ por isso que eu canto assim\nVocê é parte de mim\nNessa melodia sem fim\nO amor floresce como um jardim\n\n[Ponte]\nLembro de tudo que passamos\nE de tudo que ainda sonhamos...\n\n[Final]\nPara sempre, ${homenageado}.`;
+    // ✅ Redirecionar para checkout.html
+    window.location.href = 'checkout.html';
 }
