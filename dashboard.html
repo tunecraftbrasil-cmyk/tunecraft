@@ -489,6 +489,7 @@
           'https://miupzfchvfbqbznfhvix.supabase.co/functions/v1/generate-audio',
           {
             method: 'POST',
+            mode: 'cors',  // ✅ ADICIONE ESTA LINHA!
             headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${currentSession.access_token}`,  // ✅ TOKEN AQUI!
@@ -565,3 +566,4 @@
   </script>
 </body>
 </html>
+
