@@ -867,61 +867,55 @@ ${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
       }
     }
 
-    // ✅ Função para escolher entre versão original e modificada
-    async function escolherVersao(orderId, tipoVersao) {
-      if (!confirm(`Confirma a escolha da versão ${tipoVersao}? A produção iniciará em seguida.`)) {
-        return;
-      }
+   // ✅ Função para escolher entre versão original e modificada (usa invoke para enviar token automaticamente)
+async function escolherVersao(orderId, tipoVersao) {
+  if (!confirm(`Confirma a escolha da versão ${tipoVersao}? A produção iniciará em seguida.`)) {
+    return;
+  }
 
-      showToast("⏳ Salvando escolha...", "info");
+  showToast("⏳ Salvando escolha...", "info");
 
-      try {
-        const { data: sessionData } = await sb.auth.getSession();
-        const token = sessionData?.session?.access_token;
-
-        if (!token) {
-          throw new Error("Sessão expirada. Faça login novamente.");
-        }
-
-        console.log("📤 Enviando para aprovar-versao:", {
-          pedidoId: orderId,
-          versaoEscolhida: tipoVersao
-        });
-
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/aprovar-versao`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            pedidoId: orderId,           // ✅ Enviando como pedidoId
-            versaoEscolhida: tipoVersao  // ✅ "original" ou "modificada"
-          })
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-          throw new Error(result.error || 'Erro ao aprovar versão');
-        }
-
-        console.log("✅ Versão aprovada:", result);
-        showToast(`✅ ${result.mensagem || 'Versão aprovada!'}`, "");
-
-        // Recarregar dados
-        userData.orders = await loadOrdersFromSupabase();
-        localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
-        renderSections();
-
-        // Redirecionar para a aba "Em Produção"
-        showSection("approved", document.querySelectorAll(".menu-item")[1]);
-
-      } catch (error) {
-        console.error("❌ Erro ao escolher versão:", error);
-        showToast(`❌ Erro: ${error.message}`, "error");
-      }
+  try {
+    // ✅ Garantia extra: valida parâmetros antes de chamar
+    if (!orderId || !tipoVersao) {
+      throw new Error(`Parâmetros inválidos: orderId=${orderId} tipoVersao=${tipoVersao}`);
     }
+
+    console.log("📤 Enviando para aprovar-versao (invoke):", {
+      pedidoId: orderId,
+      versaoEscolhida: tipoVersao
+    });
+
+    // ✅ Aqui o Supabase injeta o Authorization automaticamente (token da sessão)
+    const { data, error } = await sb.functions.invoke("aprovar-versao", {
+      body: {
+        pedidoId: orderId,
+        versaoEscolhida: tipoVersao
+      }
+    });
+
+    if (error) {
+      // error pode vir como FunctionsHttpError, etc.
+      throw new Error(error.message || "Erro ao aprovar versão");
+    }
+
+    console.log("✅ Versão aprovada:", data);
+    showToast(`✅ ${data?.mensagem || "Versão aprovada!"}`, "");
+
+    // Recarregar dados
+    userData.orders = await loadOrdersFromSupabase();
+    localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
+    renderSections();
+
+    // Redirecionar para a aba "Em Produção"
+    showSection("approved", document.querySelectorAll(".menu-item")[1]);
+
+  } catch (error) {
+    console.error("❌ Erro ao escolher versão:", error);
+    showToast(`❌ Erro: ${error.message}`, "error");
+  }
+}
+
 
     function saveProfile() {
       const newName = document.getElementById("profName").value;
@@ -951,3 +945,4 @@ ${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
   </script>
 </body>
 </html>
+
