@@ -66,13 +66,13 @@
     .status-production { background: #eff6ff; color: #1d4ed8; }
     .status-completed { background: #f0fdf4; color: #15803d; }
     .status-awaiting { background: #fef3c7; color: #92400e; }
-    .status-payment-pending { background: #fef3c7; color: #92400e; }
 
     .lyrics-box {
       font-family: 'Courier New', monospace; background: #f8fafc; padding: 20px;
       border-radius: 8px; border: 1px solid #cbd5e1; white-space: pre-wrap; margin: 15px 0; max-height: 300px; overflow-y: auto;
     }
 
+    /* ✅ COMPARAÇÃO LADO A LADO */
     .comparison-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -118,9 +118,8 @@
     .btn-revise:disabled { background: #f3f4f6; color: #9ca3af; border-color: #d1d5db; cursor: not-allowed; }
     .btn-download { background: #0f172a; color: white; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; padding: 10px 14px; border-radius: 6px; }
     .btn-select { background: #00d9ff; color: white; width: 100%; margin-top: 10px; }
-    .btn-pay-now { background: linear-gradient(135deg, #00d9ff, #6366f1); color: white; flex: 1; }
-    .btn-pay-now:hover { opacity: 0.9; }
 
+    /* PROFILE SECTION STYLES */
     .profile-form label { display: block; margin-top: 15px; font-weight: 600; font-size: 0.9rem; }
     .profile-form input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; margin-top: 5px; max-width: 400px; }
     .btn-save-profile { margin-top: 20px; background: #00d9ff; color: white; border:none; padding: 10px 25px; border-radius: 6px; cursor: pointer; font-weight: bold; }
@@ -155,6 +154,7 @@
       to { transform: translateX(0); }
     }
 
+    /* ✅ MODAL DE ALTERAÇÃO */
     .alterar-modal {
       display: none;
       position: fixed;
@@ -261,45 +261,6 @@
       cursor: not-allowed;
     }
 
-    .payment-pending-card {
-      background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%);
-      border: 2px solid #f59e0b;
-      position: relative;
-    }
-
-    .payment-pending-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #f59e0b, #fbbf24);
-      border-radius: 10px 10px 0 0;
-    }
-
-    .payment-details {
-      background: #fffbeb;
-      padding: 12px;
-      border-radius: 6px;
-      margin: 12px 0;
-      font-size: 0.9rem;
-      border-left: 3px solid #f59e0b;
-    }
-
-    .payment-details p {
-      margin: 5px 0;
-      color: #92400e;
-    }
-
-    .payment-price {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: #f59e0b;
-      text-align: center;
-      margin: 15px 0;
-    }
-
     @media (max-width: 768px) {
       body { flex-direction: column; height: auto; }
       .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 10px; align-items: center; justify-content: space-between; }
@@ -312,6 +273,7 @@
 </head>
 <body>
 
+  <!-- Chat Modal (criar nova música) -->
   <div class="chat-modal" id="chatModal">
     <div class="chat-container">
       <div class="chat-header">
@@ -326,6 +288,7 @@
     </div>
   </div>
 
+  <!-- ✅ Modal de Alteração de Letra -->
   <div class="alterar-modal" id="alterarModal">
     <div class="alterar-content">
       <div class="alterar-header">
@@ -340,7 +303,7 @@
         </p>
         <textarea 
           id="mudancasDesejadas" 
-          placeholder="Ex: Gostaria que o refrão fosse mais energético..."
+          placeholder="Ex: Gostaria que o refrão fosse mais energético e mencionasse nossa viagem para o Rio..."
           maxlength="500"
           oninput="updateAlterarCharCount('mudancasDesejadas', 'count1')"
         ></textarea>
@@ -351,7 +314,7 @@
         <h3>Há algo específico que DEVE permanecer? 🔒</h3>
         <textarea 
           id="manterElementos" 
-          placeholder="Ex: Mantenha as referências a Dourados..."
+          placeholder="Ex: Mantenha as referências a Dourados e o nome 'Aline'..."
           maxlength="300"
           oninput="updateAlterarCharCount('manterElementos', 'count2')"
         ></textarea>
@@ -359,10 +322,10 @@
       </div>
 
       <div class="alterar-step">
-        <h3>Observações finais? 🎨 (Opcional)</h3>
+        <h3>Observações finais sobre o tom ou estilo? 🎨 (Opcional)</h3>
         <textarea 
           id="observacoesFinais" 
-          placeholder="Ex: Quero que seja mais emocionante..."
+          placeholder="Ex: Quero que seja mais emocionante, menos melancólica..."
           maxlength="200"
           oninput="updateAlterarCharCount('observacoesFinais', 'count3')"
         ></textarea>
@@ -384,9 +347,6 @@
     </div>
 
     <nav style="flex: 1;">
-      <div class="menu-item" onclick="showSection('pending-payment', this)">
-        ⏳ <span>Pendentes Pagamento</span>
-      </div>
       <div class="menu-item active" onclick="showSection('pending', this)">
         📝 <span>Aprovar Letra</span>
       </div>
@@ -414,12 +374,6 @@
         <div class="avatar">U</div>
         <button onclick="logout()" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:0.9rem; margin-left:10px;">Sair</button>
       </div>
-    </div>
-
-    <div id="pending-payment" class="section">
-      <h2>⏳ Músicas Aguardando Pagamento</h2>
-      <p style="color:#64748b; margin-bottom: 20px;">Finalize o pagamento para começar a produção.</p>
-      <div id="pending-payment-list"></div>
     </div>
 
     <div id="pending" class="section active"></div>
@@ -453,9 +407,10 @@
     </div>
   </main>
 
+  <!-- Toast de notificações -->
   <div class="toast-message" id="toastMessage"></div>
 
-  <script src="chat.js"></script>
+  <script src="chat.js?v=2026-01-25T17:24"></script>
 
   <script>
     const SUPABASE_URL = "https://miupzfchvfbqbznfhvix.supabase.co";
@@ -470,7 +425,10 @@
       toast.innerText = message;
       toast.className = `toast-message ${type}`;
       toast.style.display = 'block';
-      setTimeout(() => { toast.style.display = 'none'; }, 4000);
+      
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 4000);
     }
 
     function normalizeStatus(s) {
@@ -479,7 +437,6 @@
       if (v === "aguardandoaprovacao" || v === "aguardando_aprovacao") return "aguardando_aprovacao";
       if (v === "production" || v === "inproduction" || v === "generatingaudio" || v === "generating_audio") return "production";
       if (v === "completed" || v === "done" || v === "received") return "completed";
-      if (v === "pending" || v === "payment_pending") return "payment_pending";
       return v || "pending_approval";
     }
 
@@ -495,6 +452,7 @@
     async function getSessionOrRedirect() {
       const { data, error } = await sb.auth.getSession();
       if (error) console.warn("getSession error:", error);
+
       const session = data?.session;
       if (!session?.access_token || !session?.user?.id) {
         window.location.href = "login.html";
@@ -506,21 +464,22 @@
     async function loadOrdersFromSupabase() {
       const { data, error } = await sb
         .from("musicas_pedidos")
-        .select("id,title,lyrics,status,created_at,audio_urls,versao_original,versao_modificada,versao_aprovada,alteracao_usada,versao_aprovada_tipo,alteracao_solicitada,payment_status,user_name,user_email,payload")
+        .select("id,title,lyrics,status,created_at,audio_urls,versao_original,versao_modificada,versao_aprovada,alteracao_usada,versao_aprovada_tipo,alteracao_solicitada")
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error("Erro ao carregar pedidos:", error);
+        console.error("Erro sb.from(musicas_pedidos):", error);
         return [];
       }
 
       return (data || []).map(r => {
         let audioUrls = r.audio_urls;
+
         if (Array.isArray(audioUrls) && audioUrls.length > 0 && typeof audioUrls[0] === 'string') {
           try {
             audioUrls = audioUrls.map(url => JSON.parse(url));
           } catch (e) {
-            console.error("Erro ao fazer parse de audio_urls:", e);
+            console.error("❌ Erro ao fazer parse de audio_urls:", e);
             audioUrls = [];
           }
         }
@@ -530,7 +489,6 @@
           title: r.title || "Sem título",
           lyrics: r.lyrics || "",
           status: normalizeStatus(r.status),
-          payment_status: normalizeStatus(r.payment_status),
           created_at: r.created_at,
           audio_urls: audioUrls,
           versao_original: r.versao_original,
@@ -538,10 +496,7 @@
           versao_aprovada: r.versao_aprovada,
           alteracao_usada: r.alteracao_usada,
           versao_aprovada_tipo: r.versao_aprovada_tipo,
-          alteracao_solicitada: r.alteracao_solicitada,
-          user_name: r.user_name,
-          user_email: r.user_email,
-          payload: r.payload
+          alteracao_solicitada: r.alteracao_solicitada
         };
       });
     }
@@ -578,7 +533,6 @@
       }
 
       const titles = {
-        'pending-payment': "Pendentes Pagamento",
         pending: "Aprovar Letra",
         approved: "Letras Aprovadas",
         received: "Músicas Recebidas",
@@ -590,49 +544,15 @@
       document.getElementById(id).classList.add("active");
     }
 
-    function getOccasionLabel(value) {
-      const map = {
-        proposal: 'Pedido de Casamento 💍',
-        birthday: 'Aniversário 🎂',
-        confession: 'Declaração de Amor 💕',
-        tribute: 'Homenagem especial 🌹',
-        goodbye: 'Despedida/Adeus 👋',
-        celebration: 'Comemoração 🎓',
-        apology: 'Pedido de desculpas 🤝',
-        friendship: 'Comemoração de amizade 👥'
-      };
-      return map[value] || value;
-    }
-
-    function getGenreLabel(value) {
-      const map = {
-        pop: 'Pop moderno',
-        sertanejo: 'Sertanejo',
-        rock: 'Rock',
-        rap: 'Rap/Trap',
-        samba: 'Samba/Pagode',
-        acoustic: 'Acústico/MPB',
-        electronic: 'Eletrônico/House',
-        reggae: 'Reggae',
-        funk: 'Funk/Dance',
-        forro: 'Forró',
-        gospel: 'Gospel/Espiritual'
-      };
-      return map[value] || value;
-    }
-
     function renderSections() {
-      const pendingPaymentContainer = document.getElementById("pending-payment-list");
       const pendingContainer = document.getElementById("pending");
       const approvedContainer = document.getElementById("approved-list");
       const receivedContainer = document.getElementById("received-list");
 
-      pendingPaymentContainer.innerHTML = "";
       pendingContainer.innerHTML = "";
       approvedContainer.innerHTML = "";
       receivedContainer.innerHTML = "";
 
-      let hasPendingPayment = false;
       let hasPending = false;
       let hasApproved = false;
       let hasReceived = false;
@@ -642,33 +562,7 @@
           const title = escapeHtml(order.title);
           const lyrics = escapeHtml(order.lyrics);
 
-          if (order.payment_status === "payment_pending" || order.payment_status === "pending") {
-            hasPendingPayment = true;
-            pendingPaymentContainer.innerHTML += `
-              <div class="card payment-pending-card">
-                <div class="card-header">
-                  <h3>🎵 Música Personalizada</h3>
-                  <span class="status-badge status-payment-pending">⏳ Aguardando Pagamento</span>
-                </div>
-                
-                <div class="payment-details">
-                  <p><strong>Para:</strong> ${escapeHtml(order.payload?.step2 || 'Alguém Especial')}</p>
-                  <p><strong>Ocasião:</strong> ${getOccasionLabel(order.payload?.step6) || 'Não informado'}</p>
-                  <p><strong>Gênero:</strong> ${getGenreLabel(order.payload?.step8) || 'Não informado'}</p>
-                  <p><strong>Energia:</strong> ${escapeHtml(order.payload?.step10 || 'Normal')}</p>
-                </div>
-
-                <div class="payment-price">R$ 39,90</div>
-
-                <div class="action-row">
-                  <button class="btn btn-pay-now" onclick="abrirCheckout('${order.id}', '${escapeHtml(order.user_email)}', '${escapeHtml(order.user_name)}')">
-                    💳 Pagar Agora
-                  </button>
-                </div>
-              </div>
-            `;
-          }
-          else if (order.status === "pending_approval" && !order.versao_modificada) {
+          if (order.status === "pending_approval" && !order.versao_modificada) {
             hasPending = true;
             const podeAlterar = !order.alteracao_usada;
             
@@ -708,7 +602,9 @@
                   <span class="status-badge status-awaiting">Escolha uma Versão</span>
                 </div>
                 
-                <p style="font-size:0.9rem; color:#64748b; margin-bottom: 15px;">Compare as duas versões e escolha sua favorita:</p>
+                <p style="font-size:0.9rem; color:#64748b; margin-bottom: 15px;">
+                  Compare as duas versões e escolha sua favorita:
+                </p>
 
                 ${versaoModificada.changelog ? `
                   <div class="version-changelog">
@@ -792,16 +688,6 @@
         });
       }
 
-      if (!hasPendingPayment) {
-        pendingPaymentContainer.innerHTML = `
-          <div class="empty-state">
-            <span class="empty-icon">✨</span>
-            <h3>Tudo em dia!</h3>
-            <p>Você não tem pagamentos pendentes.</p>
-          </div>
-        `;
-      }
-
       if (!hasPending) {
         pendingContainer.innerHTML = `
           <div class="empty-state">
@@ -814,24 +700,26 @@
       }
 
       if (!hasApproved) {
-        approvedContainer.innerHTML = `<div class="empty-state" style="padding:20px;"><p>Sem músicas em produção.</p></div>`;
+        approvedContainer.innerHTML = `
+          <div class="empty-state" style="padding:20px;">
+            <p>Sem músicas em produção no momento.</p>
+          </div>
+        `;
       }
 
       if (!hasReceived) {
-        receivedContainer.innerHTML = `<div class="empty-state" style="padding:20px;"><p>Sem músicas prontas.</p></div>`;
+        receivedContainer.innerHTML = `
+          <div class="empty-state" style="padding:20px;">
+            <p>Sem músicas prontas no momento.</p>
+          </div>
+        `;
       }
-    }
-
-    function abrirCheckout(pedidoId, email, name) {
-      localStorage.setItem('tuneCraft_pendingOrderId', pedidoId);
-      localStorage.setItem('tuneCraft_checkoutEmail', email);
-      localStorage.setItem('tuneCraft_checkoutName', name);
-      window.location.href = 'checkout.html';
     }
 
     function abrirModalAlteracao(pedidoId) {
       currentAlterandoId = pedidoId;
       document.getElementById('alterarModal').classList.add('active');
+      
       document.getElementById('mudancasDesejadas').value = '';
       document.getElementById('manterElementos').value = '';
       document.getElementById('observacoesFinais').value = '';
@@ -862,7 +750,7 @@
       }
 
       if (manter.length < 10) {
-        showToast("Por favor, especifique o que deve ser mantido", "error");
+        showToast("Por favor, especifique o que deve ser mantido (mínimo 10 caracteres)", "error");
         return;
       }
 
@@ -870,26 +758,43 @@
       btn.disabled = true;
       btn.innerText = "Processando...";
 
-      const sugestoes = `MUDANÇAS:\n${mudancas}\n\nMANTER:\n${manter}\n${obs ? `\nOBSERVAÇÕES:\n${obs}` : ''}`;
+      const sugestoes = `
+MUDANÇAS DESEJADAS:
+${mudancas}
+
+ELEMENTOS QUE DEVEM PERMANECER:
+${manter}
+
+${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
+      `.trim();
 
       try {
         const response = await fetch(`${SUPABASE_URL}/functions/v1/alterar-letra`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pedidoId: currentAlterandoId, sugestoes: sugestoes })
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            pedidoId: currentAlterandoId,
+            sugestoes: sugestoes
+          })
         });
 
         const result = await response.json();
-        if (!response.ok) throw new Error(result.error || 'Erro ao processar');
 
-        showToast("✅ Versão modificada criada!", "");
+        if (!response.ok) {
+          throw new Error(result.error || 'Erro ao processar alterações');
+        }
+
+        showToast("✅ Versão modificada criada! Compare as versões.", "");
         fecharAlterarModal();
+
         userData.orders = await loadOrdersFromSupabase();
         localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
         renderSections();
 
       } catch (error) {
-        showToast(`❌ ${error.message}`, "error");
+        showToast(`❌ Erro: ${error.message}`, "error");
         btn.disabled = false;
         btn.innerText = "Enviar Alterações ✨";
       }
@@ -899,11 +804,29 @@
       if (!confirm("Aprovar esta letra e iniciar geração de áudio?")) return;
 
       const btn = document.getElementById(`btn-${id}`);
-      if (btn) { btn.disabled = true; btn.innerText = "Processando..."; }
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = "Processando...";
+      }
 
       try {
-        const { error: updateError } = await sb.from("musicas_pedidos").update({ status: "production" }).eq("id", id);
-        if (updateError) throw new Error("Erro ao atualizar");
+        const { error: updateError } = await sb
+          .from("musicas_pedidos")
+          .update({ 
+            status: "production",
+            versao_aprovada: sb.from("musicas_pedidos").select("versao_original").eq("id", id).single()
+          })
+          .eq("id", id);
+
+        if (updateError) {
+          console.error("❌ Erro ao atualizar:", updateError);
+          showToast("❌ Erro ao atualizar status", "error");
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = "✅ Aprovar e Gerar Áudio";
+          }
+          return;
+        }
 
         showToast("✅ Letra aprovada! Iniciando geração...", "info");
 
@@ -913,65 +836,103 @@
           body: JSON.stringify({ pedido_id: id })
         });
 
-        if (!response.ok) throw new Error("Erro ao gerar áudio");
+        if (!response.ok) {
+          throw new Error(`Erro ao gerar áudio: ${response.status}`);
+        }
 
         const result = await response.json();
-        showToast(`✅ Áudio em geração!`, "");
+        showToast(`✅ Áudio em geração! Task: ${result.task_id}`, "");
+
         userData.orders = await loadOrdersFromSupabase();
         localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
         renderSections();
-        showSection("approved", document.querySelectorAll(".menu-item")[2]);
+        showSection("approved", document.querySelectorAll(".menu-item")[1]);
 
       } catch (error) {
-        showToast(`❌ ${error.message}`, "error");
-        if (btn) { btn.disabled = false; btn.innerText = "✅ Aprovar e Gerar Áudio"; }
+        showToast(`❌ Erro: ${error.message}`, "error");
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = "✅ Aprovar e Gerar Áudio";
+        }
       }
     }
 
-    async function aprovarVersao(pedidoId, tipoVersao) {
-      if (!confirm(`Aprovar versão ${tipoVersao}?`)) return;
+    // ✅ APROVAR VERSÃO (original ou modificada)
+async function aprovarVersao(pedidoId, tipoVersao) {
+  if (!confirm(`Aprovar versão ${tipoVersao} e iniciar geração de áudio?`)) return;
 
-      showToast("⏳ Salvando...", "info");
+  showToast("⏳ Salvando escolha...", "info");
 
-      try {
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/aprovar-versao`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pedidoId: pedidoId, versaoEscolhida: tipoVersao })
-        });
+  try {
+    console.log("📤 Enviando:", { pedidoId, versaoEscolhida: tipoVersao });
 
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || 'Erro');
+    // ✅ Usar fetch DIRETO, sem Supabase SDK
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/aprovar-versao`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // ✅ Remover headers do Supabase que causam CORS
+      },
+      body: JSON.stringify({
+        pedidoId: pedidoId,
+        versaoEscolhida: tipoVersao
+      })
+    });
 
-        showToast("✅ Versão aprovada!", "");
+    const result = await response.json();
 
-        const audioResponse = await fetch(`${SUPABASE_URL}/functions/v1/generate-audio`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pedido_id: pedidoId })
-        });
-
-        if (!audioResponse.ok) throw new Error('Erro ao gerar áudio');
-
-        showToast(`✅ Áudio em geração!`, "");
-        userData.orders = await loadOrdersFromSupabase();
-        localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
-        renderSections();
-        showSection("approved", document.querySelectorAll(".menu-item")[2]);
-
-      } catch (error) {
-        console.error("Erro:", error);
-        showToast(`❌ ${error.message}`, "error");
-      }
+    if (!response.ok) {
+      throw new Error(result.error || 'Erro ao aprovar versão');
     }
+
+    console.log("✅ Versão aprovada:", result);
+    showToast("✅ Versão aprovada! Iniciando áudio...", "");
+
+    // Chamar generate-audio
+    const audioResponse = await fetch(`${SUPABASE_URL}/functions/v1/generate-audio`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        pedido_id: pedidoId
+      })
+    });
+
+    if (!audioResponse.ok) {
+      throw new Error('Erro ao iniciar geração de áudio');
+    }
+
+    const audioResult = await audioResponse.json();
+    console.log("✅ Áudio gerado:", audioResult);
+    showToast(`✅ Áudio em geração! Task: ${audioResult.task_id}`, "");
+
+    // Recarregar dados
+    userData.orders = await loadOrdersFromSupabase();
+    localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
+    renderSections();
+    showSection("approved", document.querySelectorAll(".menu-item")[1]);
+
+  } catch (error) {
+    console.error("❌ Erro completo:", error);
+    showToast(`❌ ${error.message}`, "error");
+  }
+}
+
 
     function saveProfile() {
       const newName = document.getElementById("profName").value;
+      const newPass = document.getElementById("profPass").value;
+
       userData.name = newName;
+      if (newPass) userData.password = newPass;
+
       localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
+
       document.getElementById("userName").innerText = newName.split(" ")[0];
       document.querySelector(".avatar").innerText = newName.charAt(0);
-      showToast("✅ Perfil atualizado!", "");
+
+      showToast("✅ Perfil atualizado com sucesso!", "");
     }
 
     async function logout() {
@@ -980,9 +941,11 @@
       } catch (e) {
         console.error("Erro ao deslogar:", e);
       }
+
       localStorage.removeItem("tuneCraftUser");
       window.location.href = "login.html";
     }
   </script>
 </body>
 </html>
+
