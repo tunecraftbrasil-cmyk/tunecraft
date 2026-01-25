@@ -433,7 +433,7 @@
       }
     }
 
-    async function approveOrder(id) {
+   async function approveOrder(id) {
   if (!confirm("Tem certeza? A produção iniciará imediatamente.")) return;
 
   const session = await getSessionOrRedirect();
@@ -467,38 +467,15 @@
 
     console.log("🎵 Chamando edge function generate-audio...");
     
-    // ✅ IMPORTANTE: Renovar o token ANTES de usar
-    console.log("🔄 Renovando token...");
-    const { data: refreshData, error: refreshError } = await sb.auth.refreshSession();
+    // ✅ REMOVIDO: não precisamos renovar token se não vamos enviar Authorization
     
-    if (refreshError || !refreshData?.session?.access_token) {
-      console.error("❌ Erro ao renovar token:", refreshError);
-      showToast("❌ Sua sessão expirou. Faça login novamente.", "error");
-      window.location.href = "login.html";
-      return;
-    }
-    
-    const currentSession = refreshData.session;
-    console.log("✅ Token renovado:", currentSession.access_token.substring(0, 30) + "...");
-    
-    if (!currentSession?.access_token) {
-      console.error("❌ Token não encontrado");
-      showToast("❌ Erro: Token de autenticação não encontrado", "error");
-      if (btn) {
-        btn.disabled = false;
-        btn.innerText = "Aprovar Letra";
-      }
-      return;
-    }
-
     const response = await fetch(
       'https://miupzfchvfbqbznfhvix.supabase.co/functions/v1/generate-audio',
       {
         method: 'POST',
-        mode: 'cors',
         headers: {
           'Content-Type': 'application/json',
-          
+          // ✅ SEM Authorization header!
         },
         body: JSON.stringify({
           pedido_id: id,
@@ -511,7 +488,7 @@
     if (!response.ok) {
       const errorText = await response.text();
       console.error("❌ Erro da edge function:", response.status, errorText);
-      showToast(`❌ Erro ao gerar áudio (${response.status}): ${errorText}`, "error");
+      showToast(`❌ Erro ao gerar áudio (${response.status})`, "error");
       if (btn) {
         btn.disabled = false;
         btn.innerText = "Aprovar Letra";
@@ -543,6 +520,7 @@
   }
 }
 
+
     function saveProfile() {
       const newName = document.getElementById("profName").value;
       const newPass = document.getElementById("profPass").value;
@@ -571,6 +549,7 @@
   </script>
 </body>
 </html>
+
 
 
 
