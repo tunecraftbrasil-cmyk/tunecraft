@@ -857,53 +857,68 @@ ${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
       }
     }
 
-    // ✅ ÚNICA ALTERAÇÃO: Corrigir o nome dos parâmetros
-    async function aprovarVersao(pedidoId, tipoVersao) {
-      if (!confirm(`Aprovar versão ${tipoVersao} e iniciar geração de áudio?`)) return;
+    // ✅ APROVAR VERSÃO (original ou modificada)
+async function aprovarVersao(pedidoId, tipoVersao) {
+  if (!confirm(`Aprovar versão ${tipoVersao} e iniciar geração de áudio?`)) return;
 
-      showToast("⏳ Salvando escolha...", "info");
+  showToast("⏳ Salvando escolha...", "info");
 
-      try {
-        console.log("📤 Enviando:", { pedidoId, versaoEscolhida: tipoVersao });
+  try {
+    console.log("📤 Enviando:", { pedidoId, versaoEscolhida: tipoVersao });
 
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/aprovar-versao`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            pedidoId: pedidoId,           // ✅ Corrigido
-            versaoEscolhida: tipoVersao   // ✅ Corrigido
-          })
-        });
+    // ✅ Usar fetch DIRETO, sem Supabase SDK
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/aprovar-versao`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // ✅ Remover headers do Supabase que causam CORS
+      },
+      body: JSON.stringify({
+        pedidoId: pedidoId,
+        versaoEscolhida: tipoVersao
+      })
+    });
 
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.error || 'Erro ao aprovar versão');
-        }
+    const result = await response.json();
 
-        showToast("✅ Versão aprovada! Iniciando áudio...", "");
-
-        const audioResponse = await fetch(`${SUPABASE_URL}/functions/v1/generate-audio`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pedido_id: pedidoId })
-        });
-
-        if (!audioResponse.ok) {
-          throw new Error('Erro ao iniciar geração de áudio');
-        }
-
-        const audioResult = await audioResponse.json();
-        showToast(`✅ Áudio em geração! Task: ${audioResult.task_id}`, "");
-
-        userData.orders = await loadOrdersFromSupabase();
-        localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
-        renderSections();
-        showSection("approved", document.querySelectorAll(".menu-item")[1]);
-
-      } catch (error) {
-        showToast(`❌ ${error.message}`, "error");
-      }
+    if (!response.ok) {
+      throw new Error(result.error || 'Erro ao aprovar versão');
     }
+
+    console.log("✅ Versão aprovada:", result);
+    showToast("✅ Versão aprovada! Iniciando áudio...", "");
+
+    // Chamar generate-audio
+    const audioResponse = await fetch(`${SUPABASE_URL}/functions/v1/generate-audio`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        pedido_id: pedidoId
+      })
+    });
+
+    if (!audioResponse.ok) {
+      throw new Error('Erro ao iniciar geração de áudio');
+    }
+
+    const audioResult = await audioResponse.json();
+    console.log("✅ Áudio gerado:", audioResult);
+    showToast(`✅ Áudio em geração! Task: ${audioResult.task_id}`, "");
+
+    // Recarregar dados
+    userData.orders = await loadOrdersFromSupabase();
+    localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
+    renderSections();
+    showSection("approved", document.querySelectorAll(".menu-item")[1]);
+
+  } catch (error) {
+    console.error("❌ Erro completo:", error);
+    showToast(`❌ ${error.message}`, "error");
+  }
+}
+
 
     function saveProfile() {
       const newName = document.getElementById("profName").value;
@@ -933,3 +948,4 @@ ${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
   </script>
 </body>
 </html>
+
