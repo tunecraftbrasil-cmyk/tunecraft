@@ -446,7 +446,7 @@
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+        .replaceAll("'", "'");
     }
 
     async function getSessionOrRedirect() {
@@ -621,7 +621,7 @@
                     <div class="lyrics-box" style="max-height: 250px;">
                       ${escapeHtml(versaoOriginal.customer_lyrics || versaoOriginal.lyrics)}
                     </div>
-                    <button class="btn btn-select" onclick="aprovarVersao('${order.id}', 'original')">
+                    <button class="btn btn-select" onclick="escolherVersao('${order.id}', 'original')">
                       ✅ Escolher Esta
                     </button>
                   </div>
@@ -631,7 +631,7 @@
                     <div class="lyrics-box" style="max-height: 250px;">
                       ${escapeHtml(versaoModificada.customer_lyrics)}
                     </div>
-                    <button class="btn btn-select" onclick="aprovarVersao('${order.id}', 'modificada')">
+                    <button class="btn btn-select" onclick="escolherVersao('${order.id}', 'modificada')">
                       ✅ Escolher Esta
                     </button>
                   </div>
@@ -867,51 +867,59 @@ ${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
       }
     }
 
-    // ✅ APROVAR VERSÃO (original ou modificada)
-    async function aprovarVersao(pedidoId, tipoVersao) {
-      if (!confirm(`Aprovar versão ${tipoVersao} e iniciar geração de áudio?`)) return;
+    // ✅ Função para escolher entre versão original e modificada
+    async function escolherVersao(orderId, tipoVersao) {
+      if (!confirm(`Confirma a escolha da versão ${tipoVersao}? A produção iniciará em seguida.`)) {
+        return;
+      }
 
       showToast("⏳ Salvando escolha...", "info");
 
       try {
-        // Chamar edge function aprovar-versao
+        const { data: sessionData } = await sb.auth.getSession();
+        const token = sessionData?.session?.access_token;
+
+        if (!token) {
+          throw new Error("Sessão expirada. Faça login novamente.");
+        }
+
+        console.log("📤 Enviando para aprovar-versao:", {
+          pedidoId: orderId,
+          versaoEscolhida: tipoVersao
+        });
+
         const response = await fetch(`${SUPABASE_URL}/functions/v1/aprovar-versao`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
           body: JSON.stringify({
-            pedido_id: pedidoId,
-            versao_escolhida: tipoVersao
+            pedidoId: orderId,           // ✅ Enviando como pedidoId
+            versaoEscolhida: tipoVersao  // ✅ "original" ou "modificada"
           })
         });
 
+        const result = await response.json();
+
         if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.error || 'Erro ao aprovar versão');
+          throw new Error(result.error || 'Erro ao aprovar versão');
         }
 
-        showToast("✅ Versão aprovada! Iniciando áudio...", "");
+        console.log("✅ Versão aprovada:", result);
+        showToast(`✅ ${result.mensagem || 'Versão aprovada!'}`, "");
 
-        // Chamar generate-audio
-        const audioResponse = await fetch(`${SUPABASE_URL}/functions/v1/generate-audio`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pedido_id: pedidoId })
-        });
-
-        if (!audioResponse.ok) {
-          throw new Error('Erro ao iniciar geração de áudio');
-        }
-
-        const audioResult = await audioResponse.json();
-        showToast(`✅ Áudio em geração! Task: ${audioResult.task_id}`, "");
-
+        // Recarregar dados
         userData.orders = await loadOrdersFromSupabase();
         localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
         renderSections();
+
+        // Redirecionar para a aba "Em Produção"
         showSection("approved", document.querySelectorAll(".menu-item")[1]);
 
       } catch (error) {
-        showToast(`❌ ${error.message}`, "error");
+        console.error("❌ Erro ao escolher versão:", error);
+        showToast(`❌ Erro: ${error.message}`, "error");
       }
     }
 
