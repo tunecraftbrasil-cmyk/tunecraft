@@ -498,7 +498,7 @@
         mode: 'cors',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${currentSession.access_token}`,  // ✅ Usar token renovado
+          
         },
         body: JSON.stringify({
           pedido_id: id,
@@ -571,5 +571,6 @@
   </script>
 </body>
 </html>
+
 
 
