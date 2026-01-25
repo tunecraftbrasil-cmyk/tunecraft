@@ -416,19 +416,23 @@ if (error) {
   return;
 }
 
-/* 🔹 PATCH: dispara geração de áudio */
+/* 🔹 PATCH: dispara geração de áudio (melhor via invoke) */
 try {
-  await fetch(`${SUPABASE_URL}/functions/v1/generate-audio`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + session.access_token
-    },
-    body: JSON.stringify({ pedido_id: id })
+  const { data, error: fnError } = await sb.functions.invoke("generate-audio", {
+    body: { pedido_id: id }
   });
+
+  if (fnError) {
+    console.error("Erro ao chamar generate-audio (invoke):", fnError);
+    alert("Não consegui iniciar a geração do áudio. Veja o console.");
+    return;
+  }
+
+  console.log("generate-audio ok:", data);
 } catch (err) {
-  console.error("Erro ao chamar generate-audio:", err);
+  console.error("Erro ao chamar generate-audio (invoke):", err);
 }
+
 
 
       const order = userData.orders.find(o => o.id === id);
@@ -468,4 +472,5 @@ try {
   </script>
 </body>
 </html>
+
 
