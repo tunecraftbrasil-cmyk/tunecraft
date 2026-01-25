@@ -59,26 +59,65 @@
 
     /* CARDS */
     .card { background: white; border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0; }
-    .card-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
+    .card-header { display: flex; justify-content: space-between; margin-bottom: 15px; align-items: center; }
     .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
 
     .status-pending { background: #fff7ed; color: #c2410c; }
     .status-production { background: #eff6ff; color: #1d4ed8; }
     .status-completed { background: #f0fdf4; color: #15803d; }
+    .status-awaiting { background: #fef3c7; color: #92400e; }
 
     .lyrics-box {
       font-family: 'Courier New', monospace; background: #f8fafc; padding: 20px;
       border-radius: 8px; border: 1px solid #cbd5e1; white-space: pre-wrap; margin: 15px 0; max-height: 300px; overflow-y: auto;
     }
 
-    .action-row { display: flex; gap: 10px; }
+    /* ✅ COMPARAÇÃO LADO A LADO */
+    .comparison-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .version-card {
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      background: #f8fafc;
+    }
+
+    .version-card.selected {
+      border-color: #00d9ff;
+      background: #eff6ff;
+    }
+
+    .version-card h4 {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .version-changelog {
+      background: #fff7ed;
+      border-left: 3px solid #f59e0b;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 0.9rem;
+      border-radius: 4px;
+    }
+
+    .action-row { display: flex; gap: 10px; flex-wrap: wrap; }
     .btn { padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; transition: 0.2s; }
     .btn-approve { background: #10b981; color: white; }
     .btn-approve:hover { background: #059669; }
     .btn-approve:disabled { background: #cbd5e1; cursor: not-allowed; }
-    .btn-revise { background: white; border: 1px solid #cbd5e1; color: #64748b; }
-    .btn-revise:hover { border-color: #f59e0b; color: #f59e0b; }
+    .btn-revise { background: white; border: 2px solid #f59e0b; color: #f59e0b; }
+    .btn-revise:hover { background: #fef3c7; }
+    .btn-revise:disabled { background: #f3f4f6; color: #9ca3af; border-color: #d1d5db; cursor: not-allowed; }
     .btn-download { background: #0f172a; color: white; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; padding: 10px 14px; border-radius: 6px; }
+    .btn-select { background: #00d9ff; color: white; width: 100%; margin-top: 10px; }
 
     /* PROFILE SECTION STYLES */
     .profile-form label { display: block; margin-top: 15px; font-weight: 600; font-size: 0.9rem; }
@@ -115,17 +154,126 @@
       to { transform: translateX(0); }
     }
 
+    /* ✅ MODAL DE ALTERAÇÃO */
+    .alterar-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .alterar-modal.active {
+      display: flex;
+    }
+
+    .alterar-content {
+      background: white;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 30px;
+    }
+
+    .alterar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .alterar-close {
+      background: none;
+      border: none;
+      font-size: 2rem;
+      cursor: pointer;
+      color: #64748b;
+    }
+
+    .alterar-step {
+      margin-bottom: 20px;
+    }
+
+    .alterar-step h3 {
+      margin-bottom: 10px;
+      color: #1e293b;
+    }
+
+    .alterar-step textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: inherit;
+      resize: vertical;
+    }
+
+    .alterar-step textarea:focus {
+      outline: none;
+      border-color: #00d9ff;
+    }
+
+    .char-count {
+      text-align: right;
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-top: 5px;
+    }
+
+    .alterar-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn-alterar-cancel {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #cbd5e1;
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-alterar-submit {
+      flex: 2;
+      padding: 12px;
+      border: none;
+      background: linear-gradient(135deg, #00d9ff, #6366f1);
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .btn-alterar-submit:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+    }
+
     @media (max-width: 768px) {
       body { flex-direction: column; height: auto; }
       .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 10px; align-items: center; justify-content: space-between; }
       .menu-item span { display: none; }
       .new-music-btn { margin-top: 0; padding: 8px 15px; font-size: 0.8rem; }
       .main-content { padding: 20px; }
+      .comparison-container { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
+  <!-- Chat Modal (criar nova música) -->
   <div class="chat-modal" id="chatModal">
     <div class="chat-container">
       <div class="chat-header">
@@ -137,6 +285,59 @@
       </div>
       <div class="chat-messages" id="chatMessages"></div>
       <div class="chat-input-section" id="inputSection"></div>
+    </div>
+  </div>
+
+  <!-- ✅ Modal de Alteração de Letra -->
+  <div class="alterar-modal" id="alterarModal">
+    <div class="alterar-content">
+      <div class="alterar-header">
+        <h2>✏️ Alterar Letra</h2>
+        <button class="alterar-close" onclick="fecharAlterarModal()">×</button>
+      </div>
+
+      <div class="alterar-step">
+        <h3>O que você gostaria de mudar na letra? 🎵</h3>
+        <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 10px;">
+          💡 Exemplos: "Tornar o refrão mais animado", "Adicionar menção a Dourados", "Mudar o tom de romântico para alegre"
+        </p>
+        <textarea 
+          id="mudancasDesejadas" 
+          placeholder="Ex: Gostaria que o refrão fosse mais energético e mencionasse nossa viagem para o Rio..."
+          maxlength="500"
+          oninput="updateAlterarCharCount('mudancasDesejadas', 'count1')"
+        ></textarea>
+        <div class="char-count"><span id="count1">0</span>/500</div>
+      </div>
+
+      <div class="alterar-step">
+        <h3>Há algo específico que DEVE permanecer? 🔒</h3>
+        <textarea 
+          id="manterElementos" 
+          placeholder="Ex: Mantenha as referências a Dourados e o nome 'Aline'..."
+          maxlength="300"
+          oninput="updateAlterarCharCount('manterElementos', 'count2')"
+        ></textarea>
+        <div class="char-count"><span id="count2">0</span>/300</div>
+      </div>
+
+      <div class="alterar-step">
+        <h3>Observações finais sobre o tom ou estilo? 🎨 (Opcional)</h3>
+        <textarea 
+          id="observacoesFinais" 
+          placeholder="Ex: Quero que seja mais emocionante, menos melancólica..."
+          maxlength="200"
+          oninput="updateAlterarCharCount('observacoesFinais', 'count3')"
+        ></textarea>
+        <div class="char-count"><span id="count3">0</span>/200</div>
+      </div>
+
+      <div class="alterar-buttons">
+        <button class="btn-alterar-cancel" onclick="fecharAlterarModal()">Cancelar</button>
+        <button class="btn-alterar-submit" id="btnSubmitAlteracao" onclick="submitAlteracao()">
+          Enviar Alterações ✨
+        </button>
+      </div>
     </div>
   </div>
 
@@ -209,18 +410,16 @@
   <!-- Toast de notificações -->
   <div class="toast-message" id="toastMessage"></div>
 
-  <script src="chat.js?v=2026-01-24-01"></script>
+  <script src="chat.js?v=2026-01-25"></script>
 
   <script>
-    // ✅ Supabase (use a MESMA URL/KEY do login.html)
     const SUPABASE_URL = "https://miupzfchvfbqbznfhvix.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pdXB6ZmNodmZicWJ6bmZodml4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxOTYwNzksImV4cCI6MjA4NDc3MjA3OX0.rz0W9qVovRvAeyBQ55LRewOAOM5a8pNJs1-UwWttATw";
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Local snapshot
     let userData = JSON.parse(localStorage.getItem("tuneCraftUser")) || { name: "Visitante", email: "", user_id: null, orders: [] };
+    let currentAlterandoId = null; // ✅ ID do pedido sendo alterado
 
-    // ✅ Função para mostrar notificações
     function showToast(message, type = 'info') {
       const toast = document.getElementById('toastMessage');
       toast.innerText = message;
@@ -232,11 +431,11 @@
       }, 4000);
     }
 
-    // ✅ helpers
     function normalizeStatus(s) {
       const v = (s || "").toLowerCase().replace(/\s+/g, "");
       if (v === "pendingapproval" || v === "pending_approval" || v === "waiting_user_approval" || v === "waitinguserapproval") return "pending_approval";
-      if (v === "production" || v === "inproduction" || v === "generatingaudio") return "production";
+      if (v === "aguardandoaprovacao" || v === "aguardando_aprovacao") return "aguardando_aprovacao";
+      if (v === "production" || v === "inproduction" || v === "generatingaudio" || v === "generating_audio") return "production";
       if (v === "completed" || v === "done" || v === "received") return "completed";
       return v || "pending_approval";
     }
@@ -247,7 +446,7 @@
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
-        .replaceAll("'", "'");
+        .replaceAll("'", "&#039;");
     }
 
     async function getSessionOrRedirect() {
@@ -263,41 +462,44 @@
     }
 
     async function loadOrdersFromSupabase() {
-  const { data, error } = await sb
-    .from("musicas_pedidos")
-    .select("id,title,lyrics,status,created_at,audio_urls")
-    .order("created_at", { ascending: false });
+      const { data, error } = await sb
+        .from("musicas_pedidos")
+        .select("id,title,lyrics,status,created_at,audio_urls,versao_original,versao_modificada,versao_aprovada,alteracao_usada,versao_aprovada_tipo,alteracao_solicitada")
+        .order("created_at", { ascending: false });
 
-  if (error) {
-    console.error("Erro sb.from(musicas_pedidos):", error);
-    return [];
-  }
-
-  return (data || []).map(r => {
-    let audioUrls = r.audio_urls;
-
-    // ✅ FIX: Se audio_urls for array de strings, faz parse
-    if (Array.isArray(audioUrls) && audioUrls.length > 0 && typeof audioUrls[0] === 'string') {
-      console.log("🔄 audio_urls são strings, fazendo parse...");
-      try {
-        audioUrls = audioUrls.map(url => JSON.parse(url));
-      } catch (e) {
-        console.error("❌ Erro ao fazer parse de audio_urls:", e);
-        audioUrls = [];
+      if (error) {
+        console.error("Erro sb.from(musicas_pedidos):", error);
+        return [];
       }
+
+      return (data || []).map(r => {
+        let audioUrls = r.audio_urls;
+
+        if (Array.isArray(audioUrls) && audioUrls.length > 0 && typeof audioUrls[0] === 'string') {
+          try {
+            audioUrls = audioUrls.map(url => JSON.parse(url));
+          } catch (e) {
+            console.error("❌ Erro ao fazer parse de audio_urls:", e);
+            audioUrls = [];
+          }
+        }
+
+        return {
+          id: r.id,
+          title: r.title || "Sem título",
+          lyrics: r.lyrics || "",
+          status: normalizeStatus(r.status),
+          created_at: r.created_at,
+          audio_urls: audioUrls,
+          versao_original: r.versao_original,
+          versao_modificada: r.versao_modificada,
+          versao_aprovada: r.versao_aprovada,
+          alteracao_usada: r.alteracao_usada,
+          versao_aprovada_tipo: r.versao_aprovada_tipo,
+          alteracao_solicitada: r.alteracao_solicitada
+        };
+      });
     }
-
-    return {
-      id: r.id,
-      title: r.title || "Sem título",
-      lyrics: r.lyrics || "",
-      status: normalizeStatus(r.status),
-      created_at: r.created_at,
-      audio_urls: audioUrls  // ✅ Agora é array de objetos
-    };
-  });
-}
-
 
     async function initDashboard() {
       const session = await getSessionOrRedirect();
@@ -322,7 +524,6 @@
       renderSections();
     }
 
-    // 🚀 Start
     initDashboard();
 
     function showSection(id, element) {
@@ -352,15 +553,6 @@
       approvedContainer.innerHTML = "";
       receivedContainer.innerHTML = "";
 
-      console.log("📋 Total de pedidos:", userData.orders.length);
-  userData.orders.forEach((order, index) => {
-    console.log(`Pedido ${index + 1}:`, {
-      title: order.title,
-      status: order.status,
-      audio_urls: order.audio_urls
-    });
-  });
-
       let hasPending = false;
       let hasApproved = false;
       let hasReceived = false;
@@ -370,8 +562,11 @@
           const title = escapeHtml(order.title);
           const lyrics = escapeHtml(order.lyrics);
 
-          if (order.status === "pending_approval") {
+          // ✅ PENDING: Aguardando aprovação inicial
+          if (order.status === "pending_approval" && !order.versao_modificada) {
             hasPending = true;
+            const podeAlterar = !order.alteracao_usada;
+            
             pendingContainer.innerHTML += `
               <div class="card">
                 <div class="card-header">
@@ -381,12 +576,71 @@
                 <p style="font-size:0.9rem; color:#64748b;">Leia a letra gerada abaixo.</p>
                 <div class="lyrics-box">${lyrics}</div>
                 <div class="action-row">
-                  <button class="btn btn-revise" onclick="alert('Solicitação enviada!')">Solicitar Ajuste</button>
-                  <button class="btn btn-approve" id="btn-${order.id}" onclick="approveOrder('${order.id}')">Aprovar Letra</button>
+                  <button 
+                    class="btn btn-revise" 
+                    onclick="abrirModalAlteracao('${order.id}')"
+                    ${!podeAlterar ? 'disabled title="Alteração já foi usada"' : ''}
+                  >
+                    ${podeAlterar ? '✏️ Solicitar Alteração (1x)' : '🔒 Alteração Usada'}
+                  </button>
+                  <button class="btn btn-approve" id="btn-${order.id}" onclick="aprovarLetraOriginal('${order.id}')">
+                    ✅ Aprovar e Gerar Áudio
+                  </button>
                 </div>
               </div>
             `;
-          } else if (order.status === "production") {
+          }
+          // ✅ AGUARDANDO ESCOLHA: Comparar versões
+          else if (order.status === "aguardando_aprovacao" && order.versao_modificada) {
+            hasPending = true;
+            
+            const versaoOriginal = order.versao_original || { customer_lyrics: order.lyrics };
+            const versaoModificada = order.versao_modificada;
+
+            pendingContainer.innerHTML += `
+              <div class="card">
+                <div class="card-header">
+                  <h3>${title}</h3>
+                  <span class="status-badge status-awaiting">Escolha uma Versão</span>
+                </div>
+                
+                <p style="font-size:0.9rem; color:#64748b; margin-bottom: 15px;">
+                  Compare as duas versões e escolha sua favorita:
+                </p>
+
+                ${versaoModificada.changelog ? `
+                  <div class="version-changelog">
+                    <strong>📝 O que foi alterado:</strong><br>
+                    ${escapeHtml(versaoModificada.changelog)}
+                  </div>
+                ` : ''}
+
+                <div class="comparison-container">
+                  <div class="version-card">
+                    <h4>📄 Versão Original</h4>
+                    <div class="lyrics-box" style="max-height: 250px;">
+                      ${escapeHtml(versaoOriginal.customer_lyrics || versaoOriginal.lyrics)}
+                    </div>
+                    <button class="btn btn-select" onclick="aprovarVersao('${order.id}', 'original')">
+                      ✅ Escolher Esta
+                    </button>
+                  </div>
+
+                  <div class="version-card">
+                    <h4>✨ Versão Modificada</h4>
+                    <div class="lyrics-box" style="max-height: 250px;">
+                      ${escapeHtml(versaoModificada.customer_lyrics)}
+                    </div>
+                    <button class="btn btn-select" onclick="aprovarVersao('${order.id}', 'modificada')">
+                      ✅ Escolher Esta
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }
+          // ✅ PRODUCTION
+          else if (order.status === "production") {
             hasApproved = true;
             approvedContainer.innerHTML += `
               <div class="card">
@@ -397,45 +651,44 @@
                 <p>Letra aprovada! Estamos trabalhando no áudio.</p>
               </div>
             `;
-          } else if (order.status === "completed") {
+          }
+          // ✅ COMPLETED
+          else if (order.status === "completed") {
             hasReceived = true;
+            const urls = Array.isArray(order.audio_urls) ? order.audio_urls : [];
 
-           const urls = Array.isArray(order.audio_urls) ? order.audio_urls : [];
+            receivedContainer.innerHTML += `
+              <div class="card">
+                <div class="card-header">
+                  <h3>${title}</h3>
+                  <span class="status-badge status-completed">Pronta</span>
+                </div>
 
-  console.log("🎵 URLs da música:", urls);  // Debug
+                ${
+                  urls.length >= 2
+                    ? `
+                      <strong>🎧 Versão A</strong>
+                      <audio controls src="${urls[0].audio_url || urls[0]}" style="width:100%; margin:10px 0;"></audio>
 
-  receivedContainer.innerHTML += `
-    <div class="card">
-      <div class="card-header">
-        <h3>${title}</h3>
-        <span class="status-badge status-completed">Pronta</span>
-      </div>
+                      <strong>🎧 Versão B</strong>
+                      <audio controls src="${urls[1].audio_url || urls[1]}" style="width:100%; margin:10px 0;"></audio>
 
-      ${
-        urls.length >= 2
-          ? `
-            <strong>🎧 Versão A</strong>
-            <audio controls src="${urls[0].audio_url || urls[0]}" style="width:100%; margin:10px 0;"></audio>
-
-            <strong>🎧 Versão B</strong>
-            <audio controls src="${urls[1].audio_url || urls[1]}" style="width:100%; margin:10px 0;"></audio>
-
-            <div class="action-row" style="margin-top:10px">
-              <a class="btn btn-download" href="${urls[0].audio_url || urls[0]}" download>⬇️ Baixar A</a>
-              <a class="btn btn-download" href="${urls[1].audio_url || urls[1]}" download>⬇️ Baixar B</a>
-            </div>
-          `
-          : urls.length === 1
-          ? `
-            <strong>🎧 Áudio</strong>
-            <audio controls src="${urls[0].audio_url || urls[0]}" style="width:100%; margin:10px 0;"></audio>
-            <a class="btn btn-download" href="${urls[0].audio_url || urls[0]}" download>⬇️ Baixar</a>
-          `
-          : `<p>Sua música foi finalizada e está sendo preparada para audição.</p>`
-      }
-    </div>
-  `;
-}
+                      <div class="action-row" style="margin-top:10px">
+                        <a class="btn btn-download" href="${urls[0].audio_url || urls[0]}" download>⬇️ Baixar A</a>
+                        <a class="btn btn-download" href="${urls[1].audio_url || urls[1]}" download>⬇️ Baixar B</a>
+                      </div>
+                    `
+                    : urls.length === 1
+                    ? `
+                      <strong>🎧 Áudio</strong>
+                      <audio controls src="${urls[0].audio_url || urls[0]}" style="width:100%; margin:10px 0;"></audio>
+                      <a class="btn btn-download" href="${urls[0].audio_url || urls[0]}" download>⬇️ Baixar</a>
+                    `
+                    : `<p>Sua música foi finalizada e está sendo preparada para audição.</p>`
+                }
+              </div>
+            `;
+          }
         });
       }
 
@@ -467,93 +720,200 @@
       }
     }
 
-   async function approveOrder(id) {
-  if (!confirm("Tem certeza? A produção iniciará imediatamente.")) return;
+    // ✅ MODAL DE ALTERAÇÃO
+    function abrirModalAlteracao(pedidoId) {
+      currentAlterandoId = pedidoId;
+      document.getElementById('alterarModal').classList.add('active');
+      
+      // Limpar campos
+      document.getElementById('mudancasDesejadas').value = '';
+      document.getElementById('manterElementos').value = '';
+      document.getElementById('observacoesFinais').value = '';
+      document.getElementById('count1').innerText = '0';
+      document.getElementById('count2').innerText = '0';
+      document.getElementById('count3').innerText = '0';
+    }
 
-  const session = await getSessionOrRedirect();
-  if (!session) return;
+    function fecharAlterarModal() {
+      document.getElementById('alterarModal').classList.remove('active');
+      currentAlterandoId = null;
+    }
 
-  const btn = document.getElementById(`btn-${id}`);
-  if (btn) {
-    btn.disabled = true;
-    btn.innerText = "Processando...";
-  }
+    function updateAlterarCharCount(fieldId, countId) {
+      const field = document.getElementById(fieldId);
+      const count = field.value.length;
+      document.getElementById(countId).innerText = count;
+    }
 
-  try {
-    console.log("📝 Atualizando status no banco...");
-    const { error: updateError } = await sb
-      .from("musicas_pedidos")
-      .update({ status: "production" })
-      .eq("id", id);
+    async function submitAlteracao() {
+      const mudancas = document.getElementById('mudancasDesejadas').value.trim();
+      const manter = document.getElementById('manterElementos').value.trim();
+      const obs = document.getElementById('observacoesFinais').value.trim();
 
-    if (updateError) {
-      console.error("❌ Erro ao atualizar status:", updateError);
-      showToast("❌ Erro ao atualizar status no banco", "error");
-      if (btn) {
+      if (mudancas.length < 20) {
+        showToast("Por favor, descreva as mudanças com pelo menos 20 caracteres", "error");
+        return;
+      }
+
+      if (manter.length < 10) {
+        showToast("Por favor, especifique o que deve ser mantido (mínimo 10 caracteres)", "error");
+        return;
+      }
+
+      const btn = document.getElementById('btnSubmitAlteracao');
+      btn.disabled = true;
+      btn.innerText = "Processando...";
+
+      const sugestoes = `
+MUDANÇAS DESEJADAS:
+${mudancas}
+
+ELEMENTOS QUE DEVEM PERMANECER:
+${manter}
+
+${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
+      `.trim();
+
+      try {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/alterar-letra`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            pedidoId: currentAlterandoId,
+            sugestoes: sugestoes
+          })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || 'Erro ao processar alterações');
+        }
+
+        showToast("✅ Versão modificada criada! Compare as versões.", "");
+        fecharAlterarModal();
+
+        // Recarregar dados
+        userData.orders = await loadOrdersFromSupabase();
+        localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
+        renderSections();
+
+      } catch (error) {
+        showToast(`❌ Erro: ${error.message}`, "error");
         btn.disabled = false;
-        btn.innerText = "Aprovar Letra";
+        btn.innerText = "Enviar Alterações ✨";
       }
-      return;
     }
 
-    console.log("✅ Status atualizado com sucesso");
-    showToast("✅ Status atualizado! Iniciando geração de áudio...", "info");
+    // ✅ APROVAR VERSÃO ORIGINAL (sem alteração)
+    async function aprovarLetraOriginal(id) {
+      if (!confirm("Aprovar esta letra e iniciar geração de áudio?")) return;
 
-    console.log("🎵 Chamando edge function generate-audio...");
-    
-    // ✅ REMOVIDO: não precisamos renovar token se não vamos enviar Authorization
-    
-    const response = await fetch(
-      'https://miupzfchvfbqbznfhvix.supabase.co/functions/v1/generate-audio',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // ✅ SEM Authorization header!
-        },
-        body: JSON.stringify({
-          pedido_id: id,
-        }),
-      }
-    );
-
-    console.log("📤 Response status:", response.status);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("❌ Erro da edge function:", response.status, errorText);
-      showToast(`❌ Erro ao gerar áudio (${response.status})`, "error");
+      const btn = document.getElementById(`btn-${id}`);
       if (btn) {
-        btn.disabled = false;
-        btn.innerText = "Aprovar Letra";
+        btn.disabled = true;
+        btn.innerText = "Processando...";
       }
-      return;
+
+      try {
+        // Atualizar status direto para production
+        const { error: updateError } = await sb
+          .from("musicas_pedidos")
+          .update({ 
+            status: "production",
+            versao_aprovada: sb.from("musicas_pedidos").select("versao_original").eq("id", id).single()
+          })
+          .eq("id", id);
+
+        if (updateError) {
+          console.error("❌ Erro ao atualizar:", updateError);
+          showToast("❌ Erro ao atualizar status", "error");
+          if (btn) {
+            btn.disabled = false;
+            btn.innerText = "✅ Aprovar e Gerar Áudio";
+          }
+          return;
+        }
+
+        showToast("✅ Letra aprovada! Iniciando geração...", "info");
+
+        // Chamar generate-audio
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/generate-audio`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pedido_id: id })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Erro ao gerar áudio: ${response.status}`);
+        }
+
+        const result = await response.json();
+        showToast(`✅ Áudio em geração! Task: ${result.task_id}`, "");
+
+        userData.orders = await loadOrdersFromSupabase();
+        localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
+        renderSections();
+        showSection("approved", document.querySelectorAll(".menu-item")[1]);
+
+      } catch (error) {
+        showToast(`❌ Erro: ${error.message}`, "error");
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = "✅ Aprovar e Gerar Áudio";
+        }
+      }
     }
 
-    const result = await response.json();
-    console.log("✅ generate-audio retornou:", result);
+    // ✅ APROVAR VERSÃO (original ou modificada)
+    async function aprovarVersao(pedidoId, tipoVersao) {
+      if (!confirm(`Aprovar versão ${tipoVersao} e iniciar geração de áudio?`)) return;
 
-    if (result.success) {
-      showToast(`✅ Áudio em geração! Task ID: ${result.task_id}`, "");
+      showToast("⏳ Salvando escolha...", "info");
+
+      try {
+        // Chamar edge function aprovar-versao
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/aprovar-versao`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pedido_id: pedidoId,
+            versao_escolhida: tipoVersao
+          })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Erro ao aprovar versão');
+        }
+
+        showToast("✅ Versão aprovada! Iniciando áudio...", "");
+
+        // Chamar generate-audio
+        const audioResponse = await fetch(`${SUPABASE_URL}/functions/v1/generate-audio`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pedido_id: pedidoId })
+        });
+
+        if (!audioResponse.ok) {
+          throw new Error('Erro ao iniciar geração de áudio');
+        }
+
+        const audioResult = await audioResponse.json();
+        showToast(`✅ Áudio em geração! Task: ${audioResult.task_id}`, "");
+
+        userData.orders = await loadOrdersFromSupabase();
+        localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
+        renderSections();
+        showSection("approved", document.querySelectorAll(".menu-item")[1]);
+
+      } catch (error) {
+        showToast(`❌ ${error.message}`, "error");
+      }
     }
-
-    const order = userData.orders.find(o => o.id === id);
-    if (order) order.status = "production";
-
-    localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
-    renderSections();
-    showSection("approved", document.querySelectorAll(".menu-item")[1]);
-
-  } catch (err) {
-    console.error("❌ Erro na requisição:", err);
-    showToast(`❌ Erro: ${err.message}`, "error");
-    if (btn) {
-      btn.disabled = false;
-      btn.innerText = "Aprovar Letra";
-    }
-  }
-}
-
 
     function saveProfile() {
       const newName = document.getElementById("profName").value;
@@ -574,7 +934,7 @@
       try {
         await sb.auth.signOut();
       } catch (e) {
-        console.error("Erro ao deslogar do Supabase:", e);
+        console.error("Erro ao deslogar:", e);
       }
 
       localStorage.removeItem("tuneCraftUser");
@@ -583,9 +943,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
