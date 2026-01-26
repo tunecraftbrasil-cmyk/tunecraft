@@ -917,7 +917,6 @@
   showLoading('Processando pagamento com cartão...');
 
   try {
-    // ✅ VALIDE OS INPUTS DIRETAMENTE, NÃO NO getCardFormData()
     const cardNumber = document.getElementById('form-checkout__cardNumber').value.trim();
     const cardholderName = document.getElementById('form-checkout__cardholderName').value.trim();
     const expirationDate = document.getElementById('form-checkout__cardExpirationDate').value.trim();
@@ -927,19 +926,28 @@
     const installments = document.getElementById('form-checkout__installments').value;
     const identificationType = document.getElementById('form-checkout__identificationType').value;
 
-    console.log('📤 Dados capturados direto dos inputs:', {
+    if (!cardNumber || !cardholderName || !expirationDate || !securityCode || !identificationNumber) {
+      throw new Error('Preencha todos os campos do cartão');
+    }
+
+    // ✅ PEGUE O paymentMethodId correto do CardForm
+    const cardFormData = cardFormInstance.getCardFormData();
+    const paymentMethodId = cardFormData.paymentMethodId;
+
+    console.log('📤 Dados capturados:', {
       cardNumber: cardNumber ? '***' : 'VAZIO',
       cardholderName,
       expirationDate,
       securityCode: securityCode ? '***' : 'VAZIO',
+      paymentMethodId,  // ← IMPORTANTE!
       issuer,
       installments,
       identificationType,
       identificationNumber: identificationNumber ? '***' : 'VAZIO'
     });
 
-    if (!cardNumber || !cardholderName || !expirationDate || !securityCode || !identificationNumber) {
-      throw new Error('Preencha todos os campos do cartão');
+    if (!paymentMethodId) {
+      throw new Error('Tipo de cartão não detectado. Verifique o número do cartão.');
     }
 
     const paymentPayload = {
@@ -948,7 +956,7 @@
         expirationDate: expirationDate,
         securityCode: securityCode,
         cardholderName: cardholderName,
-        paymentMethodId: document.querySelector('.payment-method-btn.active').dataset.method === 'credit_card' ? 'master' : 'visa',
+        paymentMethodId: paymentMethodId,  // ✅ USA O CORRETO
         issuerId: issuer,
         installments: installments,
         identificationType: identificationType,
@@ -994,6 +1002,7 @@
     hideLoading();
   }
 }
+
 
   // ========================
   // PAGAMENTO PIX
