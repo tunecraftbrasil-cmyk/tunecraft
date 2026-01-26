@@ -1,5 +1,3 @@
-Vou deploy para producao.
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -585,7 +583,6 @@ Vou deploy para producao.
   let pixPaymentId = null;
   let pixCheckInterval = null;
   let cardFormInstance = null;
-  let generatedCardToken = null;
 
   // ========================
   // INICIALIZAR CARDFORM - SEM IFRAME
@@ -635,29 +632,6 @@ Vou deploy para producao.
         onFormMounted: error => {
           if (error) console.error("❌ Erro ao montar form:", error);
           console.log("✅ Card form mounted com amount:", amount);
-        },
-        onCardTokenReceived: (error, token) => {
-          if (error) {
-            console.error("❌ Erro ao gerar token:", error);
-            document.getElementById('card-errors').textContent = `Erro: ${error.message || error}`;
-            document.getElementById('card-errors').style.display = 'block';
-            showToast("❌ Erro ao processar cartão", "error");
-            hideLoading();
-            return;
-          }
-
-          console.log("🔍 Token callback recebido:", {
-            token,
-            type: typeof token,
-            keys: Object.keys(token || {})
-          });
-
-          // se o log mostrar que vem como { id: 'xxx', ... }
-          generatedCardToken = token[Object.keys(token)[0]];
-
-          console.log("✅ Token gerado:", generatedCardToken ? "✅ Válido" : "❌ Vazio");
-
-          sendCardPaymentToBackend();
         },
         onBinChange: (bin) => {
           console.log("🔍 BIN detectado:", bin);
@@ -932,94 +906,41 @@ Vou deploy para producao.
   });
 
   // ========================
-  // AGUARDAR TOKEN
-  // ========================
-
-  function waitForToken(maxWaitMs) {
-    return new Promise((resolve) => {
-      const startTime = Date.now();
-      const checkInterval = setInterval(() => {
-        if (generatedCardToken) {
-          clearInterval(checkInterval);
-          console.log('✅ Token recebido no waitForToken');
-          resolve(true);
-        }
-        if (Date.now() - startTime > maxWaitMs) {
-          clearInterval(checkInterval);
-          console.log('❌ Timeout aguardando token');
-          resolve(false);
-        }
-      }, 50);
-    });
-  }
-
-  // ========================
-  // PAGAMENTO CARTÃO
+  // PAGAMENTO CARTÃO - PRODUÇÃO
   // ========================
 
   async function processCardPayment() {
     const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
-
-    showLoading('Gerando token do cartão...');
-
-    generatedCardToken = null;
-
-    try {
-      const cardholderName = document.getElementById('form-checkout__cardholderName').value.trim();
-      const cardNumber = document.getElementById('form-checkout__cardNumber').value.trim();
-      const expDate = document.getElementById('form-checkout__cardExpirationDate').value.trim();
-      const cvv = document.getElementById('form-checkout__securityCode').value.trim();
-      const docNumber = document.getElementById('form-checkout__identificationNumber').value.trim();
-
-      if (!cardholderName || !cardNumber || !expDate || !cvv || !docNumber) {
-        throw new Error('Preencha todos os campos do cartão');
-      }
-
-      console.log('🎯 Iniciando geração de token...');
-
-      cardFormInstance.createCardToken();
-
-      const tokenReceived = await waitForToken(8000);
-
-      if (!tokenReceived) {
-        throw new Error('Timeout ao gerar token do cartão. Por favor, tente novamente.');
-      }
-
-    } catch (error) {
-      console.error("❌ Erro no processamento:", error.message);
-      document.getElementById('card-errors').textContent = error.message;
-      document.getElementById('card-errors').style.display = 'block';
-      showToast(`❌ ${error.message}`, 'error');
-      hideLoading();
-    }
-  }
-
-  // ✅ CORRIGIDO: Função para enviar pagamento após token
-  async function sendCardPaymentToBackend() {
-    const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
     const name = document.getElementById('customer-name').value.trim();
     const email = document.getElementById('customer-email').value.trim();
 
-    console.log('🚀 ENVIANDO PARA BACKEND - generatedCardToken:', generatedCardToken);
-    
+    showLoading('Processando pagamento com cartão...');
+
     try {
       const cardFormData = cardFormInstance.getCardFormData();
 
-      console.log('📤 Enviando pagamento com token:', {
-        tokenPresent: !!generatedCardToken,
-        token: generatedCardToken ? String(generatedCardToken).substring(0, 10) + '...' : 'VAZIO',
+      console.log('📤 Dados do formulário:', {
+        cardNumber: cardFormData.cardNumber ? '***' : 'VAZIO',
+        cardholderName: cardFormData.cardholderName,
+        expirationDate: cardFormData.expirationDate,
+        securityCode: cardFormData.securityCode ? '***' : 'VAZIO',
         paymentMethodId: cardFormData.paymentMethodId,
         issuerId: cardFormData.issuerId,
-        installments: cardFormData.installments
+        installments: cardFormData.installments,
+        identificationType: cardFormData.identificationType,
+        identificationNumber: cardFormData.identificationNumber ? '***' : 'VAZIO'
       });
 
-      if (!generatedCardToken) {
-        throw new Error('Token do cartão não foi gerado');
+      if (!cardFormData.cardNumber || !cardFormData.expirationDate || !cardFormData.securityCode) {
+        throw new Error('Preencha todos os campos do cartão');
       }
 
       const paymentPayload = {
         paymentData: {
-          token: generatedCardToken,
+          cardNumber: cardFormData.cardNumber.replace(/\s/g, ''),
+          expirationDate: cardFormData.expirationDate,
+          securityCode: cardFormData.securityCode,
+          cardholderName: cardFormData.cardholderName,
           paymentMethodId: cardFormData.paymentMethodId,
           issuerId: cardFormData.issuerId,
           installments: cardFormData.installments,
@@ -1059,7 +980,7 @@ Vou deploy para producao.
       hideLoading();
 
     } catch (error) {
-      console.error("❌ Erro ao enviar para backend:", error.message);
+      console.error("❌ Erro ao processar cartão:", error.message);
       document.getElementById('card-errors').textContent = error.message;
       document.getElementById('card-errors').style.display = 'block';
       showToast(`❌ ${error.message}`, 'error');
