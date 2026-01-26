@@ -1,5 +1,5 @@
 // ============================================
-// LÓGICA DO CHAT (chat.js) - VERSÃO SIMPLIFICADA
+// LÓGICA DO CHAT (chat.js) - VERSÃO COM EDITAR DRAFT
 // ============================================
 
 // Função para rolar o chat para o final
@@ -222,10 +222,19 @@ const elaboratedChatFlow = [
 let currentStep = 0;
 let formData = {};
 let currentQuestion = null;
+let draftBeingEdited = null;  // ✅ NOVO: Rastrear se está editando
 
-// ===== CREDENCIAIS SUPABASE =====
+// ✅ NOVO: Detectar se há draft sendo editado quando chat.js carrega
+if (window.draftBeingEdited) {
+    draftBeingEdited = window.draftBeingEdited;
+    formData = { ...draftBeingEdited.payload }; // ✅ PRÉ-PREENCHER COM DADOS ANTIGOS
+    console.log("🔧 Editando draft:", draftBeingEdited.pedidoId);
+    console.log("📦 Dados carregados:", formData);
+}
+
+// ===== CREDENCIAIS SUPABASE (REMOVIDAS - VÊM DE config.js) =====
 // const SUPABASE_URL = 'https://miupzfchvfbqbznfhvix.supabase.co';
-// const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pdXB6ZmNodmZicWJ6bmZodml4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxOTYwNzksImV4cCI6MjA4NDc3MjA3OX0.rz0W9qVovRvAeyBQ55LRewOAOM5a8pNJs1-UwWttATw';
+// const SUPABASE_ANON_KEY = '...';
 
 // ============================================
 // FUNÇÕES DE CONTROLE DO CHAT
@@ -246,7 +255,15 @@ document.addEventListener("keydown", (e) => {
 
 function initChat() {
     currentStep = 0;
-    formData = {};
+    
+    // ✅ NOVO: Se está editando, carrega dados salvos
+    if (draftBeingEdited && draftBeingEdited.payload) {
+        formData = { ...draftBeingEdited.payload };
+        console.log("📝 Chat aberto em modo edição com dados:", formData);
+    } else {
+        formData = {};
+    }
+    
     document.getElementById("chatMessages").innerHTML = "";
     renderQuestion();
 }
@@ -387,7 +404,7 @@ function prevStep() {
 }
 
 // ============================================
-// ✅ NOVO: SALVAR DRAFT (SEM PAGAMENTO)
+// ✅ SALVAR DRAFT (COM SUPORTE A EDIÇÃO)
 // ============================================
 
 function renderSaveButton(container) {
@@ -427,45 +444,80 @@ async function saveDraftOnly() {
             return h;
         }
 
-        // ✅ 3. Inserir row com status='draft'
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/musicas_pedidos`, {
-            method: 'POST',
-            headers: sbHeaders({ prefer: true }),
-            body: JSON.stringify({
-                user_id: session.user.id,
-                user_email: session.user.email,
-                user_name: session.user.user_metadata?.full_name || "Usuário",
-                payload: formData,         // ✅ TODO o fluxo (step1...step16)
-                status: 'draft'            // ✅ STATUS = 'draft' (NÃO 'pending_approval')
-            })
-        });
+        // ✅ 3. DECIDIR: Inserir novo ou atualizar existente
+        let pedidoId = draftBeingEdited?.pedidoId; // Pega ID se estiver editando
 
-        if (!response.ok) {
-            const errText = await response.text();
-            console.error("[TuneCraft] Erro ao salvar draft:", response.status, errText);
-            throw new Error(`Erro ao salvar (${response.status}): ${errText}`);
+        if (draftBeingEdited && pedidoId) {
+            // ✅ MODO EDIÇÃO: Atualizar draft existente
+            console.log("✏️ Atualizando draft existente:", pedidoId);
+
+            const updateResponse = await fetch(`${SUPABASE_URL}/rest/v1/musicas_pedidos?id=eq.${pedidoId}`, {
+                method: 'PATCH',
+                headers: sbHeaders({ prefer: true }),
+                body: JSON.stringify({
+                    payload: formData,
+                    updated_at: new Date().toISOString()
+                })
+            });
+
+            if (!updateResponse.ok) {
+                const errText = await updateResponse.text();
+                console.error("[TuneCraft] Erro ao atualizar draft:", updateResponse.status, errText);
+                throw new Error(`Erro ao atualizar (${updateResponse.status}): ${errText}`);
+            }
+
+            const data = await updateResponse.json();
+            console.log('✅ Draft atualizado com ID:', pedidoId);
+
+            showToast("✅ Formulário atualizado!", "success");
+
+        } else {
+            // ✅ MODO NOVO: Criar novo draft
+            console.log("📝 Criando novo draft...");
+
+            const insertResponse = await fetch(`${SUPABASE_URL}/rest/v1/musicas_pedidos`, {
+                method: 'POST',
+                headers: sbHeaders({ prefer: true }),
+                body: JSON.stringify({
+                    user_id: session.user.id,
+                    user_email: session.user.email,
+                    user_name: session.user.user_metadata?.full_name || "Usuário",
+                    payload: formData,
+                    status: 'draft'
+                })
+            });
+
+            if (!insertResponse.ok) {
+                const errText = await insertResponse.text();
+                console.error("[TuneCraft] Erro ao salvar draft:", insertResponse.status, errText);
+                throw new Error(`Erro ao salvar (${insertResponse.status}): ${errText}`);
+            }
+
+            const data = await insertResponse.json();
+            pedidoId = data?.[0]?.id;
+
+            if (!pedidoId) {
+                throw new Error('Draft criado, mas ID não foi retornado');
+            }
+
+            console.log('✅ Draft criado com ID:', pedidoId);
+
+            showToast("✅ Formulário salvo!", "success");
         }
-
-        const data = await response.json();
-        const pedidoId = data?.[0]?.id;
-
-        if (!pedidoId) {
-            throw new Error('Draft criado, mas ID não foi retornado');
-        }
-
-        console.log('✅ Draft salvo com ID:', pedidoId);
 
         // ✅ 4. Salvar no localStorage (para referência rápida)
         localStorage.setItem('tuneCraft_lastDraftId', pedidoId);
 
-        showToast("✅ Formulário salvo! Redirecionando...", "success");
-
         // ✅ 5. Fechar modal
         closeChat();
 
-        // ✅ 6. Redirecionar para dashboard (com refresh)
+        // ✅ 6. Limpar draft em edição
+        window.draftBeingEdited = null;
+        draftBeingEdited = null;
+
+        // ✅ 7. Redirecionar para dashboard (SEM ?refresh=true)
         setTimeout(() => {
-            window.location.href = 'dashboard.html;
+            window.location.href = 'dashboard.html';
         }, 1000);
 
     } catch (error) {
