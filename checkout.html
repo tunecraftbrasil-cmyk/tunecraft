@@ -578,7 +578,7 @@
 
   let currentPaymentMethod = 'credit_card';
   let appliedCoupon = null;
-  let originalPrice = 4990; // R$ 49,90 em centavos
+  let originalPrice = 4990;
   let finalPrice = 4990;
   let pixPaymentId = null;
   let pixCheckInterval = null;
@@ -705,7 +705,6 @@
       discountValue.textContent = `- ${formatBRL(discount)}`;
       finalPriceEl.textContent = formatBRL(finalPrice);
 
-      // ✅ Recria o cardForm com o novo valor
       initializeCardForm(finalPrice / 100);
 
       setTimeout(updateInstallmentOptions, 300);
@@ -758,10 +757,6 @@
     document.body.appendChild(div);
     setTimeout(() => div.remove(), 4000);
   }
-
-  // ========================
-  // CARREGAR DADOS
-  // ========================
 
   function loadCheckoutData() {
     const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
@@ -891,7 +886,7 @@
   });
 
   // ========================
-  // SUBMIT FORM
+  // SUBMIT FORM - ✅ SEM USAR cardForm.submit()
   // ========================
 
   document.getElementById('payment-form').addEventListener('submit', async (e) => {
@@ -906,7 +901,9 @@
     }
 
     if (currentPaymentMethod === 'credit_card') {
-      cardFormInstance.submit();
+      // ✅ NÃO usar cardFormInstance.submit() - isso causa requestSubmit error
+      // Chamar processCardPayment() diretamente
+      await processCardPayment();
     } else {
       await processPixPayment(name, email);
     }
