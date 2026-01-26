@@ -7,10 +7,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://sdk.mercadopago.com/js/v2"></script>
   <script src="config.js"></script>
-  
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
@@ -434,7 +434,7 @@
   <div class="product-summary">
     <div class="product-name">🎵 Geração de Música Personalizada</div>
     <div class="product-description">Música única criada com IA baseada nas suas preferências</div>
-    
+
     <div id="price-breakdown">
       <div class="price-row">
         <span class="price-label">Valor:</span>
@@ -445,7 +445,7 @@
         <span class="price-value price-discount" id="discount-value">- R$ 0,00</span>
       </div>
     </div>
-    
+
     <div class="product-price" id="final-price">R$ 49,90</div>
   </div>
 
@@ -646,6 +646,37 @@
     }).format(centavos / 100);
   }
 
+  // ✅ NOVA FUNÇÃO: Atualizar opções de parcelas com preço FINAL
+  function updateInstallmentOptions() {
+    const installmentSelect = document.getElementById('form-checkout__installments');
+
+    if (!installmentSelect) {
+      console.warn('⚠️ Select de parcelas não encontrado');
+      return;
+    }
+
+    // Usar o preço FINAL (após cupom)
+    const priceToUse = appliedCoupon ? finalPrice : originalPrice;
+    const priceInReais = priceToUse / 100;
+
+    console.log('💰 Atualizando parcelas para:', formatBRL(priceToUse));
+
+    // Limpar opções antigas
+    installmentSelect.innerHTML = '';
+
+    // Gerar opções de 1x até 12x com o preço FINAL
+    for (let i = 1; i <= 12; i++) {
+      const installmentValue = (priceInReais / i).toFixed(2);
+      const totalValue = priceInReais.toFixed(2);
+
+      const option = document.createElement('option');
+      option.value = i;
+      option.textContent = `${i} parcela${i > 1 ? 's' : ''} de R$ ${installmentValue.replace('.', ',')} (R$ ${totalValue.replace('.', ',')})`;
+
+      installmentSelect.appendChild(option);
+    }
+  }
+
   function updatePriceDisplay() {
     const originalPriceEl = document.getElementById('original-price');
     const discountRow = document.getElementById('discount-row');
@@ -659,17 +690,20 @@
       discountRow.style.display = 'flex';
       discountValue.textContent = `- ${formatBRL(discount)}`;
       finalPriceEl.textContent = formatBRL(finalPrice);
-      
+
       // Atualizar amount do cardForm
       cardForm.update({ amount: (finalPrice / 100).toFixed(2) });
-      
+
+      // ✅ CHAMAR updateInstallmentOptions após aplicar cupom
+      setTimeout(updateInstallmentOptions, 200);
+
       const icon = currentPaymentMethod === 'credit_card' ? '💳' : '🏦';
       payButton.textContent = `${icon} Pagar ${formatBRL(finalPrice)}`;
     } else {
       originalPriceEl.textContent = formatBRL(originalPrice);
       discountRow.style.display = 'none';
       finalPriceEl.textContent = formatBRL(originalPrice);
-      
+
       const icon = currentPaymentMethod === 'credit_card' ? '💳' : '🏦';
       payButton.textContent = `${icon} Pagar ${formatBRL(originalPrice)}`;
     }
@@ -720,7 +754,7 @@
     const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
     const email = localStorage.getItem('tuneCraft_checkoutEmail');
     const name = localStorage.getItem('tuneCraft_checkoutName');
-    
+
     if (!pedidoId || !email || !name) {
       showToast("❌ Nenhum pagamento pendente. Redirecionando...", "error");
       setTimeout(() => window.location.href = "dashboard.html", 2000);
@@ -730,7 +764,7 @@
     document.getElementById('customer-name').value = name;
     document.getElementById('customer-email').value = email;
     document.getElementById('form-checkout__cardholderName').value = name.toUpperCase();
-    
+
     console.log("✅ Dados carregados:", { pedidoId, name, email });
   }
 
@@ -740,7 +774,7 @@
 
   document.getElementById('apply-coupon-btn').addEventListener('click', async () => {
     const couponCode = document.getElementById('coupon-code').value.trim().toUpperCase();
-    
+
     if (!couponCode) {
       showMessage('coupon-message', 'Digite um código de cupom', 'error');
       return;
@@ -799,7 +833,7 @@
 
       showMessage('coupon-message', `✅ Cupom aplicado! ${data.desconto_percentual > 0 ? data.desconto_percentual + '%' : formatBRL(discount)} de desconto`, 'success');
       updatePriceDisplay();
-      
+
       btn.textContent = '✓ Aplicado';
       document.getElementById('coupon-code').disabled = true;
 
@@ -819,9 +853,9 @@
     btn.addEventListener('click', () => {
       document.querySelectorAll('.payment-method-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      
+
       currentPaymentMethod = btn.dataset.method;
-      
+
       if (currentPaymentMethod === 'credit_card') {
         document.getElementById('card-section').style.display = 'block';
         document.getElementById('pix-section').style.display = 'none';
@@ -921,7 +955,7 @@
 
   async function processPixPayment(name, email) {
     const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
-    
+
     showLoading('Gerando QR Code PIX...');
 
     try {
@@ -1062,7 +1096,13 @@
     }
   }
 
-  window.addEventListener('load', loadCheckoutData);
+  // ✅ CHAMAR updateInstallmentOptions ao carregar a página
+  window.addEventListener('load', () => {
+    loadCheckoutData();
+    // Aguardar o cardForm montar antes de atualizar parcelas
+    setTimeout(updateInstallmentOptions, 1000);
+  });
+
   window.addEventListener('beforeunload', () => {
     if (pixCheckInterval) clearInterval(pixCheckInterval);
   });
