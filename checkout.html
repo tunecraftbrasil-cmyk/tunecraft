@@ -632,6 +632,26 @@
         event.preventDefault();
         processCardPayment();
       },
+      // ✅ NOVO: Interceptar quando o BIN do cartão é detectado
+      onBinChange: (bin) => {
+        console.log("🔍 BIN detectado:", bin);
+        // Forçar atualização das parcelas após o Mercado Pago processar o BIN
+        setTimeout(() => {
+          updateInstallmentOptions();
+        }, 500);
+      },
+      // ✅ NOVO: Interceptar quando as parcelas são carregadas
+      onInstallmentsReceived: (error, installments) => {
+        if (error) {
+          console.error("Erro ao carregar parcelas:", error);
+          return;
+        }
+        console.log("📦 Parcelas recebidas do MP:", installments);
+        // Forçar atualização com o preço correto
+        setTimeout(() => {
+          updateInstallmentOptions();
+        }, 100);
+      }
     },
   });
 
@@ -646,7 +666,7 @@
     }).format(centavos / 100);
   }
 
-  // ✅ NOVA FUNÇÃO: Atualizar opções de parcelas com preço FINAL
+  // ✅ FUNÇÃO ATUALIZADA: Atualizar opções de parcelas com preço FINAL
   function updateInstallmentOptions() {
     const installmentSelect = document.getElementById('form-checkout__installments');
 
@@ -695,7 +715,7 @@
       cardForm.update({ amount: (finalPrice / 100).toFixed(2) });
 
       // ✅ CHAMAR updateInstallmentOptions após aplicar cupom
-      setTimeout(updateInstallmentOptions, 200);
+      setTimeout(updateInstallmentOptions, 300);
 
       const icon = currentPaymentMethod === 'credit_card' ? '💳' : '🏦';
       payButton.textContent = `${icon} Pagar ${formatBRL(finalPrice)}`;
@@ -1100,7 +1120,7 @@
   window.addEventListener('load', () => {
     loadCheckoutData();
     // Aguardar o cardForm montar antes de atualizar parcelas
-    setTimeout(updateInstallmentOptions, 1000);
+    setTimeout(updateInstallmentOptions, 1500);
   });
 
   window.addEventListener('beforeunload', () => {
