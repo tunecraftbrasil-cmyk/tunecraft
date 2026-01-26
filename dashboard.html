@@ -66,6 +66,25 @@
     .status-production { background: #eff6ff; color: #1d4ed8; }
     .status-completed { background: #f0fdf4; color: #15803d; }
     .status-awaiting { background: #fef3c7; color: #92400e; }
+    .status-draft { background: #fce7f3; color: #be185d; }
+
+    .draft-summary {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-left: 4px solid #be185d;
+    }
+
+    .draft-summary p {
+      margin: 8px 0;
+      font-size: 0.95rem;
+      color: #475569;
+    }
+
+    .draft-summary p strong {
+      color: #1e293b;
+    }
 
     .lyrics-box {
       font-family: 'Courier New', monospace; background: #f8fafc; padding: 20px;
@@ -347,7 +366,10 @@
     </div>
 
     <nav style="flex: 1;">
-      <div class="menu-item active" onclick="showSection('pending', this)">
+      <div class="menu-item active" onclick="showSection('drafts', this)">
+        📋 <span>Meus Rascunhos</span>
+      </div>
+      <div class="menu-item" onclick="showSection('pending', this)">
         📝 <span>Aprovar Letra</span>
       </div>
       <div class="menu-item" onclick="showSection('approved', this)">
@@ -368,7 +390,7 @@
 
   <main class="main-content">
     <div class="header">
-      <h2 id="pageTitle">Aprovar Letra</h2>
+      <h2 id="pageTitle">Meus Rascunhos</h2>
       <div class="user-profile">
         <span id="userName">Usuário</span>
         <div class="avatar">U</div>
@@ -376,7 +398,9 @@
       </div>
     </div>
 
-    <div id="pending" class="section active"></div>
+    <div id="drafts" class="section active"></div>
+
+    <div id="pending" class="section"></div>
 
     <div id="approved" class="section">
       <h2>Em Produção</h2>
@@ -433,6 +457,7 @@
 
     function normalizeStatus(s) {
       const v = (s || "").toLowerCase().replace(/\s+/g, "");
+      if (v === "draft") return "draft";
       if (v === "pendingapproval" || v === "pending_approval" || v === "waiting_user_approval" || v === "waitinguserapproval") return "pending_approval";
       if (v === "aguardandoaprovacao" || v === "aguardando_aprovacao") return "aguardando_aprovacao";
       if (v === "production" || v === "inproduction" || v === "generatingaudio" || v === "generating_audio") return "production";
@@ -447,6 +472,16 @@
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "'");
+    }
+
+    function extractSummaryFromPayload(payload) {
+      return {
+        recipient: payload.step2 || "Indefinido",
+        ageGroup: payload.step3 || "Não especificado",
+        occasion: payload.step6 || "Não definida",
+        genre: payload.step8 || "Não definido",
+        message: payload.step12 ? payload.step12.substring(0, 80) + "..." : "Sem mensagem"
+      };
     }
 
     async function getSessionOrRedirect() {
@@ -464,7 +499,7 @@
     async function loadOrdersFromSupabase() {
       const { data, error } = await sb
         .from("musicas_pedidos")
-        .select("id,title,lyrics,status,created_at,audio_urls,versao_original,versao_modificada,versao_aprovada,alteracao_usada,versao_aprovada_tipo,alteracao_solicitada")
+        .select("id,title,lyrics,status,created_at,audio_urls,versao_original,versao_modificada,versao_aprovada,alteracao_usada,versao_aprovada_tipo,alteracao_solicitada,payload")
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -496,7 +531,8 @@
           versao_aprovada: r.versao_aprovada,
           alteracao_usada: r.alteracao_usada,
           versao_aprovada_tipo: r.versao_aprovada_tipo,
-          alteracao_solicitada: r.alteracao_solicitada
+          alteracao_solicitada: r.alteracao_solicitada,
+          payload: r.payload
         };
       });
     }
@@ -533,6 +569,7 @@
       }
 
       const titles = {
+        drafts: "Meus Rascunhos",
         pending: "Aprovar Letra",
         approved: "Letras Aprovadas",
         received: "Músicas Recebidas",
@@ -545,14 +582,17 @@
     }
 
     function renderSections() {
+      const draftsContainer = document.getElementById("drafts");
       const pendingContainer = document.getElementById("pending");
       const approvedContainer = document.getElementById("approved-list");
       const receivedContainer = document.getElementById("received-list");
 
+      draftsContainer.innerHTML = "";
       pendingContainer.innerHTML = "";
       approvedContainer.innerHTML = "";
       receivedContainer.innerHTML = "";
 
+      let hasDrafts = false;
       let hasPending = false;
       let hasApproved = false;
       let hasReceived = false;
@@ -562,7 +602,37 @@
           const title = escapeHtml(order.title);
           const lyrics = escapeHtml(order.lyrics);
 
-          if (order.status === "pending_approval" && !order.versao_modificada) {
+          // ✅ NOVA SEÇÃO: DRAFTS (status='draft')
+          if (order.status === "draft") {
+            hasDrafts = true;
+            const summary = extractSummaryFromPayload(order.payload);
+            
+            draftsContainer.innerHTML += `
+              <div class="card draft-card">
+                <div class="card-header">
+                  <h3>🎵 Música para: ${summary.recipient}</h3>
+                  <span class="status-badge status-draft">Rascunho</span>
+                </div>
+                
+                <div class="draft-summary">
+                  <p><strong>Para:</strong> ${summary.recipient} (${summary.ageGroup})</p>
+                  <p><strong>Ocasião:</strong> ${summary.occasion}</p>
+                  <p><strong>Gênero:</strong> ${summary.genre}</p>
+                  <p><strong>Mensagem:</strong> "${summary.message}"</p>
+                </div>
+                
+                <div class="action-row">
+                  <button class="btn btn-revise" onclick="editarDraft('${order.id}')">
+                    ✏️ Editar Formulário
+                  </button>
+                  <button class="btn btn-approve" onclick="irParaCheckout('${order.id}')">
+                    💳 Pagar e Gerar Letra (R$ 49,90)
+                  </button>
+                </div>
+              </div>
+            `;
+          }
+          else if (order.status === "pending_approval" && !order.versao_modificada) {
             hasPending = true;
             const podeAlterar = !order.alteracao_usada;
             
@@ -688,6 +758,17 @@
         });
       }
 
+      if (!hasDrafts) {
+        draftsContainer.innerHTML = `
+          <div class="empty-state">
+            <span class="empty-icon">📋</span>
+            <h3>Sem rascunhos no momento</h3>
+            <p>Crie uma nova música para começar!</p>
+            <button class="btn btn-approve" onclick="openChat()" style="margin-top:20px;">Criar Nova Música</button>
+          </div>
+        `;
+      }
+
       if (!hasPending) {
         pendingContainer.innerHTML = `
           <div class="empty-state">
@@ -713,6 +794,63 @@
             <p>Sem músicas prontas no momento.</p>
           </div>
         `;
+      }
+    }
+
+    // ✅ NOVA FUNÇÃO: EDITAR DRAFT
+    async function editarDraft(pedidoId) {
+      try {
+        showToast("⏳ Carregando rascunho...", "info");
+
+        const { data } = await sb
+          .from('musicas_pedidos')
+          .select('*')
+          .eq('id', pedidoId)
+          .single();
+
+        if (!data) {
+          showToast("❌ Rascunho não encontrado", "error");
+          return;
+        }
+
+        // Salva globalmente para chat.js usar
+        window.draftBeingEdited = {
+          pedidoId: pedidoId,
+          payload: data.payload
+        };
+
+        console.log("📝 Editando draft:", pedidoId);
+        console.log("📦 Payload:", data.payload);
+
+        // Abre chat
+        openChat();
+        showToast("✅ Rascunho carregado!", "success");
+
+      } catch (error) {
+        console.error("Erro ao carregar draft:", error);
+        showToast(`❌ Erro: ${error.message}`, "error");
+      }
+    }
+
+    // ✅ NOVA FUNÇÃO: IR PARA CHECKOUT
+    async function irParaCheckout(pedidoId) {
+      try {
+        // Salva no localStorage para checkout.html
+        localStorage.setItem('tuneCraft_pendingOrderId', pedidoId);
+        localStorage.setItem('tuneCraft_checkoutEmail', userData.email);
+        localStorage.setItem('tuneCraft_checkoutName', userData.name);
+
+        console.log("💳 Redirecionando para checkout:", pedidoId);
+        showToast("Redirecionando para checkout...", "info");
+
+        // Redireciona
+        setTimeout(() => {
+          window.location.href = 'checkout.html';
+        }, 500);
+
+      } catch (error) {
+        console.error("Erro ao redirecionar:", error);
+        showToast(`❌ Erro: ${error.message}`, "error");
       }
     }
 
@@ -846,7 +984,7 @@ ${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
         userData.orders = await loadOrdersFromSupabase();
         localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
         renderSections();
-        showSection("approved", document.querySelectorAll(".menu-item")[1]);
+        showSection("approved", document.querySelectorAll(".menu-item")[2]);
 
       } catch (error) {
         showToast(`❌ Erro: ${error.message}`, "error");
@@ -857,68 +995,62 @@ ${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
       }
     }
 
-    // ✅ APROVAR VERSÃO (original ou modificada)
-async function aprovarVersao(pedidoId, tipoVersao) {
-  if (!confirm(`Aprovar versão ${tipoVersao} e iniciar geração de áudio?`)) return;
+    async function aprovarVersao(pedidoId, tipoVersao) {
+      if (!confirm(`Aprovar versão ${tipoVersao} e iniciar geração de áudio?`)) return;
 
-  showToast("⏳ Salvando escolha...", "info");
+      showToast("⏳ Salvando escolha...", "info");
 
-  try {
-    console.log("📤 Enviando:", { pedidoId, versaoEscolhida: tipoVersao });
+      try {
+        console.log("📤 Enviando:", { pedidoId, versaoEscolhida: tipoVersao });
 
-    // ✅ Usar fetch DIRETO, sem Supabase SDK
-    const response = await fetch(`${SUPABASE_URL}/functions/v1/aprovar-versao`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // ✅ Remover headers do Supabase que causam CORS
-      },
-      body: JSON.stringify({
-        pedidoId: pedidoId,
-        versaoEscolhida: tipoVersao
-      })
-    });
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/aprovar-versao`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            pedidoId: pedidoId,
+            versaoEscolhida: tipoVersao
+          })
+        });
 
-    const result = await response.json();
+        const result = await response.json();
 
-    if (!response.ok) {
-      throw new Error(result.error || 'Erro ao aprovar versão');
+        if (!response.ok) {
+          throw new Error(result.error || 'Erro ao aprovar versão');
+        }
+
+        console.log("✅ Versão aprovada:", result);
+        showToast("✅ Versão aprovada! Iniciando áudio...", "");
+
+        const audioResponse = await fetch(`${SUPABASE_URL}/functions/v1/generate-audio`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            pedido_id: pedidoId
+          })
+        });
+
+        if (!audioResponse.ok) {
+          throw new Error('Erro ao iniciar geração de áudio');
+        }
+
+        const audioResult = await audioResponse.json();
+        console.log("✅ Áudio gerado:", audioResult);
+        showToast(`✅ Áudio em geração! Task: ${audioResult.task_id}`, "");
+
+        userData.orders = await loadOrdersFromSupabase();
+        localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
+        renderSections();
+        showSection("approved", document.querySelectorAll(".menu-item")[2]);
+
+      } catch (error) {
+        console.error("❌ Erro completo:", error);
+        showToast(`❌ ${error.message}`, "error");
+      }
     }
-
-    console.log("✅ Versão aprovada:", result);
-    showToast("✅ Versão aprovada! Iniciando áudio...", "");
-
-    // Chamar generate-audio
-    const audioResponse = await fetch(`${SUPABASE_URL}/functions/v1/generate-audio`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        pedido_id: pedidoId
-      })
-    });
-
-    if (!audioResponse.ok) {
-      throw new Error('Erro ao iniciar geração de áudio');
-    }
-
-    const audioResult = await audioResponse.json();
-    console.log("✅ Áudio gerado:", audioResult);
-    showToast(`✅ Áudio em geração! Task: ${audioResult.task_id}`, "");
-
-    // Recarregar dados
-    userData.orders = await loadOrdersFromSupabase();
-    localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
-    renderSections();
-    showSection("approved", document.querySelectorAll(".menu-item")[1]);
-
-  } catch (error) {
-    console.error("❌ Erro completo:", error);
-    showToast(`❌ ${error.message}`, "error");
-  }
-}
-
 
     function saveProfile() {
       const newName = document.getElementById("profName").value;
@@ -948,4 +1080,3 @@ async function aprovarVersao(pedidoId, tipoVersao) {
   </script>
 </body>
 </html>
-
