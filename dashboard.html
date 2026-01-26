@@ -1347,145 +1347,336 @@ ${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
     }
 
     async function loadEditDraft(pedidoId) {
-      const loading = document.getElementById('editDraftLoading');
-      const form = document.getElementById('editDraftForm');
+  const loading = document.getElementById('editDraftLoading');
+  const form = document.getElementById('editDraftForm');
+  
+  loading.style.display = 'flex';
+  form.style.display = 'none';
+
+  try {
+    const { data, error } = await sb
+      .from('musicas_pedidos')
+      .select('*')
+      .eq('id', pedidoId)
+      .single();
+
+    if (error) throw error;
+
+    const payload = data.payload || {};
+    
+    document.getElementById('editDraftHeaderInfo').innerText = `Criado em ${new Date(data.created_at).toLocaleDateString('pt-BR')}`;
+
+    form.innerHTML = `
+      <div class="edit-draft-section-title">👤 Destinatário</div>
       
-      loading.style.display = 'flex';
-      form.style.display = 'none';
+      <div class="edit-draft-form-group">
+        <label>Quem é a pessoa especial?</label>
+        <div class="field-name">payload.step1</div>
+        <select id="edit_step1">
+          <option value="romantic" ${payload.step1 === 'romantic' ? 'selected' : ''}>Namorado/Namorada</option>
+          <option value="parent" ${payload.step1 === 'parent' ? 'selected' : ''}>Mãe/Pai</option>
+          <option value="child" ${payload.step1 === 'child' ? 'selected' : ''}>Filho/Filha</option>
+          <option value="grandparent" ${payload.step1 === 'grandparent' ? 'selected' : ''}>Avô/Avó</option>
+          <option value="friend" ${payload.step1 === 'friend' ? 'selected' : ''}>Amigo/Amiga</option>
+          <option value="colleague" ${payload.step1 === 'colleague' ? 'selected' : ''}>Colega de trabalho</option>
+          <option value="sibling" ${payload.step1 === 'sibling' ? 'selected' : ''}>Irmão/Irmã</option>
+          <option value="mentor" ${payload.step1 === 'mentor' ? 'selected' : ''}>Professor/Mentora</option>
+          <option value="group" ${payload.step1 === 'group' ? 'selected' : ''}>Grupo/Família</option>
+          <option value="other" ${payload.step1 === 'other' ? 'selected' : ''}>Outro</option>
+        </select>
+      </div>
 
-      try {
-        const { data, error } = await sb
-          .from('musicas_pedidos')
-          .select('*')
-          .eq('id', pedidoId)
-          .single();
+      ${payload.step1 === 'other' && payload['step1.5'] ? `
+      <div class="edit-draft-form-group">
+        <label>Como você descreveria esse relacionamento?</label>
+        <div class="field-name">payload.step1.5</div>
+        <textarea id="edit_step1_5" rows="3" placeholder="Ex: Meu vizinho que é como um pai para mim...">${payload['step1.5'] || ''}</textarea>
+      </div>
+      ` : ''}
 
-        if (error) throw error;
+      <div class="edit-draft-form-group">
+        <label>Qual o nome dessa pessoa?</label>
+        <div class="field-name">payload.step2</div>
+        <input type="text" id="edit_step2" value="${payload.step2 || ''}" placeholder="Ex: Maria">
+      </div>
 
-        const payload = data.payload || {};
-        
-        document.getElementById('editDraftHeaderInfo').innerText = `Criado em ${new Date(data.created_at).toLocaleDateString('pt-BR')}`;
+      <div class="edit-draft-form-group">
+        <label>Qual a idade ou faixa etária?</label>
+        <div class="field-name">payload.step3</div>
+        <select id="edit_step3">
+          <option value="child12" ${payload.step3 === 'child12' ? 'selected' : ''}>Criança (até 12 anos)</option>
+          <option value="teen" ${payload.step3 === 'teen' ? 'selected' : ''}>Teen (13-19 anos)</option>
+          <option value="adult_young" ${payload.step3 === 'adult_young' ? 'selected' : ''}>Jovem adulto (20-35 anos)</option>
+          <option value="adult_middle" ${payload.step3 === 'adult_middle' ? 'selected' : ''}>Adulto (36-55 anos)</option>
+          <option value="adult_senior" ${payload.step3 === 'adult_senior' ? 'selected' : ''}>Senior (56+ anos)</option>
+        </select>
+      </div>
 
-        form.innerHTML = `
-          <div class="edit-draft-section-title">📝 Informações Básicas</div>
-          
-          <div class="edit-draft-form-group">
-            <label>Para quem é essa música?</label>
-            <div class="field-name">payload.step2</div>
-            <input type="text" id="edit_step2" value="${payload.step2 || ''}" placeholder="Ex: Minha namorada Aline">
-          </div>
+      <div class="edit-draft-form-group">
+        <label>Descreva a personalidade dessa pessoa</label>
+        <div class="field-name">payload.step4</div>
+        <textarea id="edit_step4" rows="4" placeholder="Ex: Alegre, extrovertida, adora dançar...">${payload.step4 || ''}</textarea>
+      </div>
 
-          <div class="edit-draft-form-group">
-            <label>Faixa etária</label>
-            <div class="field-name">payload.step3</div>
-            <select id="edit_step3">
-              <option value="crianca" ${payload.step3 === 'crianca' ? 'selected' : ''}>Criança (0-12 anos)</option>
-              <option value="adolescente" ${payload.step3 === 'adolescente' ? 'selected' : ''}>Adolescente (13-17 anos)</option>
-              <option value="adulto" ${payload.step3 === 'adulto' ? 'selected' : ''}>Adulto (18-59 anos)</option>
-              <option value="idoso" ${payload.step3 === 'idoso' ? 'selected' : ''}>Idoso (60+ anos)</option>
-            </select>
-          </div>
+      <div class="edit-draft-form-group">
+        <label>Características especiais ou histórias únicas (opcional)</label>
+        <div class="field-name">payload.step5</div>
+        <textarea id="edit_step5" rows="3" placeholder="Ex: Faz bolos incríveis, plantava suas próprias verduras...">${payload.step5 || ''}</textarea>
+      </div>
 
-          <div class="edit-draft-section-title">🎉 Ocasião e Estilo</div>
+      <div class="edit-draft-section-title">🎉 Ocasião</div>
 
-          <div class="edit-draft-form-group">
-            <label>Qual a ocasião?</label>
-            <div class="field-name">payload.step6</div>
-            <select id="edit_step6">
-              <option value="aniversario" ${payload.step6 === 'aniversario' ? 'selected' : ''}>Aniversário</option>
-              <option value="casamento" ${payload.step6 === 'casamento' ? 'selected' : ''}>Casamento</option>
-              <option value="namorados" ${payload.step6 === 'namorados' ? 'selected' : ''}>Dia dos Namorados</option>
-              <option value="maes" ${payload.step6 === 'maes' ? 'selected' : ''}>Dia das Mães</option>
-              <option value="pais" ${payload.step6 === 'pais' ? 'selected' : ''}>Dia dos Pais</option>
-              <option value="formatura" ${payload.step6 === 'formatura' ? 'selected' : ''}>Formatura</option>
-              <option value="outro" ${payload.step6 === 'outro' ? 'selected' : ''}>Outro</option>
-            </select>
-          </div>
+      <div class="edit-draft-form-group">
+        <label>Qual a ocasião especial?</label>
+        <div class="field-name">payload.step6</div>
+        <select id="edit_step6">
+          <option value="proposal" ${payload.step6 === 'proposal' ? 'selected' : ''}>Pedido de Casamento</option>
+          <option value="birthday" ${payload.step6 === 'birthday' ? 'selected' : ''}>Aniversário</option>
+          <option value="confession" ${payload.step6 === 'confession' ? 'selected' : ''}>Declaração de Amor</option>
+          <option value="tribute" ${payload.step6 === 'tribute' ? 'selected' : ''}>Homenagem especial</option>
+          <option value="goodbye" ${payload.step6 === 'goodbye' ? 'selected' : ''}>Despedida/Adeus</option>
+          <option value="celebration" ${payload.step6 === 'celebration' ? 'selected' : ''}>Comemoração (formatura, promoção, etc)</option>
+          <option value="apology" ${payload.step6 === 'apology' ? 'selected' : ''}>Pedido de desculpas</option>
+          <option value="friendship" ${payload.step6 === 'friendship' ? 'selected' : ''}>Comemoração de amizade</option>
+          <option value="other" ${payload.step6 === 'other' ? 'selected' : ''}>Outra ocasião</option>
+        </select>
+      </div>
 
-          <div class="edit-draft-form-group">
-            <label>Gênero musical</label>
-            <div class="field-name">payload.step8</div>
-            <select id="edit_step8">
-              <option value="pop" ${payload.step8 === 'pop' ? 'selected' : ''}>Pop</option>
-              <option value="rock" ${payload.step8 === 'rock' ? 'selected' : ''}>Rock</option>
-              <option value="sertanejo" ${payload.step8 === 'sertanejo' ? 'selected' : ''}>Sertanejo</option>
-              <option value="forro" ${payload.step8 === 'forro' ? 'selected' : ''}>Forró</option>
-              <option value="rap" ${payload.step8 === 'rap' ? 'selected' : ''}>Rap/Hip-Hop</option>
-              <option value="mpb" ${payload.step8 === 'mpb' ? 'selected' : ''}>MPB</option>
-              <option value="gospel" ${payload.step8 === 'gospel' ? 'selected' : ''}>Gospel</option>
-              <option value="infantil" ${payload.step8 === 'infantil' ? 'selected' : ''}>Infantil</option>
-            </select>
-          </div>
+      ${payload.step6 === 'other' && payload['step6.5'] ? `
+      <div class="edit-draft-form-group">
+        <label>Descreva a ocasião em detalhes</label>
+        <div class="field-name">payload.step6.5</div>
+        <textarea id="edit_step6_5" rows="3" placeholder="Ex: Aposentadoria após 40 anos de trabalho...">${payload['step6.5'] || ''}</textarea>
+      </div>
+      ` : ''}
 
-          <div class="edit-draft-section-title">💬 Mensagem Personalizada</div>
+      <div class="edit-draft-form-group">
+        <label>Data da ocasião (opcional)</label>
+        <div class="field-name">payload.step7</div>
+        <input type="date" id="edit_step7" value="${payload.step7 || ''}">
+      </div>
 
-          <div class="edit-draft-form-group">
-            <label>Conte mais sobre a pessoa e o que deseja na música</label>
-            <div class="field-name">payload.step12</div>
-            <textarea id="edit_step12" rows="6" placeholder="Detalhes, memórias, características...">${payload.step12 || ''}</textarea>
-          </div>
+      <div class="edit-draft-section-title">🎵 Estilo Musical</div>
 
-          <div class="edit-draft-actions">
-            <button type="button" class="edit-draft-btn edit-draft-btn-cancel" onclick="closeEditDraftModal()">
-              Cancelar
-            </button>
-            <button type="button" class="edit-draft-btn edit-draft-btn-save" onclick="saveEditDraft()">
-              💾 Salvar Alterações
-            </button>
-          </div>
-        `;
+      <div class="edit-draft-form-group">
+        <label>Gênero musical</label>
+        <div class="field-name">payload.step8</div>
+        <select id="edit_step8">
+          <option value="pop" ${payload.step8 === 'pop' ? 'selected' : ''}>Pop moderno</option>
+          <option value="sertanejo" ${payload.step8 === 'sertanejo' ? 'selected' : ''}>Sertanejo</option>
+          <option value="rock" ${payload.step8 === 'rock' ? 'selected' : ''}>Rock/Rock alternativo</option>
+          <option value="rap" ${payload.step8 === 'rap' ? 'selected' : ''}>Rap/Trap</option>
+          <option value="samba" ${payload.step8 === 'samba' ? 'selected' : ''}>Samba/Pagode</option>
+          <option value="acoustic" ${payload.step8 === 'acoustic' ? 'selected' : ''}>Acústico/MPB</option>
+          <option value="electronic" ${payload.step8 === 'electronic' ? 'selected' : ''}>Eletrônico/House</option>
+          <option value="reggae" ${payload.step8 === 'reggae' ? 'selected' : ''}>Reggae</option>
+          <option value="funk" ${payload.step8 === 'funk' ? 'selected' : ''}>Funk/Dance</option>
+          <option value="forro" ${payload.step8 === 'forro' ? 'selected' : ''}>Forró</option>
+          <option value="gospel" ${payload.step8 === 'gospel' ? 'selected' : ''}>Gospel/Espiritual</option>
+          <option value="other" ${payload.step8 === 'other' ? 'selected' : ''}>Outro</option>
+        </select>
+      </div>
 
-        loading.style.display = 'none';
-        form.style.display = 'block';
+      ${payload.step8 === 'other' && payload['step8.5'] ? `
+      <div class="edit-draft-form-group">
+        <label>Qual gnero ou mistura você prefere?</label>
+        <div class="field-name">payload.step8.5</div>
+        <textarea id="edit_step8_5" rows="2" placeholder="Ex: Eletrônico com influência de samba...">${payload['step8.5'] || ''}</textarea>
+      </div>
+      ` : ''}
 
-      } catch (error) {
-        console.error('❌ Erro ao carregar rascunho:', error);
-        showEditDraftToast(`Erro: ${error.message}`, 'error');
-        closeEditDraftModal();
+      <div class="edit-draft-form-group">
+        <label>Tempo/ritmo ideal</label>
+        <div class="field-name">payload.step9</div>
+        <select id="edit_step9">
+          <option value="slow" ${payload.step9 === 'slow' ? 'selected' : ''}>Lenta e contemplativa (60-80 BPM)</option>
+          <option value="moderate" ${payload.step9 === 'moderate' ? 'selected' : ''}>Moderada e equilibrada (80-110 BPM)</option>
+          <option value="fast" ${payload.step9 === 'fast' ? 'selected' : ''}>Rápida e energética (110+ BPM)</option>
+        </select>
+      </div>
+
+      <div class="edit-draft-form-group">
+        <label>Energia da música</label>
+        <div class="field-name">payload.step10</div>
+        <select id="edit_step10">
+          <option value="low" ${payload.step10 === 'low' ? 'selected' : ''}>Baixa (suave, intimista, relax)</option>
+          <option value="medium" ${payload.step10 === 'medium' ? 'selected' : ''}>Média (natural, fluida, equilibrada)</option>
+          <option value="high" ${payload.step10 === 'high' ? 'selected' : ''}>Alta (impacto, poderosa, celebrativa)</option>
+        </select>
+      </div>
+
+      <div class="edit-draft-section-title">🎼 Referências Musicais</div>
+
+      <div class="edit-draft-form-group">
+        <label>Artistas e músicas que inspiram (até 3)</label>
+        <div class="field-name">payload.step11</div>
+        <div class="edit-draft-references" id="referencesContainer">
+          ${(payload.step11 || []).slice(0, 3).map((ref, i) => `
+            <div class="edit-draft-reference-item">
+              <input type="text" placeholder="Artista" value="${ref.artist || ''}" data-ref-idx="${i}" data-ref-type="artist">
+              <input type="text" placeholder="Música" value="${ref.song || ''}" data-ref-idx="${i}" data-ref-type="song">
+            </div>
+          `).join('')}
+          ${payload.step11?.length < 3 ? Array.from({length: 3 - (payload.step11?.length || 0)}, (_, i) => `
+            <div class="edit-draft-reference-item">
+              <input type="text" placeholder="Artista" data-ref-idx="${(payload.step11?.length || 0) + i}" data-ref-type="artist">
+              <input type="text" placeholder="Música" data-ref-idx="${(payload.step11?.length || 0) + i}" data-ref-type="song">
+            </div>
+          `).join('') : ''}
+        </div>
+      </div>
+
+      <div class="edit-draft-section-title">💬 Mensagem e Emoção</div>
+
+      <div class="edit-draft-form-group">
+        <label>Sentimento ou mensagem PRINCIPAL</label>
+        <div class="field-name">payload.step12</div>
+        <textarea id="edit_step12" rows="4" placeholder="Ex: Quero contar nossa história de vida juntos...">${payload.step12 || ''}</textarea>
+      </div>
+
+      <div class="edit-draft-form-group">
+        <label>Histórias, memórias ou menções específicas (opcional)</label>
+        <div class="field-name">payload.step13</div>
+        <textarea id="edit_step13" rows="3" placeholder="Ex: Mencionar Dourados, aquela viagem para o Rio...">${payload.step13 || ''}</textarea>
+      </div>
+
+      <div class="edit-draft-form-group">
+        <label>Tom/estilo de linguagem</label>
+        <div class="field-name">payload.step14</div>
+        <select id="edit_step14">
+          <option value="poetic" ${payload.step14 === 'poetic' ? 'selected' : ''}>Poético e romântico (com metáforas)</option>
+          <option value="conversational" ${payload.step14 === 'conversational' ? 'selected' : ''}>Conversacional e natural</option>
+          <option value="storytelling" ${payload.step14 === 'storytelling' ? 'selected' : ''}>Storytelling (contando uma história)</option>
+          <option value="direct" ${payload.step14 === 'direct' ? 'selected' : ''}>Direto e emotivo</option>
+          <option value="humorous" ${payload.step14 === 'humorous' ? 'selected' : ''}>Bem-humorado (com humor e leveza)</option>
+        </select>
+      </div>
+
+      <div class="edit-draft-section-title">🎙️ Produção</div>
+
+      <div class="edit-draft-form-group">
+        <label>Tipo de voz</label>
+        <div class="field-name">payload.step15</div>
+        <select id="edit_step15">
+          <option value="female_warm" ${payload.step15 === 'female_warm' ? 'selected' : ''}>Voz feminina suave (calorosa, emotiva)</option>
+          <option value="female_strong" ${payload.step15 === 'female_strong' ? 'selected' : ''}>Voz feminina poderosa (energética, clara)</option>
+          <option value="male_soft" ${payload.step15 === 'male_soft' ? 'selected' : ''}>Voz masculina suave (intimista, delicada)</option>
+          <option value="male_strong" ${payload.step15 === 'male_strong' ? 'selected' : ''}>Voz masculina poderosa (grave, marcante)</option>
+          <option value="duo" ${payload.step15 === 'duo' ? 'selected' : ''}>Dueto homem+mulher (alternando)</option>
+          <option value="duo_harmony" ${payload.step15 === 'duo_harmony' ? 'selected' : ''}>Dueto homem+mulher (harmonizando)</option>
+        </select>
+      </div>
+
+      <div class="edit-draft-form-group">
+        <label>Estilo de produção</label>
+        <div class="field-name">payload.step16</div>
+        <select id="edit_step16">
+          <option value="acoustic" ${payload.step16 === 'acoustic' ? 'selected' : ''}>Acústico puro (violão, piano, natural)</option>
+          <option value="acoustic_backing" ${payload.step16 === 'acoustic_backing' ? 'selected' : ''}>Acústico com backing</option>
+          <option value="studio_polish" ${payload.step16 === 'studio_polish' ? 'selected' : ''}>Studio polish (profissional, limpo)</option>
+          <option value="live_feel" ${payload.step16 === 'live_feel' ? 'selected' : ''}>Live feel (como se ao vivo)</option>
+          <option value="cinematic" ${payload.step16 === 'cinematic' ? 'selected' : ''}>Cinematic (épico, orquestrado)</option>
+          <option value="electronic_modern" ${payload.step16 === 'electronic_modern' ? 'selected' : ''}>Eletrônico/Moderno (sintetizadores, beats)</option>
+        </select>
+      </div>
+
+      <div class="edit-draft-actions">
+        <button type="button" class="edit-draft-btn edit-draft-btn-cancel" onclick="closeEditDraftModal()">
+          Cancelar
+        </button>
+        <button type="button" class="edit-draft-btn edit-draft-btn-save" onclick="saveEditDraft()">
+          💾 Salvar Alterações
+        </button>
+      </div>
+    `;
+
+    loading.style.display = 'none';
+    form.style.display = 'block';
+
+  } catch (error) {
+    console.error('❌ Erro ao carregar rascunho:', error);
+    showEditDraftToast(`Erro: ${error.message}`, 'error');
+    closeEditDraftModal();
+  }
+}
+
+
+   async function saveEditDraft() {
+  if (!editDraftCurrentPedidoId) return;
+
+  const btn = document.querySelector('.edit-draft-btn-save');
+  btn.disabled = true;
+  btn.innerText = '⏳ Salvando...';
+
+  try {
+    // Coletar referências
+    const references = [];
+    document.querySelectorAll('[data-ref-type="artist"]').forEach((artistInput, idx) => {
+      const songInput = document.querySelector(`[data-ref-idx="${idx}"][data-ref-type="song"]`);
+      const artist = artistInput.value.trim();
+      const song = songInput?.value.trim();
+      
+      if (artist && song) {
+        references.push({ artist, song });
       }
-    }
+    });
 
-    async function saveEditDraft() {
-      if (!editDraftCurrentPedidoId) return;
+    const updatedPayload = {
+      step1: document.getElementById('edit_step1')?.value,
+      'step1.5': document.getElementById('edit_step1_5')?.value || undefined,
+      step2: document.getElementById('edit_step2')?.value,
+      step3: document.getElementById('edit_step3')?.value,
+      step4: document.getElementById('edit_step4')?.value,
+      step5: document.getElementById('edit_step5')?.value,
+      step6: document.getElementById('edit_step6')?.value,
+      'step6.5': document.getElementById('edit_step6_5')?.value || undefined,
+      step7: document.getElementById('edit_step7')?.value,
+      step8: document.getElementById('edit_step8')?.value,
+      'step8.5': document.getElementById('edit_step8_5')?.value || undefined,
+      step9: document.getElementById('edit_step9')?.value,
+      step10: document.getElementById('edit_step10')?.value,
+      step11: references.length > 0 ? references : undefined,
+      step12: document.getElementById('edit_step12')?.value,
+      step13: document.getElementById('edit_step13')?.value,
+      step14: document.getElementById('edit_step14')?.value,
+      step15: document.getElementById('edit_step15')?.value,
+      step16: document.getElementById('edit_step16')?.value
+    };
 
-      const btn = document.querySelector('.edit-draft-btn-save');
-      btn.disabled = true;
-      btn.innerText = '⏳ Salvando...';
-
-      try {
-        const updatedPayload = {
-          step2: document.getElementById('edit_step2').value,
-          step3: document.getElementById('edit_step3').value,
-          step6: document.getElementById('edit_step6').value,
-          step8: document.getElementById('edit_step8').value,
-          step12: document.getElementById('edit_step12').value
-        };
-
-        const { error } = await sb
-          .from('musicas_pedidos')
-          .update({ 
-            payload: updatedPayload,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', editDraftCurrentPedidoId);
-
-        if (error) throw error;
-
-        showEditDraftToast('✅ Rascunho atualizado com sucesso!', '');
-        closeEditDraftModal();
-
-        userData.orders = await loadOrdersFromSupabase();
-        localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
-        renderSections();
-
-      } catch (error) {
-        console.error('❌ Erro ao salvar:', error);
-        showEditDraftToast(`Erro: ${error.message}`, 'error');
-        btn.disabled = false;
-        btn.innerText = '💾 Salvar Alterações';
+    // Remove undefined values
+    Object.keys(updatedPayload).forEach(key => {
+      if (updatedPayload[key] === undefined || updatedPayload[key] === '') {
+        delete updatedPayload[key];
       }
-    }
+    });
+
+    const { error } = await sb
+      .from('musicas_pedidos')
+      .update({ 
+        payload: updatedPayload,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', editDraftCurrentPedidoId);
+
+    if (error) throw error;
+
+    showEditDraftToast('✅ Rascunho atualizado com sucesso!', '');
+    closeEditDraftModal();
+
+    userData.orders = await loadOrdersFromSupabase();
+    localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
+    renderSections();
+
+  } catch (error) {
+    console.error('❌ Erro ao salvar:', error);
+    showEditDraftToast(`Erro: ${error.message}`, 'error');
+    btn.disabled = false;
+    btn.innerText = '💾 Salvar Alterações';
+  }
+}
+
   </script>
 
 </body>
 </html>
+
