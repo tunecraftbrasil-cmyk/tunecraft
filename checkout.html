@@ -634,7 +634,6 @@
           if (error) console.error("❌ Erro ao montar form:", error);
           console.log("✅ Card form mounted com amount:", amount);
         },
-        // ✅ CORRIGIDO: Tratar callback corretamente
         onCardTokenReceived: (error, token) => {
           if (error) {
             console.error("❌ Erro ao gerar token:", error);
@@ -645,19 +644,17 @@
             return;
           }
 
-          // ✅ NOVO: Log detalhado para debug
           console.log("🔍 Token callback recebido:", {
-            token: token,
+            token,
             type: typeof token,
             keys: Object.keys(token || {})
           });
 
-          // ✅ CORRIGIDO: O token é uma string, não um objeto com .id
-          generatedCardToken = token;
+          // se o log mostrar que vem como { id: 'xxx', ... }
+          generatedCardToken = token.id;  // ← usa o campo correto
 
           console.log("✅ Token gerado:", generatedCardToken ? "✅ Válido" : "❌ Vazio");
 
-          // Agora envie o pagamento com o token
           sendCardPaymentToBackend();
         },
         onBinChange: (bin) => {
@@ -950,7 +947,7 @@
           console.log('❌ Timeout aguardando token');
           resolve(false);
         }
-      }, 50); // Verificar a cada 50ms em vez de 100ms
+      }, 50);
     });
   }
 
@@ -977,11 +974,9 @@
       }
 
       console.log('🎯 Iniciando geração de token...');
-      
-      // Chamar createCardToken
+
       cardFormInstance.createCardToken();
 
-      // Aguardar com timeout maior (8 segundos)
       const tokenReceived = await waitForToken(8000);
 
       if (!tokenReceived) {
@@ -1008,7 +1003,7 @@
 
       console.log('📤 Enviando pagamento com token:', {
         tokenPresent: !!generatedCardToken,
-        token: generatedCardToken ? generatedCardToken.substring(0, 10) + '...' : 'VAZIO',
+        token: generatedCardToken ? String(generatedCardToken).substring(0, 10) + '...' : 'VAZIO',
         paymentMethodId: cardFormData.paymentMethodId,
         issuerId: cardFormData.issuerId,
         installments: cardFormData.installments
@@ -1020,7 +1015,7 @@
 
       const paymentPayload = {
         paymentData: {
-          token: generatedCardToken, // ✅ AGORA CORRETO: String, não undefined
+          token: generatedCardToken,
           paymentMethodId: cardFormData.paymentMethodId,
           issuerId: cardFormData.issuerId,
           installments: cardFormData.installments,
