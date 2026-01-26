@@ -998,6 +998,8 @@
     const name = document.getElementById('customer-name').value.trim();
     const email = document.getElementById('customer-email').value.trim();
 
+    console.log('🚀 ENVIANDO PARA BACKEND - generatedCardToken:', generatedCardToken);
+    
     try {
       const cardFormData = cardFormInstance.getCardFormData();
 
