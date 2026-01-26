@@ -808,16 +808,12 @@
 
    async function editarDraft(pedidoId) {
   try {
-    showToast("⏳ Abrindo editor de rascunho...", "info");
-    console.log("📝 Abrindo editor para:", pedidoId);
-
-    // ✅ Redirecionar para edit-draft.html com o ID
+    showToast("⏳ Abrindo editor...", "info");
     setTimeout(() => {
       window.location.href = `edit-draft.html?id=${pedidoId}`;
     }, 500);
-
   } catch (error) {
-    console.error("Erro ao abrir editor:", error);
+    console.error("Erro:", error);
     showToast(`❌ Erro: ${error.message}`, "error");
   }
 }
@@ -1070,6 +1066,7 @@ ${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
   </script>
 </body>
 </html>
+
 
 
 
