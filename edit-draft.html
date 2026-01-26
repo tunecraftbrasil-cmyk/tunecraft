@@ -497,6 +497,12 @@
     let currentPedidoId = null;
     let originalPayload = {};
 
+    // ✅ CRIAR CLIENT SUPABASE (se não existir)
+    if (!window.sb) {
+      window.sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      console.log("✅ Supabase client criado em edit-draft.html");
+    }
+
     // ✅ Buscar pedidoId da URL
     const urlParams = new URLSearchParams(window.location.search);
     currentPedidoId = urlParams.get('id');
