@@ -263,7 +263,7 @@
       color: #1e293b;
     }
 
-    .mp-field input, 
+    .mp-field input,
     .mp-field select {
       padding: 12px;
       border: 1px solid #cbd5e1;
@@ -583,16 +583,17 @@
   let pixPaymentId = null;
   let pixCheckInterval = null;
   let cardFormInstance = null;
+  let generatedCardToken = null; // ✅ NOVO: Armazenar token gerado
 
   // ========================
   // INICIALIZAR CARDFORM - SEM IFRAME
   // ========================
   function initializeCardForm(amount) {
     console.log('🔄 Inicializando cardForm com amount:', amount);
-    
+
     cardFormInstance = mp.cardForm({
       amount: amount.toFixed(2),
-      iframe: false, // ✅ SEM IFRAME - usa campos nativos
+      iframe: false,
       form: {
         id: "form-checkout",
         cardNumber: {
@@ -632,6 +633,21 @@
         onFormMounted: error => {
           if (error) console.error("❌ Erro ao montar form:", error);
           console.log("✅ Card form mounted com amount:", amount);
+        },
+        // ✅ NOVO: Callback para token gerado
+        onCardTokenReceived: (error, tokenData) => {
+          if (error) {
+            console.error("❌ Erro ao gerar token:", error);
+            showToast("❌ Erro ao processar cartão", "error");
+            hideLoading();
+            return;
+          }
+
+          console.log("✅ Token gerado:", tokenData.id);
+          generatedCardToken = tokenData.id;
+
+          // Agora envie o pagamento com o token
+          sendCardPaymentToBackend();
         },
         onBinChange: (bin) => {
           console.log("🔍 BIN detectado:", bin);
@@ -691,6 +707,7 @@
     }
   }
 
+  // ✅ CORRIGIDO: updatePriceDisplay NÃO reinicializa CardForm
   function updatePriceDisplay() {
     const originalPriceEl = document.getElementById('original-price');
     const discountRow = document.getElementById('discount-row');
@@ -705,8 +722,7 @@
       discountValue.textContent = `- ${formatBRL(discount)}`;
       finalPriceEl.textContent = formatBRL(finalPrice);
 
-      initializeCardForm(finalPrice / 100);
-
+      // Apenas atualizar parcelas, NÃO reinicializar CardForm
       setTimeout(updateInstallmentOptions, 300);
 
       const icon = currentPaymentMethod === 'credit_card' ? '💳' : '🏦';
@@ -908,46 +924,118 @@
   });
 
   // ========================
-  // PAGAMENTO CARTÃO
+  // AGUARDAR TOKEN
   // ========================
 
+  // ✅ NOVO: Função auxiliar para aguardar geração do token
+  function waitForToken(maxWaitMs) {
+    return new Promise((resolve) => {
+      const startTime = Date.now();
+      const checkInterval = setInterval(() => {
+        if (generatedCardToken) {
+          clearInterval(checkInterval);
+          resolve(true);
+        }
+        if (Date.now() - startTime > maxWaitMs) {
+          clearInterval(checkInterval);
+          resolve(false);
+        }
+      }, 100);
+    });
+  }
+
+  // ========================
+  // PAGAMENTO CARTÃO - REFATORADO
+  // ========================
+
+  // ✅ NOVO: Função refatorada para processar pagamento com cartão
   async function processCardPayment() {
     const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
     const name = document.getElementById('customer-name').value.trim();
     const email = document.getElementById('customer-email').value.trim();
 
-    showLoading('Processando pagamento...');
+    showLoading('Gerando token do cartão...');
+
+    // Reset token para esta tentativa
+    generatedCardToken = null;
+
+    try {
+      // Validar campos obrigatórios ANTES de gerar token
+      const cardholderName = document.getElementById('form-checkout__cardholderName').value.trim();
+      const cardNumber = document.getElementById('form-checkout__cardNumber').value.trim();
+      const expDate = document.getElementById('form-checkout__cardExpirationDate').value.trim();
+      const cvv = document.getElementById('form-checkout__securityCode').value.trim();
+      const docNumber = document.getElementById('form-checkout__identificationNumber').value.trim();
+
+      if (!cardholderName || !cardNumber || !expDate || !cvv || !docNumber) {
+        throw new Error('Preencha todos os campos do cartão');
+      }
+
+      // Chamar createCardToken - isso dispara o callback onCardTokenReceived
+      cardFormInstance.createCardToken();
+
+      // Aguardar geração do token (timeout de 5 segundos)
+      const tokenReceived = await waitForToken(5000);
+
+      if (!tokenReceived) {
+        throw new Error('Timeout ao gerar token do cartão');
+      }
+
+    } catch (error) {
+      console.error("❌ Erro:", error.message);
+      document.getElementById('card-errors').textContent = error.message;
+      document.getElementById('card-errors').style.display = 'block';
+      showToast(`❌ ${error.message}`, 'error');
+      hideLoading();
+    }
+  }
+
+  // ✅ NOVO: Função para enviar pagamento após token ser gerado
+  async function sendCardPaymentToBackend() {
+    const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
+    const name = document.getElementById('customer-name').value.trim();
+    const email = document.getElementById('customer-email').value.trim();
 
     try {
       const cardFormData = cardFormInstance.getCardFormData();
 
-      console.log('📤 Dados do cartão:', {
-        token: cardFormData.token ? '✅ Presente' : '❌ Vazio',
+      console.log('📤 Dados do cartão com token:', {
+        token: generatedCardToken ? '✅ Presente' : '❌ Vazio',
         paymentMethodId: cardFormData.paymentMethodId,
         issuerId: cardFormData.issuerId,
-        installments: cardFormData.installments,
-        amount: appliedCoupon ? finalPrice / 100 : originalPrice / 100
+        installments: cardFormData.installments
       });
 
-      if (!cardFormData.token) {
-        throw new Error('❌ Erro ao gerar token do cartão. Verifique os dados e tente novamente.');
+      if (!generatedCardToken) {
+        throw new Error('Token do cartão não foi gerado');
       }
 
+      // Criar payload com o token gerado
+      const paymentPayload = {
+        paymentData: {
+          token: generatedCardToken,
+          paymentMethodId: cardFormData.paymentMethodId,
+          issuerId: cardFormData.issuerId,
+          installments: cardFormData.installments,
+          identificationType: cardFormData.identificationType,
+          identificationNumber: cardFormData.identificationNumber
+        },
+        amount: appliedCoupon ? finalPrice / 100 : originalPrice / 100,
+        customerName: name,
+        customerEmail: email,
+        orderId: pedidoId,
+        couponCode: appliedCoupon?.codigo || null,
+        paymentMethod: 'credit_card'
+      };
+
+      // Enviar para seu backend
       const response = await fetch(`${SUPABASE_URL}/functions/v1/process-mercadopago-payment`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
         },
-        body: JSON.stringify({
-          paymentData: cardFormData,
-          amount: appliedCoupon ? finalPrice / 100 : originalPrice / 100,
-          customerName: name,
-          customerEmail: email,
-          orderId: pedidoId,
-          couponCode: appliedCoupon?.codigo || null,
-          paymentMethod: 'credit_card'
-        })
+        body: JSON.stringify(paymentPayload)
       });
 
       const result = await response.json();
@@ -959,6 +1047,7 @@
       }
 
       await finalizePurchase(pedidoId, result.id, 'credit_card');
+      hideLoading();
 
     } catch (error) {
       console.error("❌ Erro:", error.message);
@@ -981,7 +1070,7 @@
     try {
       const response = await fetch(`${SUPABASE_URL}/functions/v1/process-mercadopago-payment`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
         },
@@ -1003,7 +1092,7 @@
 
       pixPaymentId = result.id;
 
-      document.getElementById('pix-qrcode-img').src = result.point_of_interaction.transaction_data.qr_code_base64 
+      document.getElementById('pix-qrcode-img').src = result.point_of_interaction.transaction_data.qr_code_base64
         ? `data:image/png;base64,${result.point_of_interaction.transaction_data.qr_code_base64}`
         : result.point_of_interaction.transaction_data.ticket_url;
       document.getElementById('pix-code-text').textContent = result.point_of_interaction.transaction_data.qr_code;
@@ -1030,7 +1119,7 @@
       try {
         const response = await fetch(`${SUPABASE_URL}/functions/v1/check-mercadopago-payment`, {
           method: 'POST',
-          headers: { 
+          headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
           },
@@ -1082,7 +1171,7 @@
 
       await fetch(`${SUPABASE_URL}/functions/v1/generate-lyrics`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
         },
