@@ -651,7 +651,7 @@
           });
 
           // se o log mostrar que vem como { id: 'xxx', ... }
-          generatedCardToken = token.id;  // ← usa o campo correto
+          generatedCardToken = token[Object.keys(token)[0]];
 
           console.log("✅ Token gerado:", generatedCardToken ? "✅ Válido" : "❌ Vazio");
 
