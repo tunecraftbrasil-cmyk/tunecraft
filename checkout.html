@@ -628,26 +628,21 @@
         if (error) console.error("Form Mounted handling error: ", error);
         console.log("✅ Card form mounted");
       },
-      onSubmit: event => {
-        event.preventDefault();
-        processCardPayment();
-      },
-      // ✅ NOVO: Interceptar quando o BIN do cartão é detectado
+      // ✅ REMOVIDO: onSubmit (estava causando o erro)
+      // Agora vamos processar manualmente no evento do form
+
       onBinChange: (bin) => {
         console.log("🔍 BIN detectado:", bin);
-        // Forçar atualização das parcelas após o Mercado Pago processar o BIN
         setTimeout(() => {
           updateInstallmentOptions();
         }, 500);
       },
-      // ✅ NOVO: Interceptar quando as parcelas são carregadas
       onInstallmentsReceived: (error, installments) => {
         if (error) {
           console.error("Erro ao carregar parcelas:", error);
           return;
         }
         console.log("📦 Parcelas recebidas do MP:", installments);
-        // Forçar atualização com o preço correto
         setTimeout(() => {
           updateInstallmentOptions();
         }, 100);
@@ -666,7 +661,6 @@
     }).format(centavos / 100);
   }
 
-  // ✅ FUNÇÃO ATUALIZADA: Atualizar opções de parcelas com preço FINAL
   function updateInstallmentOptions() {
     const installmentSelect = document.getElementById('form-checkout__installments');
 
@@ -675,16 +669,13 @@
       return;
     }
 
-    // Usar o preço FINAL (após cupom)
     const priceToUse = appliedCoupon ? finalPrice : originalPrice;
     const priceInReais = priceToUse / 100;
 
     console.log('💰 Atualizando parcelas para:', formatBRL(priceToUse));
 
-    // Limpar opções antigas
     installmentSelect.innerHTML = '';
 
-    // Gerar opções de 1x até 12x com o preço FINAL
     for (let i = 1; i <= 12; i++) {
       const installmentValue = (priceInReais / i).toFixed(2);
       const totalValue = priceInReais.toFixed(2);
@@ -711,10 +702,8 @@
       discountValue.textContent = `- ${formatBRL(discount)}`;
       finalPriceEl.textContent = formatBRL(finalPrice);
 
-      // Atualizar amount do cardForm
       cardForm.update({ amount: (finalPrice / 100).toFixed(2) });
 
-      // ✅ CHAMAR updateInstallmentOptions após aplicar cupom
       setTimeout(updateInstallmentOptions, 300);
 
       const icon = currentPaymentMethod === 'credit_card' ? '💳' : '🏦';
@@ -818,7 +807,6 @@
         return;
       }
 
-      // Validações
       if (!data.ativo) {
         showMessage('coupon-message', '❌ Cupom desativado', 'error');
         btn.disabled = false;
@@ -840,7 +828,6 @@
         return;
       }
 
-      // Calcular desconto
       let discount = 0;
       if (data.desconto_percentual > 0) {
         discount = Math.round((originalPrice * data.desconto_percentual) / 100);
@@ -900,7 +887,7 @@
   });
 
   // ========================
-  // SUBMIT FORM
+  // SUBMIT FORM - ✅ CORRIGIDO
   // ========================
 
   document.getElementById('payment-form').addEventListener('submit', async (e) => {
@@ -915,14 +902,15 @@
     }
 
     if (currentPaymentMethod === 'credit_card') {
-      cardForm.submit();
+      // ✅ USAR getCardFormData() ao invés de submit()
+      await processCardPayment();
     } else {
       await processPixPayment(name, email);
     }
   });
 
   // ========================
-  // PAGAMENTO CARTÃO
+  // PAGAMENTO CARTÃO - ✅ CORRIGIDO
   // ========================
 
   async function processCardPayment() {
@@ -933,7 +921,10 @@
     showLoading('Processando pagamento...');
 
     try {
+      // ✅ Pegar dados do formulário diretamente
       const cardFormData = cardForm.getCardFormData();
+
+      console.log('📤 Enviando dados do cartão:', cardFormData);
 
       const response = await fetch(`${SUPABASE_URL}/functions/v1/process-mercadopago-payment`, {
         method: 'POST',
@@ -953,6 +944,8 @@
       });
 
       const result = await response.json();
+
+      console.log('📥 Resposta do pagamento:', result);
 
       if (!response.ok || result.status !== 'approved') {
         throw new Error(result.error || result.status_detail || 'Pagamento recusado');
@@ -1116,10 +1109,8 @@
     }
   }
 
-  // ✅ CHAMAR updateInstallmentOptions ao carregar a página
   window.addEventListener('load', () => {
     loadCheckoutData();
-    // Aguardar o cardForm montar antes de atualizar parcelas
     setTimeout(updateInstallmentOptions, 1500);
   });
 
