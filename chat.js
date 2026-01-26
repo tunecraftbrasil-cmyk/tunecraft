@@ -1,513 +1,383 @@
-// ============================================
-// LÓGICA DO CHAT (chat-stripe.js) 
-// VERSÃO COMPLETA COM SUPABASE DIRETO
-// ============================================
-
-// Inicializa Supabase Client
-// const supabaseUrl = 'https://your-project.supabase.co'; // SUBSTITUA
-// const supabaseKey = 'your-anon-key'; // SUBSTITUA
-// const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-// Função para rolar o chat para o final
-function scrollToBottom() {
-    const messagesContainer = document.getElementById("chatMessages");
-    if (messagesContainer) {
-        setTimeout(() => {
-            messagesContainer.scrollTo({
-                top: messagesContainer.scrollHeight,
-                behavior: 'smooth'
-            });
-        }, 100);
-    }
-}
-
-const elaboratedChatFlow = [
-    {
-        step: 1, section: "DESTINATÁRIO",
-        question: "Quem é a pessoa especial para quem você quer criar uma música?? 👤",
-        type: "select",
-        options: [
-            { label: "Namorada/Namorado 💕", value: "romantic" },
-            { label: "Mãe/Pai 👨‍👩‍👧", value: "parent" },
-            { label: "Filho/Filha 👶", value: "child" },
-            { label: "Avó/Avô 👵", value: "grandparent" },
-            { label: "Amigo/Amiga 👥", value: "friend" },
-            { label: "Colega de trabalho 💼", value: "colleague" },
-            { label: "Irmão/Irmã 👬", value: "sibling" },
-            { label: "Professor/Mentora 🎓", value: "mentor" },
-            { label: "Grupo/Família 👨‍👩‍👧‍👦", value: "group" },
-            { label: "Outro 🎭", value: "other" },
-        ],
-        metadata: { fieldName: "recipient.relationship", required: true }
-    },
-    {
-        step: 1.5, condition: (data) => data.step1 === "other",
-        question: "Como você descreveria esse relacionamento? Por favor, seja bem específico.",
-        type: "textarea", placeholder: "Ex: Meu vizinho que é como um pai para mim...",
-        minLength: 5, metadata: { fieldName: "recipient.customRelationship", required: true }
-    },
-    {
-        step: 2, section: "DESTINATÁRIO",
-        question: "Qual é o nome dessa pessoa? 🎤",
-        type: "input", placeholder: "Ex: Maria",
-        minLength: 2, metadata: { fieldName: "recipient.name", required: true }
-    },
-    {
-        step: 3, section: "DESTINATÁRIO",
-        question: "Qual a idade ou faixa etária? 🎂",
-        type: "select",
-        options: [
-            { label: "Criança (até 12 anos)", value: "child_12" },
-            { label: "Teen (13-19 anos)", value: "teen" },
-            { label: "Jovem adulto (20-35 anos)", value: "adult_young" },
-            { label: "Adulto (36-55 anos)", value: "adult_middle" },
-            { label: "Senior (56+ anos)", value: "adult_senior" },
-        ],
-        metadata: { fieldName: "recipient.ageGroup", required: true }
-    },
-    {
-        step: 4, section: "DESTINATÁRIO",
-        question: "Descreva a personalidade dessa pessoa em detalhes. Como ela é? 💭",
-        type: "textarea", placeholder: "Ex: Alegre, extrovertida, adora dançar, tem um senso de humor único...",
-        minLength: 15, metadata: { fieldName: "recipient.personality", required: true }
-    },
-    {
-        step: 5, section: "DESTINATÁRIO",
-        question: "Há características especiais ou histórias únicas sobre essa pessoa? 🌟",
-        type: "textarea", placeholder: "Ex: Faz bolos incríveis, plantava suas próprias verduras...",
-        minLength: 5, metadata: { fieldName: "recipient.specialCharacteristics", required: false }
-    },
-
-    // ===== SEÇÃO 2: OCASIÃO =====
-    {
-        step: 6, section: "OCASIÃO",
-        question: "Qual é a ocasião especial? 🎉",
-        type: "select",
-        options: [
-            { label: "Pedido de Casamento 💍", value: "proposal" },
-            { label: "Aniversário 🎂", value: "birthday" },
-            { label: "Declaração de Amor 💕", value: "confession" },
-            { label: "Homenagem especial 🌹", value: "tribute" },
-            { label: "Despedida/Adeus 👋", value: "goodbye" },
-            { label: "Comemoração (formatura, promoção, etc) 🎓", value: "celebration" },
-            { label: "Pedido de desculpas 🤝", value: "apology" },
-            { label: "Comemoração de amizade 👥", value: "friendship" },
-            { label: "Outra ocasião 📅", value: "other" },
-        ],
-        metadata: { fieldName: "occasion.type", required: true }
-    },
-    {
-        step: 6.5, condition: (data) => data.step6 === "other",
-        question: "Descreva a ocasião em detalhes",
-        type: "textarea", placeholder: "Ex: Aposentadoria após 40 anos de trabalho...",
-        minLength: 5, metadata: { fieldName: "occasion.customDescription", required: true }
-    },
-    {
-        step: 7, section: "OCASIÃO",
-        question: "Qual é a data da ocasião? (Opcional - ajuda com contexto) 📆",
-        type: "input", inputType: "date",
-        metadata: { fieldName: "occasion.date", required: false }
-    },
-
-    // ===== SEÇÃO 3: ESTILO MUSICAL =====
-    {
-        step: 8, section: "ESTILO MUSICAL",
-        question: "Qual é o gênero musical que você quer que influencie mais a música? 🎵",
-        type: "select",
-        options: [
-            { label: "Pop moderno", value: "pop" },
-            { label: "Sertanejo (tradicional ou universitário)", value: "sertanejo" },
-            { label: "Rock/Rock alternativo", value: "rock" },
-            { label: "Rap/Trap", value: "rap" },
-            { label: "Samba/Pagode", value: "samba" },
-            { label: "Acústico/MPB", value: "acoustic" },
-            { label: "Eletrônico/House", value: "electronic" },
-            { label: "Reggae", value: "reggae" },
-            { label: "Funk/Dance", value: "funk" },
-            { label: "Forró", value: "forro" },
-            { label: "Gospel/Espiritual", value: "gospel" },
-            { label: "Outro 🎶", value: "other" },
-        ],
-        metadata: { fieldName: "musicStyle.primaryGenre", required: true }
-    },
-    {
-        step: 8.5, condition: (data) => data.step8 === "other",
-        question: "Qual gênero ou mistura você prefere para a música? Seja criativo!",
-        type: "textarea", placeholder: "Ex: Eletrônico com influência de samba...",
-        minLength: 5, metadata: { fieldName: "musicStyle.customGenre", required: true }
-    },
-    {
-        step: 9, section: "ESTILO MUSICAL",
-        question: "Qual é o tempo/ritmo ideal para a música? ⏱️",
-        type: "select",
-        options: [
-            { label: "Lenta e contemplativa (60-80 BPM)", value: "slow" },
-            { label: "Moderada e equilibrada (80-110 BPM)", value: "moderate" },
-            { label: "Rápida e energética (110+ BPM)", value: "fast" },
-        ],
-        metadata: { fieldName: "musicStyle.tempo", required: true }
-    },
-    {
-        step: 10, section: "ESTILO MUSICAL",
-        question: "Qual deve ser a energia da música? ⚡",
-        type: "select",
-        options: [
-            { label: "Baixa (suave, intimista, relax)", value: "low" },
-            { label: "Média (natural, fluida, equilibrada)", value: "medium" },
-            { label: "Alta (impacto, poderosa, celebrativa)", value: "high" },
-        ],
-        metadata: { fieldName: "musicStyle.energy", required: true }
-    },
-
-    // ===== SEÇÃO 4: REFERÊNCIAS MUSICAIS =====
-    {
-        step: 11, section: "REFERÊNCIAS",
-        question: "Qual(is) artista(s) e música(s) quer que inspire a música? 🎤 (Adicione até 3 referências)",
-        type: "references", maxReferences: 3,
-        metadata: { fieldName: "musicStyle.references", required: true }
-    },
-
-    // ===== SEÇÃO 5: MENSAGEM E EMOÇÃO =====
-    {
-        step: 12, section: "MENSAGEM",
-        question: "Qual é o sentimento ou mensagem PRINCIPAL que você quer transmitir? 💖",
-        type: "textarea", placeholder: "Ex: Quero contar nossa história de vida juntos...",
-        minLength: 15, metadata: { fieldName: "lyricDetails.mainMessage", required: true }
-    },
-    {
-        step: 13, section: "MENSAGEM",
-        question: "Há histórias, memórias ou menções específicas que DEVEM estar na letra? 🌟",
-        type: "textarea", placeholder: "Ex: Mencionar Dourados, aquela viagem para o Rio...",
-        minLength: 5, metadata: { fieldName: "lyricDetails.specialMentions", required: false }
-    },
-    {
-        step: 14, section: "MENSAGEM",
-        question: "Qual é o tom/estilo de linguagem? 🎨",
-        type: "select",
-        options: [
-            { label: "Poético e romântico (com metáforas)", value: "poetic" },
-            { label: "Conversacional e natural (como falamos)", value: "conversational" },
-            { label: "Storytelling (contando uma história)", value: "storytelling" },
-            { label: "Direto e emotivo (straight from heart)", value: "direct" },
-            { label: "Bem-humorado (com humor e leveza)", value: "humorous" },
-        ],
-        metadata: { fieldName: "lyricDetails.languageStyle", required: true }
-    },
-
-    // ===== SEÇÃO 6: PRODUÇÃO =====
-    {
-        step: 15, section: "PRODUÇÃO",
-        question: "Qual tipo de voz você gostaria? 🎙️",
-        type: "select",
-        options: [
-            { label: "Voz feminina (suave, calorosa, emotiva)", value: "female_warm" },
-            { label: "Voz feminina (poderosa, energética, clara)", value: "female_strong" },
-            { label: "Voz masculina (suave, intimista, delicada)", value: "male_soft" },
-            { label: "Voz masculina (poderosa, grave, marcante)", value: "male_strong" },
-            { label: "Dueto (homem + mulher alternando)", value: "duo" },
-            { label: "Dueto (homem + mulher harmonizando)", value: "duo_harmony" },
-        ],
-        metadata: { fieldName: "productionDetails.vocalApproach.vocalGender", required: true }
-    },
-    {
-        step: 16, section: "PRODUÇÃO",
-        question: "Qual é o estilo de produção? 🎚️",
-        type: "select",
-        options: [
-            { label: "Acústico puro (violão, piano, natural)", value: "acoustic" },
-            { label: "Acústico com backing (acústica + percussão suave)", value: "acoustic_backing" },
-            { label: "Studio polish (profissional, limpo, brilhante)", value: "studio_polish" },
-            { label: "Live feel (como se tivesse ao vivo na frente de você)", value: "live_feel" },
-            { label: "Cinematic (épico, cinematográfico, orquestrado)", value: "cinematic" },
-            { label: "Eletrônico/Moderno (sintetizadores, beats modernos)", value: "electronic_modern" },
-        ],
-        metadata: { fieldName: "productionDetails.production.productionStyle", required: true }
-    },
-
-    // ===== SEÇÃO 7: DADOS PESSOAIS =====
-    {
-        step: 17, section: "DADOS PESSOAIS",
-        question: "Qual é o seu nome completo? 👤",
-        type: "input", placeholder: "Seu nome",
-        minLength: 3, metadata: { fieldName: "customer.name", required: true }
-    },
-    {
-        step: 18, section: "DADOS PESSOAIS",
-        question: "Qual é o seu email? 📧",
-        type: "input", inputType: "email", placeholder: "seu@email.com",
-        minLength: 5, metadata: { fieldName: "customer.email", required: true }
-    }
-];
-
-let currentStep = 0;
-let formData = {};
-let currentQuestion = null;
-
-// ============================================
-// CONTROLE DO CHAT
-// ============================================
-
-function openChat() {
-    document.getElementById("chatModal").classList.add("active");
-    initChat();
-}
-
-function closeChat() {
-    document.getElementById("chatModal").classList.remove("active");
-}
-
-document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeChat();
-});
-
-function initChat() {
-    currentStep = 0;
-    formData = {};
-    document.getElementById("chatMessages").innerHTML = "";
-    renderQuestion();
-}
-
-function renderQuestion() {
-    const inputContainer = document.getElementById("inputSection");
-    inputContainer.innerHTML = "";
-
-    const validSteps = elaboratedChatFlow.filter((step) => {
-        if (step.condition) return step.condition(formData);
-        return true;
-    });
-
-    if (currentStep >= validSteps.length) {
-        renderFinalMessage(inputContainer);
-        scrollToBottom();
-        return;
-    }
-
-    currentQuestion = validSteps[currentStep];
-
-    const progress = ((currentStep + 1) / (validSteps.length + 1)) * 100;
-    const pf = document.getElementById("progressFill");
-    if (pf) pf.style.width = progress + "%";
-
-    addMessage("bot", currentQuestion.question);
-
-    setTimeout(() => {
-        renderInput(currentQuestion, inputContainer);
-        scrollToBottom();
-    }, 500);
-}
-
-function addMessage(sender, text) {
-    const messagesContainer = document.getElementById("chatMessages");
-    const messageEl = document.createElement("div");
-    messageEl.className = "message";
-
-    if (sender === "bot") {
-        messageEl.innerHTML = `<div class="bot-message"><div class="avatar">🎵</div><div class="bubble">${text}</div></div>`;
-    } else {
-        messageEl.innerHTML = `<div class="user-message">${text}</div>`;
-    }
-
-    messagesContainer.appendChild(messageEl);
-    scrollToBottom();
-}
-
-function renderInput(question, container) {
-    let html = `<div class="input-label">SUA RESPOSTA</div>`;
-
-    if (question.type === "select") {
-        html += `<div class="options-grid">`;
-        question.options.forEach(opt => {
-            html += `<button class="option-btn" onclick="handleOption('${opt.value}', '${opt.label}')">${opt.label}</button>`;
-        });
-        html += `</div>`;
-    } else if (question.type === "input") {
-        const type = question.inputType || "text";
-        html += `<input type="${type}" class="chat-text-input" id="chatInput" placeholder="${question.placeholder || ''}" onkeypress="if(event.key==='Enter') handleInput()">
-                 <button class="btn-chat-action" onclick="handleInput()">Enviar</button>`;
-    } else if (question.type === "textarea") {
-        html += `<textarea class="chat-text-input" id="chatInput" rows="3" placeholder="${question.placeholder || ''}"></textarea>
-                 <button class="btn-chat-action" onclick="handleInput()">Enviar</button>`;
-    } else if (question.type === "references") {
-        html += '<div id="referencesContainer">';
-        for (let i = 0; i < question.maxReferences; i++) {
-            html += `<div class="reference-item">
-                        <input type="text" class="reference-artist" placeholder="Artista" data-index="${i}">
-                        <input type="text" class="reference-song" placeholder="Música" data-index="${i}">
-                     </div>`;
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TuneCraft - Crie Sua Música Personalizada</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        html += '</div><button class="btn-chat-action" onclick="handleInput()">Enviar Referências</button>';
-    }
 
-    html += `<div class="action-buttons" style="margin-top: 1rem;">
-                ${currentStep > 0 ? '<button class="btn-back" onclick="prevStep()">← Voltar</button>' : ""}
-             </div>`;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
 
-    container.innerHTML = html;
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 60px 40px;
+            max-width: 600px;
+            text-align: center;
+        }
 
-    const input = document.getElementById("chatInput");
-    if (input) input.focus();
-}
+        h1 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
 
-function handleOption(val, label) {
-    addMessage("user", label);
-    formData[`step${currentQuestion.step}`] = val;
-    currentStep++;
-    setTimeout(renderQuestion, 600);
-}
+        p {
+            color: #555;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            font-size: 1.1em;
+        }
 
-function handleInput() {
-    if (currentQuestion.type === "references") {
-        const refs = [];
-        document.querySelectorAll('.reference-item').forEach(item => {
-            const artist = item.querySelector('.reference-artist').value.trim();
-            const song = item.querySelector('.reference-song').value.trim();
-            if (artist || song) refs.push({ artist, song });
-        });
-        if (refs.length === 0) return alert("Adicione pelo menos uma referência");
+        .btn-start {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
 
-        addMessage("user", `${refs.length} referências adicionadas`);
-        formData[`step${currentQuestion.step}`] = refs;
-        currentStep++;
-        setTimeout(renderQuestion, 600);
-        return;
-    }
+        .btn-start:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
 
-    const val = document.getElementById("chatInput").value;
-    if (!val.trim()) return;
+        /* Modal Chat */
+        #chatModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
 
-    if (currentQuestion.minLength && val.length < currentQuestion.minLength) {
-        alert(`Por favor, escreva pelo menos ${currentQuestion.minLength} caracteres.`);
-        return;
-    }
+        #chatModal.active {
+            display: flex;
+        }
 
-    addMessage("user", val);
-    formData[`step${currentQuestion.step}`] = val;
-    currentStep++;
-    setTimeout(renderQuestion, 600);
-}
+        .chat-container {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
 
-function prevStep() {
-    if (currentStep > 0) {
-        currentStep--;
-        renderQuestion();
-    }
-}
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-// ============================================
-// FINALIZAR E SALVAR NO SUPABASE
-// ============================================
+        .chat-title {
+            font-size: 1.3em;
+            font-weight: bold;
+        }
 
-function renderFinalMessage(container) {
-    const pf = document.getElementById("progressFill");
-    if (pf) pf.style.width = "100%";
+        .close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    addMessage("bot", "✨ Obrigado! Seus dados foram recebidos com sucesso. Sua música será criada em breve!");
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
 
-    container.innerHTML = `
-        <div style="text-align: center; padding: 2rem;">
-            <p style="font-size: 1.2rem; margin-bottom: 1rem;">🎵 Sua solicitação foi salva!</p>
-            <button class="btn-chat-action" onclick="closeChat()" style="background: linear-gradient(135deg, #00d9ff, #6366f1); border:none; color:white; font-weight:700;">
-                ← Fechar Chat
-            </button>
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e0e0e0;
+        }
+
+        #progressFill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        #chatMessages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bot-message {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .avatar {
+            font-size: 1.5em;
+            flex-shrink: 0;
+        }
+
+        .bubble {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 80%;
+            text-align: left;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-message {
+            text-align: right;
+            margin-left: auto;
+            margin-right: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 80%;
+            box-shadow: 0 2px 5px rgba(102, 126, 234, 0.3);
+        }
+
+        #inputSection {
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+            background: white;
+        }
+
+        .input-label {
+            font-size: 0.9em;
+            color: #999;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #ddd;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .option-btn:hover {
+            border-color: #667eea;
+            background: #f0f0ff;
+            transform: translateX(5px);
+        }
+
+        .chat-text-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            margin-bottom: 10px;
+            font-family: inherit;
+        }
+
+        .chat-text-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea.chat-text-input {
+            resize: vertical;
+        }
+
+        .btn-chat-action {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .btn-chat-action:hover {
+            transform: translateY(-2px);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-back {
+            flex: 1;
+            padding: 12px;
+            background: #f0f0f0;
+            color: #666;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-back:hover {
+            background: #e0e0e0;
+        }
+
+        .reference-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .reference-artist,
+        .reference-song {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        .reference-artist:focus,
+        .reference-song:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .reg-form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .reg-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .reg-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        .reg-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 TuneCraft</h1>
+        <p>Crie uma música personalizada e inesquecível para pessoas especiais na sua vida.</p>
+        <button class="btn-start" onclick="openChat()">Começar Agora</button>
+    </div>
+
+    <!-- Chat Modal -->
+    <div id="chatModal">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-title">TuneCraft - Seu Assistente 🎵</div>
+                <button class="close-btn" onclick="closeChat()">✕</button>
+            </div>
+            <div class="progress-bar">
+                <div id="progressFill"></div>
+            </div>
+            <div id="chatMessages"></div>
+            <div id="inputSection"></div>
         </div>
-    `;
+    </div>
 
-    scrollToBottom();
-}
-
-function buildDataStructure() {
-    const estrutura = {
-        // Cliente
-        customer_name: formData.step17,
-        customer_email: formData.step18,
-
-        // Destinatário
-        recipient_relationship: formData.step1,
-        recipient_custom_relationship: formData.step1_5 || null,
-        recipient_name: formData.step2,
-        recipient_age_group: formData.step3,
-        recipient_personality: formData.step4,
-        recipient_special_characteristics: formData.step5 || null,
-
-        // Ocasião
-        occasion_type: formData.step6,
-        occasion_custom_description: formData.step6_5 || null,
-        occasion_date: formData.step7 || null,
-
-        // Estilo Musical
-        music_primary_genre: formData.step8,
-        music_custom_genre: formData.step8_5 || null,
-        music_tempo: formData.step9,
-        music_energy: formData.step10,
-        music_references: JSON.stringify(formData.step11 || []),
-
-        // Lyrics Details
-        lyric_main_message: formData.step12,
-        lyric_special_mentions: formData.step13 || null,
-        lyric_language_style: formData.step14,
-
-        // Produção
-        production_vocal_approach: formData.step15,
-        production_style: formData.step16,
-
-        // Status
-        status: 'pendente',
-        created_at: new Date().toISOString()
-    };
-
-    return estrutura;
-}
-
-async function salvarNoSupabase() {
-    try {
-        const dados = buildDataStructure();
-        
-        console.log('📝 Salvando dados no Supabase...', dados);
-
-        const { data, error } = await supabase
-            .from('musicas_pedidos')
-            .insert([dados])
-            .select();
-
-        if (error) {
-            console.error('❌ Erro ao salvar:', error);
-            addMessage("bot", `❌ Erro ao salvar: ${error.message}`);
-            return false;
+    <!-- Supabase Client (DEVE CARREGAR PRIMEIRO!) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Pequeno delay para garantir Supabase carregado -->
+    <script>
+        // Espera Supabase estar pronto
+        function waitForSupabase() {
+            if (typeof window.supabase !== 'undefined' && window.supabase.createClient) {
+                console.log('✅ Supabase carregado com sucesso!');
+                loadChatScript();
+            } else {
+                console.log('⏳ Aguardando Supabase...');
+                setTimeout(waitForSupabase, 100);
+            }
         }
-
-        console.log('✅ Dados salvos com sucesso!', data);
-        return true;
-
-    } catch (err) {
-        console.error('❌ Erro inesperado:', err);
-        addMessage("bot", "❌ Erro ao processar sua solicitação");
-        return false;
-    }
-}
-
-// Salvar dados quando chegar na última pergunta (step 18)
-const originalHandleInput = handleInput;
-window.addEventListener('DOMContentLoaded', () => {
-    // Override handleInput para chamar salvarNoSupabase ao final
-    window.handleInputOriginal = handleInput;
-});
-
-// Modificar renderQuestion para chamar salvar na hora certa
-const originalRenderQuestion = renderQuestion;
-renderQuestion = function() {
-    const validSteps = elaboratedChatFlow.filter((step) => {
-        if (step.condition) return step.condition(formData);
-        return true;
-    });
-
-    // Se chegou no final e próximo passo seria sair
-    if (currentStep >= validSteps.length) {
-        // Salvar no Supabase ANTES de renderizar mensagem final
-        salvarNoSupabase().then(() => {
-            originalRenderQuestion.call(this);
-        });
-        return;
-    }
-
-    originalRenderQuestion.call(this);
-};
+        
+        function loadChatScript() {
+            const script = document.createElement('script');
+            script.src = 'chat-stripe.js';
+            script.onerror = function() {
+                console.error('❌ Erro ao carregar chat-stripe.js');
+            };
+            document.head.appendChild(script);
+        }
+        
+        // Inicia quando DOM estiver pronto
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', waitForSupabase);
+        } else {
+            waitForSupabase();
+        }
+    </script>
+</body>
+</html>
