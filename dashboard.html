@@ -806,40 +806,21 @@
       }
     }
 
-    // ✅ NOVA FUNÇÃO: EDITAR DRAFT
-    async function editarDraft(pedidoId) {
-      try {
-        showToast("⏳ Carregando rascunho...", "info");
+   async function editarDraft(pedidoId) {
+  try {
+    showToast("⏳ Abrindo editor de rascunho...", "info");
+    console.log("📝 Abrindo editor para:", pedidoId);
 
-        const { data } = await sb
-          .from('musicas_pedidos')
-          .select('*')
-          .eq('id', pedidoId)
-          .single();
+    // ✅ Redirecionar para edit-draft.html com o ID
+    setTimeout(() => {
+      window.location.href = `edit-draft.html?id=${pedidoId}`;
+    }, 500);
 
-        if (!data) {
-          showToast("❌ Rascunho não encontrado", "error");
-          return;
-        }
-
-        // Salva globalmente para chat.js usar
-        window.draftBeingEdited = {
-          pedidoId: pedidoId,
-          payload: data.payload
-        };
-
-        console.log("📝 Editando draft:", pedidoId);
-        console.log("📦 Payload:", data.payload);
-
-        // Abre chat
-        openChat();
-        showToast("✅ Rascunho carregado!", "success");
-
-      } catch (error) {
-        console.error("Erro ao carregar draft:", error);
-        showToast(`❌ Erro: ${error.message}`, "error");
-      }
-    }
+  } catch (error) {
+    console.error("Erro ao abrir editor:", error);
+    showToast(`❌ Erro: ${error.message}`, "error");
+  }
+}
 
     // ✅ NOVA FUNÇÃO: IR PARA CHECKOUT
     async function irParaCheckout(pedidoId) {
@@ -1089,6 +1070,7 @@ ${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
   </script>
 </body>
 </html>
+
 
 
 
