@@ -256,12 +256,13 @@ document.addEventListener("keydown", (e) => {
 function initChat() {
     currentStep = 0;
     
-    // ✅ NOVO: Se está editando, carrega dados salvos
-    if (draftBeingEdited && draftBeingEdited.payload) {
-        formData = { ...draftBeingEdited.payload };
-        console.log("📝 Chat aberto em modo edição com dados:", formData);
+    // ✅ VERIFICAR DRAFT TODA VEZ QUE CHAT ABRE
+    if (window.draftBeingEdited?.payload) {
+        formData = { ...window.draftBeingEdited.payload };
+        console.log("📝✅ Editando draft com dados carregados:", formData);
     } else {
         formData = {};
+        console.log("📝✅ Novo chat (sem draft anterior)");
     }
     
     document.getElementById("chatMessages").innerHTML = "";
