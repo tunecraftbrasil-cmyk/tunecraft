@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Checkout | TuneCraft</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://js.stripe.com/v3/"></script>
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
   <script src="config.js"></script>
   
   <style>
@@ -144,11 +144,6 @@
       box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
     }
 
-    .form-input:disabled {
-      background: #f1f5f9;
-      color: #94a3b8;
-    }
-
     .coupon-container {
       position: relative;
     }
@@ -243,18 +238,52 @@
     }
 
     #card-section {
-      display: none;
+      display: block;
     }
 
     #pix-section {
       display: none;
     }
 
-    #card-element {
+    /* Mercado Pago Card Form */
+    #form-checkout {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .mp-field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .mp-field label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #1e293b;
+    }
+
+    .mp-field input, 
+    .mp-field select {
       padding: 12px;
       border: 1px solid #cbd5e1;
       border-radius: 8px;
-      background: white;
+      font-size: 0.95rem;
+      transition: border-color 0.2s;
+    }
+
+    .mp-field input:focus,
+    .mp-field select:focus {
+      outline: none;
+      border-color: #00d9ff;
+      box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+    }
+
+    .mp-field-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
 
     .pix-instructions {
@@ -384,6 +413,10 @@
       .payment-methods {
         grid-template-columns: 1fr;
       }
+
+      .mp-field-group {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -445,7 +478,7 @@
     <div class="form-section">
       <label class="form-label">Método de Pagamento *</label>
       <div class="payment-methods">
-        <button type="button" class="payment-method-btn active" data-method="card">
+        <button type="button" class="payment-method-btn active" data-method="credit_card">
           <span class="icon">💳</span>
           <span class="label">Cartão</span>
         </button>
@@ -456,13 +489,52 @@
       </div>
     </div>
 
-    <!-- Seção Cartão -->
-    <div id="card-section" style="display: block;">
-      <div class="form-section">
-        <label class="form-label">Dados do Cartão *</label>
-        <div id="card-element"></div>
-        <div id="card-errors" class="error-message"></div>
+    <!-- Seção Cartão (Mercado Pago) -->
+    <div id="card-section">
+      <div id="form-checkout">
+        <div class="mp-field">
+          <label for="form-checkout__cardNumber">Número do Cartão</label>
+          <input type="text" id="form-checkout__cardNumber" placeholder="0000 0000 0000 0000" />
+        </div>
+
+        <div class="mp-field">
+          <label for="form-checkout__cardholderName">Nome no Cartão</label>
+          <input type="text" id="form-checkout__cardholderName" placeholder="NOME COMPLETO" />
+        </div>
+
+        <div class="mp-field-group">
+          <div class="mp-field">
+            <label for="form-checkout__cardExpirationDate">Validade</label>
+            <input type="text" id="form-checkout__cardExpirationDate" placeholder="MM/AA" />
+          </div>
+
+          <div class="mp-field">
+            <label for="form-checkout__securityCode">CVV</label>
+            <input type="text" id="form-checkout__securityCode" placeholder="123" />
+          </div>
+        </div>
+
+        <div class="mp-field">
+          <label for="form-checkout__issuer">Banco Emissor</label>
+          <select id="form-checkout__issuer"></select>
+        </div>
+
+        <div class="mp-field">
+          <label for="form-checkout__installments">Parcelas</label>
+          <select id="form-checkout__installments"></select>
+        </div>
+
+        <div class="mp-field">
+          <label for="form-checkout__identificationType">Tipo de Documento</label>
+          <select id="form-checkout__identificationType"></select>
+        </div>
+
+        <div class="mp-field">
+          <label for="form-checkout__identificationNumber">CPF</label>
+          <input type="text" id="form-checkout__identificationNumber" placeholder="000.000.000-00" />
+        </div>
       </div>
+      <div class="error-message" id="card-errors"></div>
     </div>
 
     <!-- Seção PIX -->
@@ -497,32 +569,71 @@
   </form>
 
   <div class="footer-text">
-    🔒 Pagamento 100% seguro processado por Stripe
+    🔒 Pagamento 100% seguro processado por Mercado Pago
   </div>
 </div>
 
 <script>
-  const stripe = Stripe(STRIPE_PUBLIC_KEY);
-  const elements = stripe.elements();
-  const cardElement = elements.create('card', {
-    style: {
-      base: {
-        fontSize: '16px',
-        color: '#1e293b',
-        '::placeholder': { color: '#94a3b8' }
-      }
-    }
-  });
+  const mp = new MercadoPago(MERCADOPAGO_PUBLIC_KEY);
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  cardElement.mount('#card-element');
-
-  let currentPaymentMethod = 'card';
+  let currentPaymentMethod = 'credit_card';
   let appliedCoupon = null;
   let originalPrice = 4990; // R$ 49,90 em centavos
   let finalPrice = 4990;
-  let pixPaymentIntentId = null;
+  let pixPaymentId = null;
   let pixCheckInterval = null;
+
+  // Card Form do Mercado Pago
+  const cardForm = mp.cardForm({
+    amount: "49.90",
+    iframe: true,
+    form: {
+      id: "form-checkout",
+      cardNumber: {
+        id: "form-checkout__cardNumber",
+        placeholder: "0000 0000 0000 0000",
+      },
+      expirationDate: {
+        id: "form-checkout__cardExpirationDate",
+        placeholder: "MM/AA",
+      },
+      securityCode: {
+        id: "form-checkout__securityCode",
+        placeholder: "123",
+      },
+      cardholderName: {
+        id: "form-checkout__cardholderName",
+        placeholder: "NOME COMPLETO",
+      },
+      issuer: {
+        id: "form-checkout__issuer",
+        placeholder: "Banco emissor",
+      },
+      installments: {
+        id: "form-checkout__installments",
+        placeholder: "Parcelas",
+      },
+      identificationType: {
+        id: "form-checkout__identificationType",
+        placeholder: "Tipo de documento",
+      },
+      identificationNumber: {
+        id: "form-checkout__identificationNumber",
+        placeholder: "000.000.000-00",
+      },
+    },
+    callbacks: {
+      onFormMounted: error => {
+        if (error) console.error("Form Mounted handling error: ", error);
+        console.log("✅ Card form mounted");
+      },
+      onSubmit: event => {
+        event.preventDefault();
+        processCardPayment();
+      },
+    },
+  });
 
   // ========================
   // FUNÇÕES AUXILIARES
@@ -549,14 +660,17 @@
       discountValue.textContent = `- ${formatBRL(discount)}`;
       finalPriceEl.textContent = formatBRL(finalPrice);
       
-      const icon = currentPaymentMethod === 'card' ? '💳' : '🏦';
+      // Atualizar amount do cardForm
+      cardForm.update({ amount: (finalPrice / 100).toFixed(2) });
+      
+      const icon = currentPaymentMethod === 'credit_card' ? '💳' : '🏦';
       payButton.textContent = `${icon} Pagar ${formatBRL(finalPrice)}`;
     } else {
       originalPriceEl.textContent = formatBRL(originalPrice);
       discountRow.style.display = 'none';
       finalPriceEl.textContent = formatBRL(originalPrice);
       
-      const icon = currentPaymentMethod === 'card' ? '💳' : '🏦';
+      const icon = currentPaymentMethod === 'credit_card' ? '💳' : '🏦';
       payButton.textContent = `${icon} Pagar ${formatBRL(originalPrice)}`;
     }
   }
@@ -566,10 +680,6 @@
     el.textContent = message;
     el.className = `coupon-message ${type}`;
     el.style.display = 'block';
-  }
-
-  function hideMessage(elementId) {
-    document.getElementById(elementId).style.display = 'none';
   }
 
   function showLoading(text = 'Processando...') {
@@ -603,7 +713,7 @@
   }
 
   // ========================
-  // CARREGAR DADOS DO PEDIDO
+  // CARREGAR DADOS
   // ========================
 
   function loadCheckoutData() {
@@ -619,6 +729,7 @@
 
     document.getElementById('customer-name').value = name;
     document.getElementById('customer-email').value = email;
+    document.getElementById('form-checkout__cardholderName').value = name.toUpperCase();
     
     console.log("✅ Dados carregados:", { pedidoId, name, email });
   }
@@ -680,7 +791,7 @@
       if (data.desconto_percentual > 0) {
         discount = Math.round((originalPrice * data.desconto_percentual) / 100);
       } else if (data.desconto_fixo > 0) {
-        discount = data.desconto_fixo * 100; // Converter para centavos
+        discount = data.desconto_fixo * 100;
       }
 
       finalPrice = Math.max(originalPrice - discount, 0);
@@ -701,7 +812,7 @@
   });
 
   // ========================
-  // ALTERNAR MÉTODO DE PAGAMENTO
+  // ALTERNAR MÉTODO
   // ========================
 
   document.querySelectorAll('.payment-method-btn').forEach(btn => {
@@ -711,7 +822,7 @@
       
       currentPaymentMethod = btn.dataset.method;
       
-      if (currentPaymentMethod === 'card') {
+      if (currentPaymentMethod === 'credit_card') {
         document.getElementById('card-section').style.display = 'block';
         document.getElementById('pix-section').style.display = 'none';
         document.getElementById('pay-button').textContent = `💳 Pagar ${formatBRL(appliedCoupon ? finalPrice : originalPrice)}`;
@@ -724,7 +835,7 @@
   });
 
   // ========================
-  // COPIAR CÓDIGO PIX
+  // COPIAR PIX
   // ========================
 
   document.getElementById('copy-pix-btn').addEventListener('click', () => {
@@ -735,7 +846,7 @@
   });
 
   // ========================
-  // SUBMETER PAGAMENTO
+  // SUBMIT FORM
   // ========================
 
   document.getElementById('payment-form').addEventListener('submit', async (e) => {
@@ -743,96 +854,85 @@
 
     const name = document.getElementById('customer-name').value.trim();
     const email = document.getElementById('customer-email').value.trim();
-    const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
 
     if (!name || !email) {
       showToast("❌ Preencha nome e email!", "error");
       return;
     }
 
-    if (currentPaymentMethod === 'card') {
-      await processCardPayment(name, email, pedidoId);
+    if (currentPaymentMethod === 'credit_card') {
+      cardForm.submit();
     } else {
-      await processPixPayment(name, email, pedidoId);
+      await processPixPayment(name, email);
     }
   });
 
   // ========================
-  // PAGAMENTO COM CARTÃO
+  // PAGAMENTO CARTÃO
   // ========================
 
-  async function processCardPayment(name, email, pedidoId) {
-    showLoading('Processando pagamento com cartão...');
+  async function processCardPayment() {
+    const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
+    const name = document.getElementById('customer-name').value.trim();
+    const email = document.getElementById('customer-email').value.trim();
+
+    showLoading('Processando pagamento...');
 
     try {
-      // 1. Criar Payment Intent
-      const piResponse = await fetch(`${SUPABASE_URL}/functions/v1/create-payment-intent`, {
+      const cardFormData = cardForm.getCardFormData();
+
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/process-mercadopago-payment`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
         },
         body: JSON.stringify({
-          amount: appliedCoupon ? finalPrice : originalPrice,
-          currency: 'brl',
+          paymentData: cardFormData,
+          amount: appliedCoupon ? finalPrice / 100 : originalPrice / 100,
           customerName: name,
           customerEmail: email,
           orderId: pedidoId,
           couponCode: appliedCoupon?.codigo || null,
-          paymentMethod: 'card'
+          paymentMethod: 'credit_card'
         })
       });
 
-      const piData = await piResponse.json();
+      const result = await response.json();
 
-      if (!piResponse.ok || !piData.clientSecret) {
-        throw new Error(piData.error || 'Erro ao criar pagamento');
+      if (!response.ok || result.status !== 'approved') {
+        throw new Error(result.error || result.status_detail || 'Pagamento recusado');
       }
 
-      // 2. Confirmar pagamento com Stripe
-      const result = await stripe.confirmCardPayment(piData.clientSecret, {
-        payment_method: {
-          card: cardElement,
-          billing_details: { name, email }
-        }
-      });
-
-      if (result.error) {
-        throw new Error(result.error.message);
-      }
-
-      if (result.paymentIntent.status !== 'succeeded') {
-        throw new Error(`Pagamento ${result.paymentIntent.status}`);
-      }
-
-      // 3. Atualizar pedido e incrementar cupom
-      await finalizePurchase(pedidoId, result.paymentIntent.id, 'card');
+      await finalizePurchase(pedidoId, result.id, 'credit_card');
 
     } catch (error) {
       console.error("❌ Erro:", error);
+      document.getElementById('card-errors').textContent = error.message;
+      document.getElementById('card-errors').style.display = 'block';
       showToast(`❌ ${error.message}`, 'error');
       hideLoading();
     }
   }
 
   // ========================
-  // PAGAMENTO COM PIX
+  // PAGAMENTO PIX
   // ========================
 
-  async function processPixPayment(name, email, pedidoId) {
+  async function processPixPayment(name, email) {
+    const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
+    
     showLoading('Gerando QR Code PIX...');
 
     try {
-      // 1. Criar Payment Intent para PIX
-      const piResponse = await fetch(`${SUPABASE_URL}/functions/v1/create-payment-intent`, {
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/process-mercadopago-payment`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
         },
         body: JSON.stringify({
-          amount: appliedCoupon ? finalPrice : originalPrice,
-          currency: 'brl',
+          amount: appliedCoupon ? finalPrice / 100 : originalPrice / 100,
           customerName: name,
           customerEmail: email,
           orderId: pedidoId,
@@ -841,23 +941,23 @@
         })
       });
 
-      const piData = await piResponse.json();
+      const result = await response.json();
 
-      if (!piResponse.ok) {
-        throw new Error(piData.error || 'Erro ao gerar PIX');
+      if (!response.ok) {
+        throw new Error(result.error || 'Erro ao gerar PIX');
       }
 
-      pixPaymentIntentId = piData.paymentIntentId;
+      pixPaymentId = result.id;
 
-      // 2. Mostrar QR Code
-      document.getElementById('pix-qrcode-img').src = piData.qrCodeUrl;
-      document.getElementById('pix-code-text').textContent = piData.pixCode;
+      document.getElementById('pix-qrcode-img').src = result.point_of_interaction.transaction_data.qr_code_base64 
+        ? `data:image/png;base64,${result.point_of_interaction.transaction_data.qr_code_base64}`
+        : result.point_of_interaction.transaction_data.ticket_url;
+      document.getElementById('pix-code-text').textContent = result.point_of_interaction.transaction_data.qr_code;
       document.getElementById('pix-qrcode-container').style.display = 'block';
 
       hideLoading();
       document.getElementById('pay-button').style.display = 'none';
 
-      // 3. Iniciar verificação de pagamento
       startPixPaymentCheck(pedidoId);
 
     } catch (error) {
@@ -868,47 +968,46 @@
   }
 
   // ========================
-  // VERIFICAR PAGAMENTO PIX
+  // VERIFICAR PIX
   // ========================
 
   function startPixPaymentCheck(pedidoId) {
     pixCheckInterval = setInterval(async () => {
       try {
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/check-pix-payment`, {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/check-mercadopago-payment`, {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
           },
-          body: JSON.stringify({ paymentIntentId: pixPaymentIntentId })
+          body: JSON.stringify({ paymentId: pixPaymentId })
         });
 
         const data = await response.json();
 
-        if (data.status === 'succeeded') {
+        if (data.status === 'approved') {
           clearInterval(pixCheckInterval);
-          await finalizePurchase(pedidoId, pixPaymentIntentId, 'pix');
+          await finalizePurchase(pedidoId, pixPaymentId, 'pix');
         }
       } catch (error) {
         console.error('Erro ao verificar PIX:', error);
       }
-    }, 3000); // Verifica a cada 3 segundos
+    }, 3000);
   }
 
   // ========================
   // FINALIZAR COMPRA
   // ========================
 
-  async function finalizePurchase(pedidoId, paymentIntentId, paymentMethod) {
+  async function finalizePurchase(pedidoId, paymentId, paymentMethod) {
     showLoading('Finalizando compra...');
 
     try {
-      // 1. Atualizar pedido
       const { error: updateError } = await sb
         .from('musicas_pedidos')
         .update({
           status: 'payment_received',
-          stripe_payment_intent_id: paymentIntentId,
+          mercadopago_payment_id: paymentId,
           payment_date: new Date().toISOString(),
           payment_method: paymentMethod,
           cupom_usado: appliedCoupon?.codigo || null,
@@ -920,17 +1019,13 @@
 
       if (updateError) throw updateError;
 
-      // 2. Incrementar uso do cupom
       if (appliedCoupon) {
         await sb
           .from('cupons')
-          .update({ 
-            usos_atuais: appliedCoupon.usos_atuais + 1 
-          })
+          .update({ usos_atuais: appliedCoupon.usos_atuais + 1 })
           .eq('id', appliedCoupon.id);
       }
 
-      // 3. Gerar letra
       const genResp = await fetch(`${SUPABASE_URL}/functions/v1/generate-lyrics`, {
         method: 'POST',
         headers: { 
@@ -940,13 +1035,8 @@
         body: JSON.stringify({ pedidoId })
       });
 
-      if (!genResp.ok) {
-        console.error('Erro ao gerar letra');
-      }
-
       showToast("✅ Pagamento confirmado! Gerando letra...", "success");
 
-      // 4. Limpar e redirecionar
       localStorage.removeItem('tuneCraft_pendingOrderId');
       localStorage.removeItem('tuneCraft_checkoutEmail');
       localStorage.removeItem('tuneCraft_checkoutName');
@@ -962,10 +1052,6 @@
     }
   }
 
-  // ========================
-  // VOLTAR AO DASHBOARD
-  // ========================
-
   function voltarDashboard() {
     if (confirm("Descartar esta compra e voltar?")) {
       if (pixCheckInterval) clearInterval(pixCheckInterval);
@@ -976,10 +1062,7 @@
     }
   }
 
-  // Carregar dados ao iniciar
   window.addEventListener('load', loadCheckoutData);
-
-  // Limpar intervalo ao sair
   window.addEventListener('beforeunload', () => {
     if (pixCheckInterval) clearInterval(pixCheckInterval);
   });
