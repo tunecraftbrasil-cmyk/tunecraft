@@ -9,7 +9,7 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const STRIPE_PUBLIC_KEY = "pk_test_51StZvo1wgBnYhkbFGEWUqMCIhCzXBCzUrDxypLj7ge0InE6ZlQj4QXWHPmljSyaLqaC4hNxZvA0oZ4PWCEh6FJj10072HL9w8v";
 
 // Mercado Pago (coloque sua Public Key aqui)
-const MERCADOPAGO_PUBLIC_KEY = "APP_USR-ba19e69a-29d4-4346-824e-5c99ed4047b3";
+const MERCADOPAGO_PUBLIC_KEY = "APP_USR-8ec47a84-e54f-46da-8455-9e6ac0f1031e";
 
 // Evita redeclaração se já estiver carregado
 if (!window.TUNECRAFT_CONFIG_LOADED) {
