@@ -465,7 +465,7 @@ async function saveDraftOnly() {
 
         // ✅ 6. Redirecionar para dashboard (com refresh)
         setTimeout(() => {
-            window.location.href = 'dashboard.html?refresh=true';
+            window.location.href = 'dashboard.html;
         }, 1000);
 
     } catch (error) {
