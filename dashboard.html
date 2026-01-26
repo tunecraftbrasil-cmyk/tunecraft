@@ -1654,7 +1654,7 @@ ${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
       .from('musicas_pedidos')
       .update({ 
         payload: updatedPayload,
-        updated_at: new Date().toISOString()
+        
       })
       .eq('id', editDraftCurrentPedidoId);
 
@@ -1679,4 +1679,5 @@ ${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
 
 </body>
 </html>
+
 
