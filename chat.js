@@ -1,16 +1,9 @@
 // ============================================
-// LÓGICA DO CHAT - NOVO FLUXO
-// Preenche formulário → Cria row na tabela com status "pending_payment"
-// Depois vai para dashboard com aba "Pendentes Pagamento"
+// LÓGICA DO CHAT (chat-stripe.js) 
+// VERSÃO COMPLETA COM STRIPE + CHECKOUT
 // ============================================
 
-// const SUPABASE_URL = "https://miupzfchvfbqbznfhvix.supabase.co";
-// const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pdXB6ZmNodmZicWJ6bmZodml4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxOTYwNzksImV4cCI6MjA4NDc3MjA3OX0.rz0W9qVovRvAeyBQ55LRewOAOM5a8pNJs1-UwWttATw";
-
-let currentStep = 0;
-let formData = {};
-let currentQuestion = null;
-
+// Função para rolar o chat para o final
 function scrollToBottom() {
     const messagesContainer = document.getElementById("chatMessages");
     if (messagesContainer) {
@@ -24,47 +17,38 @@ function scrollToBottom() {
 }
 
 const elaboratedChatFlow = [
-    // ===== SEÇÃO 1: DESTINATÁRIO =====
     {
-        step: 1,
-        section: "DESTINATÁRIO",
+        step: 1, section: "DESTINATÁRIO",
         question: "Quem é a pessoa especial para quem você quer criar uma música? 👤",
         type: "select",
         options: [
             { label: "Namorada/Namorado 💕", value: "romantic" },
-            { label: "Mãe/Pai 👨👩👧", value: "parent" },
+            { label: "Mãe/Pai 👨‍👩‍👧", value: "parent" },
             { label: "Filho/Filha 👶", value: "child" },
             { label: "Avó/Avô 👵", value: "grandparent" },
             { label: "Amigo/Amiga 👥", value: "friend" },
             { label: "Colega de trabalho 💼", value: "colleague" },
             { label: "Irmão/Irmã 👬", value: "sibling" },
             { label: "Professor/Mentora 🎓", value: "mentor" },
-            { label: "Grupo/Família 👨👩👧👦", value: "group" },
+            { label: "Grupo/Família 👨‍👩‍👧‍👦", value: "group" },
             { label: "Outro 🎭", value: "other" },
         ],
         metadata: { fieldName: "recipient.relationship", required: true }
     },
     {
-        step: 1.5,
-        condition: (data) => data.step1 === "other",
+        step: 1.5, condition: (data) => data.step1 === "other",
         question: "Como você descreveria esse relacionamento? Por favor, seja bem específico.",
-        type: "textarea",
-        placeholder: "Ex: Meu vizinho que é como um pai para mim...",
-        minLength: 5,
-        metadata: { fieldName: "recipient.customRelationship", required: true }
+        type: "textarea", placeholder: "Ex: Meu vizinho que é como um pai para mim...",
+        minLength: 5, metadata: { fieldName: "recipient.customRelationship", required: true }
     },
     {
-        step: 2,
-        section: "DESTINATÁRIO",
+        step: 2, section: "DESTINATÁRIO",
         question: "Qual é o nome dessa pessoa? 🎤",
-        type: "input",
-        placeholder: "Ex: Maria",
-        minLength: 2,
-        metadata: { fieldName: "recipient.name", required: true }
+        type: "input", placeholder: "Ex: Maria",
+        minLength: 2, metadata: { fieldName: "recipient.name", required: true }
     },
     {
-        step: 3,
-        section: "DESTINATÁRIO",
+        step: 3, section: "DESTINATÁRIO",
         question: "Qual a idade ou faixa etária? 🎂",
         type: "select",
         options: [
@@ -77,27 +61,21 @@ const elaboratedChatFlow = [
         metadata: { fieldName: "recipient.ageGroup", required: true }
     },
     {
-        step: 4,
-        section: "DESTINATÁRIO",
+        step: 4, section: "DESTINATÁRIO",
         question: "Descreva a personalidade dessa pessoa em detalhes. Como ela é? 💭",
-        type: "textarea",
-        placeholder: "Ex: Alegre, extrovertida, adora dançar, tem um senso de humor único...",
-        minLength: 15,
-        metadata: { fieldName: "recipient.personality", required: true }
+        type: "textarea", placeholder: "Ex: Alegre, extrovertida, adora dançar, tem um senso de humor único...",
+        minLength: 15, metadata: { fieldName: "recipient.personality", required: true }
     },
     {
-        step: 5,
-        section: "DESTINATÁRIO",
+        step: 5, section: "DESTINATÁRIO",
         question: "Há características especiais ou histórias únicas sobre essa pessoa? 🌟",
-        type: "textarea",
-        placeholder: "Ex: Faz bolos incríveis, plantava suas próprias verduras...",
-        minLength: 5,
-        metadata: { fieldName: "recipient.specialCharacteristics", required: false }
+        type: "textarea", placeholder: "Ex: Faz bolos incríveis, plantava suas próprias verduras...",
+        minLength: 5, metadata: { fieldName: "recipient.specialCharacteristics", required: false }
     },
+
     // ===== SEÇÃO 2: OCASIÃO =====
     {
-        step: 6,
-        section: "OCASIÃO",
+        step: 6, section: "OCASIÃO",
         question: "Qual é a ocasião especial? 🎉",
         type: "select",
         options: [
@@ -114,26 +92,21 @@ const elaboratedChatFlow = [
         metadata: { fieldName: "occasion.type", required: true }
     },
     {
-        step: 6.5,
-        condition: (data) => data.step6 === "other",
+        step: 6.5, condition: (data) => data.step6 === "other",
         question: "Descreva a ocasião em detalhes",
-        type: "textarea",
-        placeholder: "Ex: Aposentadoria após 40 anos de trabalho...",
-        minLength: 5,
-        metadata: { fieldName: "occasion.customDescription", required: true }
+        type: "textarea", placeholder: "Ex: Aposentadoria após 40 anos de trabalho...",
+        minLength: 5, metadata: { fieldName: "occasion.customDescription", required: true }
     },
     {
-        step: 7,
-        section: "OCASIÃO",
+        step: 7, section: "OCASIÃO",
         question: "Qual é a data da ocasião? (Opcional - ajuda com contexto) 📆",
-        type: "input",
-        inputType: "date",
+        type: "input", inputType: "date",
         metadata: { fieldName: "occasion.date", required: false }
     },
+
     // ===== SEÇÃO 3: ESTILO MUSICAL =====
     {
-        step: 8,
-        section: "ESTILO MUSICAL",
+        step: 8, section: "ESTILO MUSICAL",
         question: "Qual é o gênero musical que você quer que influencie mais a música? 🎵",
         type: "select",
         options: [
@@ -153,17 +126,13 @@ const elaboratedChatFlow = [
         metadata: { fieldName: "musicStyle.primaryGenre", required: true }
     },
     {
-        step: 8.5,
-        condition: (data) => data.step8 === "other",
+        step: 8.5, condition: (data) => data.step8 === "other",
         question: "Qual gênero ou mistura você prefere para a música? Seja criativo!",
-        type: "textarea",
-        placeholder: "Ex: Eletrônico com influência de samba...",
-        minLength: 5,
-        metadata: { fieldName: "musicStyle.customGenre", required: true }
+        type: "textarea", placeholder: "Ex: Eletrônico com influência de samba...",
+        minLength: 5, metadata: { fieldName: "musicStyle.customGenre", required: true }
     },
     {
-        step: 9,
-        section: "ESTILO MUSICAL",
+        step: 9, section: "ESTILO MUSICAL",
         question: "Qual é o tempo/ritmo ideal para a música? ⏱️",
         type: "select",
         options: [
@@ -174,8 +143,7 @@ const elaboratedChatFlow = [
         metadata: { fieldName: "musicStyle.tempo", required: true }
     },
     {
-        step: 10,
-        section: "ESTILO MUSICAL",
+        step: 10, section: "ESTILO MUSICAL",
         question: "Qual deve ser a energia da música? ⚡",
         type: "select",
         options: [
@@ -185,37 +153,30 @@ const elaboratedChatFlow = [
         ],
         metadata: { fieldName: "musicStyle.energy", required: true }
     },
+
     // ===== SEÇÃO 4: REFERÊNCIAS MUSICAIS =====
     {
-        step: 11,
-        section: "REFERÊNCIAS",
+        step: 11, section: "REFERÊNCIAS",
         question: "Qual(is) artista(s) e música(s) quer que inspire a música? 🎤 (Adicione até 3 referências)",
-        type: "references",
-        maxReferences: 3,
+        type: "references", maxReferences: 3,
         metadata: { fieldName: "musicStyle.references", required: true }
     },
+
     // ===== SEÇÃO 5: MENSAGEM E EMOÇÃO =====
     {
-        step: 12,
-        section: "MENSAGEM",
+        step: 12, section: "MENSAGEM",
         question: "Qual é o sentimento ou mensagem PRINCIPAL que você quer transmitir? 💖",
-        type: "textarea",
-        placeholder: "Ex: Quero contar nossa história de vida juntos...",
-        minLength: 15,
-        metadata: { fieldName: "lyricDetails.mainMessage", required: true }
+        type: "textarea", placeholder: "Ex: Quero contar nossa história de vida juntos...",
+        minLength: 15, metadata: { fieldName: "lyricDetails.mainMessage", required: true }
     },
     {
-        step: 13,
-        section: "MENSAGEM",
+        step: 13, section: "MENSAGEM",
         question: "Há histórias, memórias ou menções específicas que DEVEM estar na letra? 🌟",
-        type: "textarea",
-        placeholder: "Ex: Mencionar Dourados, aquela viagem para o Rio...",
-        minLength: 5,
-        metadata: { fieldName: "lyricDetails.specialMentions", required: false }
+        type: "textarea", placeholder: "Ex: Mencionar Dourados, aquela viagem para o Rio...",
+        minLength: 5, metadata: { fieldName: "lyricDetails.specialMentions", required: false }
     },
     {
-        step: 14,
-        section: "MENSAGEM",
+        step: 14, section: "MENSAGEM",
         question: "Qual é o tom/estilo de linguagem? 🎨",
         type: "select",
         options: [
@@ -227,10 +188,10 @@ const elaboratedChatFlow = [
         ],
         metadata: { fieldName: "lyricDetails.languageStyle", required: true }
     },
+
     // ===== SEÇÃO 6: PRODUÇÃO =====
     {
-        step: 15,
-        section: "PRODUÇÃO",
+        step: 15, section: "PRODUÇÃO",
         question: "Qual tipo de voz você gostaria? 🎙️",
         type: "select",
         options: [
@@ -244,8 +205,7 @@ const elaboratedChatFlow = [
         metadata: { fieldName: "productionDetails.vocalApproach.vocalGender", required: true }
     },
     {
-        step: 16,
-        section: "PRODUÇÃO",
+        step: 16, section: "PRODUÇÃO",
         question: "Qual é o estilo de produção? 🎚️",
         type: "select",
         options: [
@@ -259,6 +219,14 @@ const elaboratedChatFlow = [
         metadata: { fieldName: "productionDetails.production.productionStyle", required: true }
     }
 ];
+
+let currentStep = 0;
+let formData = {};
+let currentQuestion = null;
+
+// ============================================
+// CONTROLE DO CHAT
+// ============================================
 
 function openChat() {
     document.getElementById("chatModal").classList.add("active");
@@ -282,6 +250,7 @@ function initChat() {
 
 function renderQuestion() {
     const inputContainer = document.getElementById("inputSection");
+
     inputContainer.innerHTML = "";
 
     const validSteps = elaboratedChatFlow.filter((step) => {
@@ -290,7 +259,7 @@ function renderQuestion() {
     });
 
     if (currentStep >= validSteps.length) {
-        renderFinalForm(inputContainer);
+        renderCheckoutForm(inputContainer);
         scrollToBottom();
         return;
     }
@@ -407,29 +376,30 @@ function prevStep() {
 }
 
 // ============================================
-// NOVO: FORMULÁRIO FINAL (DADOS PESSOAIS)
+// CHECKOUT COM STRIPE ✅ COMPLETO
 // ============================================
 
-function renderFinalForm(container) {
+function renderCheckoutForm(container) {
     const pf = document.getElementById("progressFill");
     if (pf) pf.style.width = "100%";
 
-    addMessage("bot", "🎵 Perfeito! Agora preciso de seus dados para criar a música.");
+    addMessage("bot", "🎵 Perfeito! Sua música está pronta para ser criada. Clique abaixo para ir ao pagamento seguro.");
 
+    // Mostra formulário para coletar nome e email
     container.innerHTML = `
-        <div class="input-label">SEUS DADOS</div>
+        <div class="input-label">DADOS PARA O PAGAMENTO</div>
         <div class="reg-form-group">
             <label class="reg-label">👤 Nome Completo</label>
-            <input type="text" class="reg-input" id="finalName" placeholder="Seu nome completo">
+            <input type="text" class="reg-input" id="checkoutName" placeholder="Seu nome completo">
         </div>
         <div class="reg-form-group">
             <label class="reg-label">📧 Email</label>
-            <input type="email" class="reg-input" id="finalEmail" placeholder="seu@email.com">
+            <input type="email" class="reg-input" id="checkoutEmail" placeholder="seu@email.com">
         </div>
-        <button class="btn-chat-action" onclick="finalizarFormulario()" style="background: linear-gradient(135deg, #00d9ff, #6366f1); border:none; color:white; font-weight:700;">
-            ✅ Finalizar e Ir para Pagamento
+        <button class="btn-chat-action" onclick="irParaPagamento()" style="background: linear-gradient(135deg, #00d9ff, #6366f1); border:none; color:white; font-weight:700;">
+            💳 Ir para Pagamento (R$ 39,90)
         </button>
-        <button class="btn-chat-action" onclick="prevStep()" style="margin-top:10px; background:#f3f4f6; color:#64748b; border:none;">
+        <button class="btn-chat-action" onclick="closeChat()" style="margin-top:10px; background:#f3f4f6; color:#64748b; border:none;">
             ← Voltar
         </button>
     `;
@@ -438,12 +408,12 @@ function renderFinalForm(container) {
 }
 
 // ============================================
-// FINALIZAR FORMULÁRIO E CRIAR PEDIDO
+// FUNÇÃO PRINCIPAL: IR PARA PAGAMENTO ✅
 // ============================================
 
-async function finalizarFormulario() {
-    const name = document.getElementById('finalName').value.trim();
-    const email = document.getElementById('finalEmail').value.trim();
+function irParaPagamento() {
+    const name = document.getElementById('checkoutName').value.trim();
+    const email = document.getElementById('checkoutEmail').value.trim();
 
     if (!name || !email) {
         alert("Por favor, preencha seu nome e email!");
@@ -455,97 +425,16 @@ async function finalizarFormulario() {
         return;
     }
 
-    console.log("✅ Finalizando formulário...", { name, email, formData });
+    console.log("✅ Salvando dados do chat...", { name, email, formData });
 
-    // ✅ Mostrar loading
-    const inputSection = document.getElementById('inputSection');
-    inputSection.innerHTML = `
-        <div style="text-align: center; padding: 20px;">
-            <div style="border: 3px solid #f1f5f9; border-top: 3px solid #00d9ff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px;"></div>
-            <p>Criando seu pedido...</p>
-        </div>
-    `;
+    // ✅ Salvar dados DO CHAT no localStorage
+    localStorage.setItem('tuneCraftFormData', JSON.stringify({
+        name: name,
+        email: email,
+        formData: formData,
+        timestamp: new Date().toISOString()
+    }));
 
-    try {
-        // ✅ 1. Recuperar user_id
-        const USER_ID = localStorage.getItem('tuneCraft_userId');
-        
-        if (!USER_ID) {
-            throw new Error("Você precisa estar logado para continuar!");
-        }
-
-        console.log("✅ User ID encontrado:", USER_ID);
-
-        // ✅ 2. CRIAR PEDIDO NO SUPABASE COM STATUS "pending_payment"
-        console.log("📤 Criando pedido no Supabase...");
-
-        const pedidoResponse = await fetch(
-            `${SUPABASE_URL}/rest/v1/musicas_pedidos`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                    'Prefer': 'return=representation'
-                },
-                body: JSON.stringify({
-                    user_id: USER_ID,
-                    user_email: email,
-                    user_name: name,
-                    title: `Música para ${formData.step2 || 'Alguém Especial'}`,
-                    status: "waiting_user_approval",
-                    payment_status: "pending",
-                    payload: formData,
-                    ai_metadata: {
-                        formData: formData,
-                        created_at: new Date().toISOString()
-                    }
-                })
-            }
-        );
-
-        if (!pedidoResponse.ok) {
-            const errorData = await pedidoResponse.json();
-            console.error("❌ Erro ao criar pedido:", errorData);
-            throw new Error(`Erro ao criar pedido: ${errorData.message || pedidoResponse.statusText}`);
-        }
-
-        const pedidoDataArray = await pedidoResponse.json();
-        const pedidoId = pedidoDataArray[0].id;
-
-        console.log("✅ Pedido criado com sucesso:", pedidoId);
-
-        // ✅ 3. SALVAR NO LOCALSTORAGE PARA O CHECKOUT
-        localStorage.setItem('tuneCraft_pendingOrderId', pedidoId);
-        localStorage.setItem('tuneCraft_checkoutEmail', email);
-        localStorage.setItem('tuneCraft_checkoutName', name);
-
-        // ✅ 4. MOSTRAR SUCESSO
-        addMessage("bot", "✅ Pedido criado com sucesso! Você será redirecionado para o dashboard...");
-
-        // ✅ 5. REDIRECIONAR PARA DASHBOARD COM ABA "PENDENTES PAGAMENTO"
-        setTimeout(() => {
-            window.location.href = 'dashboard.html#pendentes-pagamento';
-        }, 2000);
-
-    } catch (error) {
-        console.error("❌ Erro completo:", error);
-
-        inputSection.innerHTML = `
-            <div style="padding: 20px; background: #fee2e2; border-radius: 8px; color: #991b1b; border: 1px solid #fecaca;">
-                <strong>❌ Erro ao processar:</strong> 
-                <p style="margin-top: 8px; font-size: 0.9rem;">${error.message}</p>
-                <div style="margin-top: 15px; display: flex; gap: 10px;">
-                    <button class="btn-chat-action" onclick="finalizarFormulario()" style="flex: 1; background: #fca5a5; color: #7f1d1d; border: none; cursor: pointer;">
-                        Tentar Novamente
-                    </button>
-                    <button class="btn-chat-action" onclick="closeChat()" style="flex: 1; background: #64748b; color: white; border: none; cursor: pointer;">
-                        Fechar Chat
-                    </button>
-                </div>
-            </div>
-        `;
-
-        scrollToBottom();
-    }
+    // ✅ Redirecionar para checkout.html
+    window.location.href = 'checkout.html';
 }
