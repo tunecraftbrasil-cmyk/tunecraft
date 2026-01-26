@@ -1,7 +1,12 @@
 // ============================================
 // LÓGICA DO CHAT (chat-stripe.js) 
-// VERSÃO COMPLETA (SEM STRIPE) -> SALVA PEDIDO NO SUPABASE
+// VERSÃO COMPLETA COM SUPABASE DIRETO
 // ============================================
+
+// Inicializa Supabase Client
+// const supabaseUrl = 'https://your-project.supabase.co'; // SUBSTITUA
+// const supabaseKey = 'your-anon-key'; // SUBSTITUA
+// const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 // Função para rolar o chat para o final
 function scrollToBottom() {
@@ -15,21 +20,6 @@ function scrollToBottom() {
         }, 100);
     }
 }
-
-// ============================================
-// ✅ SUPABASE CLIENT (AJUSTE AQUI)
-// ============================================
-// IMPORTANTE: a página que usa esse JS precisa carregar:
-// <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-// const SUPABASE_URL = "https://SEU_PROJECT_REF.supabase.co";
-// const SUPABASE_ANON_KEY = "SUA_ANON_KEY";
-
-// const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// ============================================
-// FLUXO DO CHAT
-// ============================================
 
 const elaboratedChatFlow = [
     {
@@ -232,6 +222,20 @@ const elaboratedChatFlow = [
             { label: "Eletrônico/Moderno (sintetizadores, beats modernos)", value: "electronic_modern" },
         ],
         metadata: { fieldName: "productionDetails.production.productionStyle", required: true }
+    },
+
+    // ===== SEÇÃO 7: DADOS PESSOAIS =====
+    {
+        step: 17, section: "DADOS PESSOAIS",
+        question: "Qual é o seu nome completo? 👤",
+        type: "input", placeholder: "Seu nome",
+        minLength: 3, metadata: { fieldName: "customer.name", required: true }
+    },
+    {
+        step: 18, section: "DADOS PESSOAIS",
+        question: "Qual é o seu email? 📧",
+        type: "input", inputType: "email", placeholder: "seu@email.com",
+        minLength: 5, metadata: { fieldName: "customer.email", required: true }
     }
 ];
 
@@ -265,7 +269,6 @@ function initChat() {
 
 function renderQuestion() {
     const inputContainer = document.getElementById("inputSection");
-
     inputContainer.innerHTML = "";
 
     const validSteps = elaboratedChatFlow.filter((step) => {
@@ -274,7 +277,7 @@ function renderQuestion() {
     });
 
     if (currentStep >= validSteps.length) {
-        renderCheckoutForm(inputContainer);
+        renderFinalMessage(inputContainer);
         scrollToBottom();
         return;
     }
@@ -391,96 +394,120 @@ function prevStep() {
 }
 
 // ============================================
-// ✅ FINALIZAÇÃO: SALVAR PEDIDO NO SUPABASE
+// FINALIZAR E SALVAR NO SUPABASE
 // ============================================
 
-function renderCheckoutForm(container) {
+function renderFinalMessage(container) {
     const pf = document.getElementById("progressFill");
     if (pf) pf.style.width = "100%";
 
-    addMessage("bot", "🎵 Perfeito! Agora vou salvar seu pedido para criar sua música.");
+    addMessage("bot", "✨ Obrigado! Seus dados foram recebidos com sucesso. Sua música será criada em breve!");
 
     container.innerHTML = `
-        <div class="input-label">DADOS PARA O PEDIDO</div>
-        <div class="reg-form-group">
-            <label class="reg-label">👤 Nome Completo</label>
-            <input type="text" class="reg-input" id="checkoutName" placeholder="Seu nome completo">
+        <div style="text-align: center; padding: 2rem;">
+            <p style="font-size: 1.2rem; margin-bottom: 1rem;">🎵 Sua solicitação foi salva!</p>
+            <button class="btn-chat-action" onclick="closeChat()" style="background: linear-gradient(135deg, #00d9ff, #6366f1); border:none; color:white; font-weight:700;">
+                ← Fechar Chat
+            </button>
         </div>
-        <div class="reg-form-group">
-            <label class="reg-label">📧 Email</label>
-            <input type="email" class="reg-input" id="checkoutEmail" placeholder="seu@email.com">
-        </div>
-
-        <button class="btn-chat-action" id="btnFinalizarPedido" onclick="finalizarPedido()" style="background: linear-gradient(135deg, #00d9ff, #6366f1); border:none; color:white; font-weight:700;">
-            ✅ Finalizar Pedido
-        </button>
-
-        <button class="btn-chat-action" onclick="closeChat()" style="margin-top:10px; background:#f3f4f6; color:#64748b; border:none;">
-            ← Voltar
-        </button>
     `;
 
     scrollToBottom();
 }
 
-// ============================================
-// ✅ FUNÇÃO PRINCIPAL: INSERIR ROW EM musicas_pedidos
-// ============================================
+function buildDataStructure() {
+    const estrutura = {
+        // Cliente
+        customer_name: formData.step17,
+        customer_email: formData.step18,
 
-async function finalizarPedido() {
-    const name = document.getElementById('checkoutName').value.trim();
-    const email = document.getElementById('checkoutEmail').value.trim();
+        // Destinatário
+        recipient_relationship: formData.step1,
+        recipient_custom_relationship: formData.step1_5 || null,
+        recipient_name: formData.step2,
+        recipient_age_group: formData.step3,
+        recipient_personality: formData.step4,
+        recipient_special_characteristics: formData.step5 || null,
 
-    if (!name || !email) {
-        alert("Por favor, preencha seu nome e email!");
-        return;
-    }
+        // Ocasião
+        occasion_type: formData.step6,
+        occasion_custom_description: formData.step6_5 || null,
+        occasion_date: formData.step7 || null,
 
-    if (!email.includes('@')) {
-        alert("Email inválido!");
-        return;
-    }
+        // Estilo Musical
+        music_primary_genre: formData.step8,
+        music_custom_genre: formData.step8_5 || null,
+        music_tempo: formData.step9,
+        music_energy: formData.step10,
+        music_references: JSON.stringify(formData.step11 || []),
 
-    const btn = document.getElementById("btnFinalizarPedido");
-    if (btn) {
-        btn.disabled = true;
-        btn.innerText = "Salvando pedido...";
-    }
+        // Lyrics Details
+        lyric_main_message: formData.step12,
+        lyric_special_mentions: formData.step13 || null,
+        lyric_language_style: formData.step14,
 
+        // Produção
+        production_vocal_approach: formData.step15,
+        production_style: formData.step16,
+
+        // Status
+        status: 'pendente',
+        created_at: new Date().toISOString()
+    };
+
+    return estrutura;
+}
+
+async function salvarNoSupabase() {
     try {
-        console.log("✅ Salvando pedido no Supabase...", { name, email, formData });
-
-        // 🔥 Ajuste os nomes das colunas conforme sua tabela
-        const payload = {
-            customer_name: name,
-            customer_email: email,
-            form_data: formData,
-            status: "novo",
-            source: "chat",
-            created_at: new Date().toISOString()
-        };
+        const dados = buildDataStructure();
+        
+        console.log('📝 Salvando dados no Supabase...', dados);
 
         const { data, error } = await supabase
-            .from("musicas_pedidos")
-            .insert([payload])
-            .select("id")
-            .single();
+            .from('musicas_pedidos')
+            .insert([dados])
+            .select();
 
-        if (error) throw error;
+        if (error) {
+            console.error('❌ Erro ao salvar:', error);
+            addMessage("bot", `❌ Erro ao salvar: ${error.message}`);
+            return false;
+        }
 
-        addMessage("bot", `✅ Pedido salvo com sucesso! Nº do pedido: <b>${data.id}</b><br>Agora vamos gerar sua música em seguida.`);
-
-        // opcional: limpar e fechar
-        // closeChat();
+        console.log('✅ Dados salvos com sucesso!', data);
+        return true;
 
     } catch (err) {
-        console.error("❌ Erro ao salvar pedido:", err);
-        alert("Não foi possível salvar seu pedido. Verifique o console e tente novamente.");
-    } finally {
-        if (btn) {
-            btn.disabled = false;
-            btn.innerText = "✅ Finalizar Pedido";
-        }
-        scrollToBottom();
+        console.error('❌ Erro inesperado:', err);
+        addMessage("bot", "❌ Erro ao processar sua solicitação");
+        return false;
     }
 }
+
+// Salvar dados quando chegar na última pergunta (step 18)
+const originalHandleInput = handleInput;
+window.addEventListener('DOMContentLoaded', () => {
+    // Override handleInput para chamar salvarNoSupabase ao final
+    window.handleInputOriginal = handleInput;
+});
+
+// Modificar renderQuestion para chamar salvar na hora certa
+const originalRenderQuestion = renderQuestion;
+renderQuestion = function() {
+    const validSteps = elaboratedChatFlow.filter((step) => {
+        if (step.condition) return step.condition(formData);
+        return true;
+    });
+
+    // Se chegou no final e próximo passo seria sair
+    if (currentStep >= validSteps.length) {
+        // Salvar no Supabase ANTES de renderizar mensagem final
+        salvarNoSupabase().then(() => {
+            originalRenderQuestion.call(this);
+        });
+        return;
+    }
+
+    originalRenderQuestion.call(this);
+};
