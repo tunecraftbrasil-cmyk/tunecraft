@@ -292,8 +292,19 @@
   const stripe = Stripe(STRIPE_PUBLIC_KEY);
   const elements = stripe.elements();
   const cardElement = elements.create('card');
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   cardElement.mount('#card-element');
+
+  // ✅ Função para preparar headers do Supabase
+  function sbHeaders({ prefer = true } = {}) {
+    const h = {
+      apikey: SUPABASE_ANON_KEY,
+      'Content-Type': 'application/json',
+    };
+    if (prefer) h.Prefer = "return=representation";
+    return h;
+  }
 
   // ✅ Carregar dados do localStorage ao abrir página
   function loadCheckoutData() {
@@ -340,7 +351,7 @@
       localStorage.removeItem('tuneCraft_pendingOrderId');
       localStorage.removeItem('tuneCraft_checkoutEmail');
       localStorage.removeItem('tuneCraft_checkoutName');
-      window.location.href = "dashboard.html#pendentes-pagamento";
+      window.location.href = "dashboard.html";
     }
   }
 
@@ -418,19 +429,58 @@
         throw new Error(`Pagamento ${result.paymentIntent.status}`);
       }
 
-      // ✅ 3. Pagamento aprovado!
-      console.log("✅ Pagamento aprovado!", result.paymentIntent);
+      // ✅ 3. NOVO: Após pagamento aprovado
+      console.log("✅ Pagamento aprovado! ID:", result.paymentIntent.id);
 
-      showToast("✅ Pagamento aprovado! Redirecionando para o painel...", "success");
+      // ✅ 3.1. Atualizar status para 'payment_received' no Supabase
+      console.log("📝 Atualizando status para 'payment_received'...");
+      
+      const updateResp = await fetch(`${SUPABASE_URL}/rest/v1/musicas_pedidos?id=eq.${pedidoId}`, {
+        method: 'PATCH',
+        headers: sbHeaders({ prefer: true }),
+        body: JSON.stringify({
+          status: 'payment_received',
+          stripe_payment_intent_id: result.paymentIntent.id,
+          payment_date: new Date().toISOString()
+        })
+      });
 
-      // ✅ 4. Limpar localStorage
+      if (!updateResp.ok) {
+        const errText = await updateResp.text();
+        console.error("❌ Erro ao atualizar status:", updateResp.status, errText);
+        throw new Error(`Erro ao atualizar pedido: ${updateResp.status}`);
+      }
+
+      console.log("✅ Status atualizado para 'payment_received'");
+
+      // ✅ 3.2. Chamar Edge Function para gerar letra
+      console.log("🎵 Chamando Edge Function: generate-lyrics...");
+      
+      const genResp = await fetch(`${SUPABASE_URL}/functions/v1/generate-lyrics`, {
+        method: 'POST',
+        headers: sbHeaders({ prefer: false }),
+        body: JSON.stringify({ pedidoId })
+      });
+
+      if (!genResp.ok) {
+        const errText = await genResp.text();
+        console.error("❌ Erro ao gerar letra:", genResp.status, errText);
+        throw new Error(`Erro ao gerar letra: ${genResp.status}`);
+      }
+
+      const genData = await genResp.json();
+      console.log("✅ Letra gerada com sucesso:", genData);
+
+      showToast("✅ Pagamento confirmado! Gerando letra...", "success");
+
+      // ✅ 3.3. Limpar localStorage
       localStorage.removeItem('tuneCraft_pendingOrderId');
       localStorage.removeItem('tuneCraft_checkoutEmail');
       localStorage.removeItem('tuneCraft_checkoutName');
 
-      // ✅ 5. Redirecionar para dashboard após 2s (para aba Aguardando Aprovação)
+      // ✅ 3.4. Redirecionar para dashboard (seção de letras para aprovar)
       setTimeout(() => {
-        window.location.href = "dashboard.html#aguardando-aprovacao";
+        window.location.href = 'dashboard.html?section=pending';
       }, 2000);
 
     } catch (error) {
