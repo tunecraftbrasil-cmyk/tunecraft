@@ -1,4 +1,4 @@
-// 09:42
+// 09:50
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -290,6 +290,14 @@
       .comparison-container { grid-template-columns: 1fr; }
     }
   </style>
+
+<!-- Modal de Edição de Rascunho -->
+<div class="edit-draft-modal" id="editDraftModal">
+  <div class="edit-draft-content">
+    <!-- ... conteúdo do modal ... -->
+  </div>
+</div>
+  
 </head>
 <body>
 
@@ -807,16 +815,11 @@
       }
     }
 
-   async function editarDraft(pedidoId) {
-  try {
-    showToast("⏳ Abrindo editor...", "info");
-    setTimeout(() => {
-      window.location.href = `edit-draft.html?id=${pedidoId}`;
-    }, 500);
-  } catch (error) {
-    console.error("Erro:", error);
-    showToast(`❌ Erro: ${error.message}`, "error");
-  }
+   function editarDraft(pedidoId) {
+  console.log("📝 Abrindo editor para:", pedidoId);
+  
+  // ✅ Abre o modal modal
+  openEditDraftModal(pedidoId);
 }
 
     // ✅ NOVA FUNÇÃO: IR PARA CHECKOUT
@@ -1067,6 +1070,7 @@ ${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
   </script>
 </body>
 </html>
+
 
 
 
