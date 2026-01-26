@@ -583,7 +583,7 @@
   let pixPaymentId = null;
   let pixCheckInterval = null;
   let cardFormInstance = null;
-  let generatedCardToken = null; // ✅ NOVO: Armazenar token gerado
+  let generatedCardToken = null;
 
   // ========================
   // INICIALIZAR CARDFORM - SEM IFRAME
@@ -634,17 +634,28 @@
           if (error) console.error("❌ Erro ao montar form:", error);
           console.log("✅ Card form mounted com amount:", amount);
         },
-        // ✅ NOVO: Callback para token gerado
-        onCardTokenReceived: (error, tokenData) => {
+        // ✅ CORRIGIDO: Tratar callback corretamente
+        onCardTokenReceived: (error, token) => {
           if (error) {
             console.error("❌ Erro ao gerar token:", error);
+            document.getElementById('card-errors').textContent = `Erro: ${error.message || error}`;
+            document.getElementById('card-errors').style.display = 'block';
             showToast("❌ Erro ao processar cartão", "error");
             hideLoading();
             return;
           }
 
-          console.log("✅ Token gerado:", tokenData.id);
-          generatedCardToken = tokenData.id;
+          // ✅ NOVO: Log detalhado para debug
+          console.log("🔍 Token callback recebido:", {
+            token: token,
+            type: typeof token,
+            keys: Object.keys(token || {})
+          });
+
+          // ✅ CORRIGIDO: O token é uma string, não um objeto com .id
+          generatedCardToken = token;
+
+          console.log("✅ Token gerado:", generatedCardToken ? "✅ Válido" : "❌ Vazio");
 
           // Agora envie o pagamento com o token
           sendCardPaymentToBackend();
@@ -707,7 +718,6 @@
     }
   }
 
-  // ✅ CORRIGIDO: updatePriceDisplay NÃO reinicializa CardForm
   function updatePriceDisplay() {
     const originalPriceEl = document.getElementById('original-price');
     const discountRow = document.getElementById('discount-row');
@@ -722,7 +732,6 @@
       discountValue.textContent = `- ${formatBRL(discount)}`;
       finalPriceEl.textContent = formatBRL(finalPrice);
 
-      // Apenas atualizar parcelas, NÃO reinicializar CardForm
       setTimeout(updateInstallmentOptions, 300);
 
       const icon = currentPaymentMethod === 'credit_card' ? '💳' : '🏦';
@@ -927,40 +936,36 @@
   // AGUARDAR TOKEN
   // ========================
 
-  // ✅ NOVO: Função auxiliar para aguardar geração do token
   function waitForToken(maxWaitMs) {
     return new Promise((resolve) => {
       const startTime = Date.now();
       const checkInterval = setInterval(() => {
         if (generatedCardToken) {
           clearInterval(checkInterval);
+          console.log('✅ Token recebido no waitForToken');
           resolve(true);
         }
         if (Date.now() - startTime > maxWaitMs) {
           clearInterval(checkInterval);
+          console.log('❌ Timeout aguardando token');
           resolve(false);
         }
-      }, 100);
+      }, 50); // Verificar a cada 50ms em vez de 100ms
     });
   }
 
   // ========================
-  // PAGAMENTO CARTÃO - REFATORADO
+  // PAGAMENTO CARTÃO
   // ========================
 
-  // ✅ NOVO: Função refatorada para processar pagamento com cartão
   async function processCardPayment() {
     const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
-    const name = document.getElementById('customer-name').value.trim();
-    const email = document.getElementById('customer-email').value.trim();
 
     showLoading('Gerando token do cartão...');
 
-    // Reset token para esta tentativa
     generatedCardToken = null;
 
     try {
-      // Validar campos obrigatórios ANTES de gerar token
       const cardholderName = document.getElementById('form-checkout__cardholderName').value.trim();
       const cardNumber = document.getElementById('form-checkout__cardNumber').value.trim();
       const expDate = document.getElementById('form-checkout__cardExpirationDate').value.trim();
@@ -971,18 +976,20 @@
         throw new Error('Preencha todos os campos do cartão');
       }
 
-      // Chamar createCardToken - isso dispara o callback onCardTokenReceived
+      console.log('🎯 Iniciando geração de token...');
+      
+      // Chamar createCardToken
       cardFormInstance.createCardToken();
 
-      // Aguardar geração do token (timeout de 5 segundos)
-      const tokenReceived = await waitForToken(5000);
+      // Aguardar com timeout maior (8 segundos)
+      const tokenReceived = await waitForToken(8000);
 
       if (!tokenReceived) {
-        throw new Error('Timeout ao gerar token do cartão');
+        throw new Error('Timeout ao gerar token do cartão. Por favor, tente novamente.');
       }
 
     } catch (error) {
-      console.error("❌ Erro:", error.message);
+      console.error("❌ Erro no processamento:", error.message);
       document.getElementById('card-errors').textContent = error.message;
       document.getElementById('card-errors').style.display = 'block';
       showToast(`❌ ${error.message}`, 'error');
@@ -990,7 +997,7 @@
     }
   }
 
-  // ✅ NOVO: Função para enviar pagamento após token ser gerado
+  // ✅ CORRIGIDO: Função para enviar pagamento após token
   async function sendCardPaymentToBackend() {
     const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
     const name = document.getElementById('customer-name').value.trim();
@@ -999,8 +1006,9 @@
     try {
       const cardFormData = cardFormInstance.getCardFormData();
 
-      console.log('📤 Dados do cartão com token:', {
-        token: generatedCardToken ? '✅ Presente' : '❌ Vazio',
+      console.log('📤 Enviando pagamento com token:', {
+        tokenPresent: !!generatedCardToken,
+        token: generatedCardToken ? generatedCardToken.substring(0, 10) + '...' : 'VAZIO',
         paymentMethodId: cardFormData.paymentMethodId,
         issuerId: cardFormData.issuerId,
         installments: cardFormData.installments
@@ -1010,10 +1018,9 @@
         throw new Error('Token do cartão não foi gerado');
       }
 
-      // Criar payload com o token gerado
       const paymentPayload = {
         paymentData: {
-          token: generatedCardToken,
+          token: generatedCardToken, // ✅ AGORA CORRETO: String, não undefined
           paymentMethodId: cardFormData.paymentMethodId,
           issuerId: cardFormData.issuerId,
           installments: cardFormData.installments,
@@ -1028,7 +1035,6 @@
         paymentMethod: 'credit_card'
       };
 
-      // Enviar para seu backend
       const response = await fetch(`${SUPABASE_URL}/functions/v1/process-mercadopago-payment`, {
         method: 'POST',
         headers: {
@@ -1040,7 +1046,11 @@
 
       const result = await response.json();
 
-      console.log('📥 Resposta pagamento:', result);
+      console.log('📥 Resposta pagamento:', {
+        ok: response.ok,
+        status: result.status,
+        id: result.id
+      });
 
       if (!response.ok || result.status !== 'approved') {
         throw new Error(result.error || result.status_detail || 'Pagamento recusado');
@@ -1050,7 +1060,7 @@
       hideLoading();
 
     } catch (error) {
-      console.error("❌ Erro:", error.message);
+      console.error("❌ Erro ao enviar para backend:", error.message);
       document.getElementById('card-errors').textContent = error.message;
       document.getElementById('card-errors').style.display = 'block';
       showToast(`❌ ${error.message}`, 'error');
