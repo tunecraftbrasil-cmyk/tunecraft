@@ -6,6 +6,7 @@
   <title>Checkout | TuneCraft</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://js.stripe.com/v3/"></script>
+  <script src="config.js"></script>
   
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -23,7 +24,7 @@
 
     .container {
       width: 100%;
-      max-width: 500px;
+      max-width: 550px;
       background: white;
       border-radius: 20px;
       padding: 40px;
@@ -32,7 +33,7 @@
 
     .header {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 30px;
     }
 
     .logo {
@@ -59,7 +60,7 @@
       background: #f8fafc;
       border-radius: 12px;
       padding: 20px;
-      margin-bottom: 30px;
+      margin-bottom: 25px;
       border: 1px solid #e2e8f0;
     }
 
@@ -75,10 +76,39 @@
       margin-bottom: 15px;
     }
 
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .price-label {
+      color: #64748b;
+    }
+
+    .price-value {
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .price-discount {
+      color: #10b981;
+    }
+
+    .price-original {
+      text-decoration: line-through;
+      color: #94a3b8;
+    }
+
     .product-price {
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       font-weight: 700;
       color: #00d9ff;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #e2e8f0;
     }
 
     .divider {
@@ -88,7 +118,7 @@
     }
 
     .form-section {
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
 
     .form-label {
@@ -119,6 +149,107 @@
       color: #94a3b8;
     }
 
+    .coupon-container {
+      position: relative;
+    }
+
+    .coupon-input-wrapper {
+      display: flex;
+      gap: 10px;
+    }
+
+    .coupon-input {
+      flex: 1;
+      text-transform: uppercase;
+    }
+
+    .btn-apply-coupon {
+      padding: 12px 20px;
+      background: #6366f1;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-apply-coupon:hover:not(:disabled) {
+      background: #4f46e5;
+    }
+
+    .btn-apply-coupon:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .coupon-message {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: none;
+    }
+
+    .coupon-message.success {
+      color: #10b981;
+      display: block;
+    }
+
+    .coupon-message.error {
+      color: #ef4444;
+      display: block;
+    }
+
+    .payment-methods {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .payment-method-btn {
+      padding: 15px;
+      border: 2px solid #cbd5e1;
+      border-radius: 10px;
+      background: white;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      color: #64748b;
+    }
+
+    .payment-method-btn:hover {
+      border-color: #00d9ff;
+      background: #f8fafc;
+    }
+
+    .payment-method-btn.active {
+      border-color: #00d9ff;
+      background: #eff6ff;
+      color: #00d9ff;
+    }
+
+    .payment-method-btn .icon {
+      font-size: 1.8rem;
+    }
+
+    .payment-method-btn .label {
+      font-size: 0.9rem;
+    }
+
+    #card-section {
+      display: none;
+    }
+
+    #pix-section {
+      display: none;
+    }
+
     #card-element {
       padding: 12px;
       border: 1px solid #cbd5e1;
@@ -126,15 +257,55 @@
       background: white;
     }
 
-    .stripe-error {
-      color: #ef4444;
-      font-size: 0.85rem;
-      margin-top: 5px;
-      display: none;
+    .pix-instructions {
+      background: #eff6ff;
+      border: 2px solid #00d9ff;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
     }
 
-    .stripe-success {
-      color: #10b981;
+    .pix-qrcode {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 15px 0;
+      display: inline-block;
+    }
+
+    .pix-qrcode img {
+      max-width: 200px;
+      height: auto;
+    }
+
+    .pix-code {
+      background: white;
+      padding: 12px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.75rem;
+      word-break: break-all;
+      margin: 15px 0;
+      border: 1px solid #cbd5e1;
+    }
+
+    .btn-copy-pix {
+      padding: 10px 20px;
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-copy-pix:hover {
+      background: #059669;
+    }
+
+    .error-message {
+      color: #ef4444;
       font-size: 0.85rem;
       margin-top: 5px;
       display: none;
@@ -142,13 +313,13 @@
 
     .btn-pay {
       width: 100%;
-      padding: 14px;
+      padding: 16px;
       background: linear-gradient(135deg, #00d9ff, #6366f1);
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-weight: 700;
-      font-size: 1rem;
+      font-size: 1.05rem;
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s;
       margin-top: 20px;
@@ -174,8 +345,8 @@
       border: 3px solid #f1f5f9;
       border-top: 3px solid #00d9ff;
       border-radius: 50%;
-      width: 30px;
-      height: 30px;
+      width: 35px;
+      height: 35px;
       animation: spin 1s linear infinite;
       margin: 0 auto 10px;
     }
@@ -205,28 +376,13 @@
       text-decoration: underline;
     }
 
-    .info-box {
-      background: #eff6ff;
-      border-left: 3px solid #00d9ff;
-      padding: 12px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      color: #0369a1;
-      margin-bottom: 20px;
-      display: none;
-    }
-
     @media (max-width: 600px) {
       .container {
         padding: 25px;
       }
 
-      .logo-text {
-        font-size: 1.2rem;
-      }
-
-      .product-price {
-        font-size: 1.3rem;
+      .payment-methods {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -243,14 +399,24 @@
   </div>
 
   <div class="product-summary">
-    <div class="product-name">🎵 Geração de Música</div>
-    <div class="product-description">Gera uma música personalizada com IA</div>
-    <div class="product-price">R$ 39,90</div>
+    <div class="product-name">🎵 Geração de Música Personalizada</div>
+    <div class="product-description">Música única criada com IA baseada nas suas preferências</div>
+    
+    <div id="price-breakdown">
+      <div class="price-row">
+        <span class="price-label">Valor:</span>
+        <span class="price-value" id="original-price">R$ 49,90</span>
+      </div>
+      <div class="price-row" id="discount-row" style="display: none;">
+        <span class="price-label">Desconto:</span>
+        <span class="price-value price-discount" id="discount-value">- R$ 0,00</span>
+      </div>
+    </div>
+    
+    <div class="product-price" id="final-price">R$ 49,90</div>
   </div>
 
   <div class="divider"></div>
-
-  <div class="info-box" id="info-box"></div>
 
   <form id="payment-form">
     <div class="form-section">
@@ -263,99 +429,315 @@
       <input type="email" id="customer-email" class="form-input" placeholder="joao@example.com" required>
     </div>
 
+    <!-- Cupom de Desconto -->
+    <div class="form-section coupon-container">
+      <label class="form-label">Cupom de Desconto (opcional)</label>
+      <div class="coupon-input-wrapper">
+        <input type="text" id="coupon-code" class="form-input coupon-input" placeholder="CUPOM10" maxlength="20">
+        <button type="button" class="btn-apply-coupon" id="apply-coupon-btn">Aplicar</button>
+      </div>
+      <div class="coupon-message" id="coupon-message"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Método de Pagamento -->
     <div class="form-section">
-      <label class="form-label">Cartão de Crédito *</label>
-      <div id="card-element"></div>
-      <div id="card-errors" class="stripe-error"></div>
+      <label class="form-label">Método de Pagamento *</label>
+      <div class="payment-methods">
+        <button type="button" class="payment-method-btn active" data-method="card">
+          <span class="icon">💳</span>
+          <span class="label">Cartão</span>
+        </button>
+        <button type="button" class="payment-method-btn" data-method="pix">
+          <span class="icon">🏦</span>
+          <span class="label">PIX</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Seção Cartão -->
+    <div id="card-section" style="display: block;">
+      <div class="form-section">
+        <label class="form-label">Dados do Cartão *</label>
+        <div id="card-element"></div>
+        <div id="card-errors" class="error-message"></div>
+      </div>
+    </div>
+
+    <!-- Seção PIX -->
+    <div id="pix-section">
+      <div class="pix-instructions">
+        <h3 style="margin-bottom: 15px; color: #1e293b;">📱 Pagamento via PIX</h3>
+        <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 15px;">
+          Clique em "Gerar QR Code PIX" para continuar
+        </p>
+        <div id="pix-qrcode-container" style="display: none;">
+          <div class="pix-qrcode">
+            <img id="pix-qrcode-img" src="" alt="QR Code PIX">
+          </div>
+          <p style="margin: 10px 0; font-weight: 600; color: #1e293b;">Ou copie o código PIX:</p>
+          <div class="pix-code" id="pix-code-text"></div>
+          <button type="button" class="btn-copy-pix" id="copy-pix-btn">📋 Copiar Código PIX</button>
+          <p style="margin-top: 15px; font-size: 0.85rem; color: #64748b;">
+            ⏱️ Aguardando pagamento... (atualiza automaticamente)
+          </p>
+        </div>
+      </div>
     </div>
 
     <button type="submit" class="btn-pay" id="pay-button">
-      Pagar R$ 39,90
+      💳 Pagar R$ 49,90
     </button>
 
     <div class="loading" id="loading">
       <div class="spinner"></div>
-      <p>Processando pagamento...</p>
+      <p id="loading-text">Processando pagamento...</p>
     </div>
   </form>
 
   <div class="footer-text">
-    💳 Pagamento seguro processado por Stripe
+    🔒 Pagamento 100% seguro processado por Stripe
   </div>
 </div>
 
 <script>
-  // const SUPABASE_URL = "https://miupzfchvfbqbznfhvix.supabase.co";
-  // const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pdXB6ZmNodmZicWJ6bmZodml4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxOTYwNzksImV4cCI6MjA4NDc3MjA3OX0.rz0W9qVovRvAeyBQ55LRewOAOM5a8pNJs1-UwWttATw";
-  // const STRIPE_PUBLIC_KEY = "pk_test_51StZvo1wgBnYhkbFGEWUqMCIhCzXBCzUrDxypLj7ge0InE6ZlQj4QXWHPmljSyaLqaC4hNxZvA0oZ4PWCEh6FJj10072HL9w8v";
-
-  // const stripe = Stripe(STRIPE_PUBLIC_KEY);
+  const stripe = Stripe(STRIPE_PUBLIC_KEY);
   const elements = stripe.elements();
-  const cardElement = elements.create('card');
+  const cardElement = elements.create('card', {
+    style: {
+      base: {
+        fontSize: '16px',
+        color: '#1e293b',
+        '::placeholder': { color: '#94a3b8' }
+      }
+    }
+  });
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   cardElement.mount('#card-element');
 
-  // ✅ Função para preparar headers do Supabase
-  function sbHeaders({ prefer = true } = {}) {
-    const h = {
-      apikey: SUPABASE_ANON_KEY,
-      'Content-Type': 'application/json',
-    };
-    if (prefer) h.Prefer = "return=representation";
-    return h;
+  let currentPaymentMethod = 'card';
+  let appliedCoupon = null;
+  let originalPrice = 4990; // R$ 49,90 em centavos
+  let finalPrice = 4990;
+  let pixPaymentIntentId = null;
+  let pixCheckInterval = null;
+
+  // ========================
+  // FUNÇÕES AUXILIARES
+  // ========================
+
+  function formatBRL(centavos) {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(centavos / 100);
   }
 
-  // ✅ Carregar dados do localStorage ao abrir página
+  function updatePriceDisplay() {
+    const originalPriceEl = document.getElementById('original-price');
+    const discountRow = document.getElementById('discount-row');
+    const discountValue = document.getElementById('discount-value');
+    const finalPriceEl = document.getElementById('final-price');
+    const payButton = document.getElementById('pay-button');
+
+    if (appliedCoupon) {
+      const discount = originalPrice - finalPrice;
+      originalPriceEl.innerHTML = `<span class="price-original">${formatBRL(originalPrice)}</span>`;
+      discountRow.style.display = 'flex';
+      discountValue.textContent = `- ${formatBRL(discount)}`;
+      finalPriceEl.textContent = formatBRL(finalPrice);
+      
+      const icon = currentPaymentMethod === 'card' ? '💳' : '🏦';
+      payButton.textContent = `${icon} Pagar ${formatBRL(finalPrice)}`;
+    } else {
+      originalPriceEl.textContent = formatBRL(originalPrice);
+      discountRow.style.display = 'none';
+      finalPriceEl.textContent = formatBRL(originalPrice);
+      
+      const icon = currentPaymentMethod === 'card' ? '💳' : '🏦';
+      payButton.textContent = `${icon} Pagar ${formatBRL(originalPrice)}`;
+    }
+  }
+
+  function showMessage(elementId, message, type = 'error') {
+    const el = document.getElementById(elementId);
+    el.textContent = message;
+    el.className = `coupon-message ${type}`;
+    el.style.display = 'block';
+  }
+
+  function hideMessage(elementId) {
+    document.getElementById(elementId).style.display = 'none';
+  }
+
+  function showLoading(text = 'Processando...') {
+    document.getElementById('loading-text').textContent = text;
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('pay-button').disabled = true;
+  }
+
+  function hideLoading() {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('pay-button').disabled = false;
+  }
+
+  function showToast(message, type = 'info') {
+    const div = document.createElement('div');
+    div.textContent = message;
+    div.style.cssText = `
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      z-index: 9999;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    `;
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 4000);
+  }
+
+  // ========================
+  // CARREGAR DADOS DO PEDIDO
+  // ========================
+
   function loadCheckoutData() {
     const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
     const email = localStorage.getItem('tuneCraft_checkoutEmail');
     const name = localStorage.getItem('tuneCraft_checkoutName');
     
     if (!pedidoId || !email || !name) {
-      showInfo("❌ Nenhum pagamento pendente. Redirecionando...");
-      setTimeout(() => {
-        window.location.href = "index.html";
-      }, 2000);
+      showToast("❌ Nenhum pagamento pendente. Redirecionando...", "error");
+      setTimeout(() => window.location.href = "dashboard.html", 2000);
       return;
     }
 
-    // ✅ Pré-preencher campos
     document.getElementById('customer-name').value = name;
     document.getElementById('customer-email').value = email;
     
     console.log("✅ Dados carregados:", { pedidoId, name, email });
   }
 
-  function showInfo(message) {
-    const box = document.getElementById('info-box');
-    box.textContent = message;
-    box.style.display = 'block';
-  }
+  // ========================
+  // APLICAR CUPOM
+  // ========================
 
-  // ✅ Verificar erros do Stripe
-  cardElement.addEventListener('change', (event) => {
-    const displayError = document.getElementById('card-errors');
-    if (event.error) {
-      displayError.textContent = event.error.message;
-      displayError.style.display = 'block';
-    } else {
-      displayError.textContent = '';
-      displayError.style.display = 'none';
+  document.getElementById('apply-coupon-btn').addEventListener('click', async () => {
+    const couponCode = document.getElementById('coupon-code').value.trim().toUpperCase();
+    
+    if (!couponCode) {
+      showMessage('coupon-message', 'Digite um código de cupom', 'error');
+      return;
+    }
+
+    const btn = document.getElementById('apply-coupon-btn');
+    btn.disabled = true;
+    btn.textContent = 'Verificando...';
+
+    try {
+      const { data, error } = await sb
+        .from('cupons')
+        .select('*')
+        .eq('codigo', couponCode)
+        .single();
+
+      if (error || !data) {
+        showMessage('coupon-message', '❌ Cupom inválido', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Aplicar';
+        return;
+      }
+
+      // Validações
+      if (!data.ativo) {
+        showMessage('coupon-message', '❌ Cupom desativado', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Aplicar';
+        return;
+      }
+
+      if (data.usos_atuais >= data.usos_maximos) {
+        showMessage('coupon-message', '❌ Cupom esgotado', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Aplicar';
+        return;
+      }
+
+      if (data.data_validade && new Date(data.data_validade) < new Date()) {
+        showMessage('coupon-message', '❌ Cupom expirado', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Aplicar';
+        return;
+      }
+
+      // Calcular desconto
+      let discount = 0;
+      if (data.desconto_percentual > 0) {
+        discount = Math.round((originalPrice * data.desconto_percentual) / 100);
+      } else if (data.desconto_fixo > 0) {
+        discount = data.desconto_fixo * 100; // Converter para centavos
+      }
+
+      finalPrice = Math.max(originalPrice - discount, 0);
+      appliedCoupon = data;
+
+      showMessage('coupon-message', `✅ Cupom aplicado! ${data.desconto_percentual > 0 ? data.desconto_percentual + '%' : formatBRL(discount)} de desconto`, 'success');
+      updatePriceDisplay();
+      
+      btn.textContent = '✓ Aplicado';
+      document.getElementById('coupon-code').disabled = true;
+
+    } catch (error) {
+      console.error('Erro ao validar cupom:', error);
+      showMessage('coupon-message', '❌ Erro ao validar cupom', 'error');
+      btn.disabled = false;
+      btn.textContent = 'Aplicar';
     }
   });
 
-  // ✅ Função para voltar ao dashboard
-  function voltarDashboard() {
-    if (confirm("Descartar esta compra e voltar?")) {
-      localStorage.removeItem('tuneCraft_pendingOrderId');
-      localStorage.removeItem('tuneCraft_checkoutEmail');
-      localStorage.removeItem('tuneCraft_checkoutName');
-      window.location.href = "dashboard.html";
-    }
-  }
+  // ========================
+  // ALTERNAR MÉTODO DE PAGAMENTO
+  // ========================
 
-  // ✅ Submeter pagamento
+  document.querySelectorAll('.payment-method-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.payment-method-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      currentPaymentMethod = btn.dataset.method;
+      
+      if (currentPaymentMethod === 'card') {
+        document.getElementById('card-section').style.display = 'block';
+        document.getElementById('pix-section').style.display = 'none';
+        document.getElementById('pay-button').textContent = `💳 Pagar ${formatBRL(appliedCoupon ? finalPrice : originalPrice)}`;
+      } else {
+        document.getElementById('card-section').style.display = 'none';
+        document.getElementById('pix-section').style.display = 'block';
+        document.getElementById('pay-button').textContent = `🏦 Gerar QR Code PIX (${formatBRL(appliedCoupon ? finalPrice : originalPrice)})`;
+      }
+    });
+  });
+
+  // ========================
+  // COPIAR CÓDIGO PIX
+  // ========================
+
+  document.getElementById('copy-pix-btn').addEventListener('click', () => {
+    const pixCode = document.getElementById('pix-code-text').textContent;
+    navigator.clipboard.writeText(pixCode).then(() => {
+      showToast('✅ Código PIX copiado!', 'success');
+    });
+  });
+
+  // ========================
+  // SUBMETER PAGAMENTO
+  // ========================
+
   document.getElementById('payment-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -364,17 +746,26 @@
     const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
 
     if (!name || !email) {
-      alert("Preencha nome e email!");
+      showToast("❌ Preencha nome e email!", "error");
       return;
     }
 
-    document.getElementById('loading').style.display = 'block';
-    document.getElementById('pay-button').disabled = true;
+    if (currentPaymentMethod === 'card') {
+      await processCardPayment(name, email, pedidoId);
+    } else {
+      await processPixPayment(name, email, pedidoId);
+    }
+  });
+
+  // ========================
+  // PAGAMENTO COM CARTÃO
+  // ========================
+
+  async function processCardPayment(name, email, pedidoId) {
+    showLoading('Processando pagamento com cartão...');
 
     try {
-      // ✅ 1. Criar Payment Intent na Edge Function do Supabase
-      console.log("📤 Chamando Edge Function: create-payment-intent");
-      
+      // 1. Criar Payment Intent
       const piResponse = await fetch(`${SUPABASE_URL}/functions/v1/create-payment-intent`, {
         method: 'POST',
         headers: { 
@@ -382,139 +773,216 @@
           'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
         },
         body: JSON.stringify({
-          amount: 3990, // R$ 39,90 em centavos
+          amount: appliedCoupon ? finalPrice : originalPrice,
           currency: 'brl',
           customerName: name,
           customerEmail: email,
-          orderId: pedidoId  // ← Enviar o ID do pedido para rastrear no webhook
+          orderId: pedidoId,
+          couponCode: appliedCoupon?.codigo || null,
+          paymentMethod: 'card'
+        })
+      });
+
+      const piData = await piResponse.json();
+
+      if (!piResponse.ok || !piData.clientSecret) {
+        throw new Error(piData.error || 'Erro ao criar pagamento');
+      }
+
+      // 2. Confirmar pagamento com Stripe
+      const result = await stripe.confirmCardPayment(piData.clientSecret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: { name, email }
+        }
+      });
+
+      if (result.error) {
+        throw new Error(result.error.message);
+      }
+
+      if (result.paymentIntent.status !== 'succeeded') {
+        throw new Error(`Pagamento ${result.paymentIntent.status}`);
+      }
+
+      // 3. Atualizar pedido e incrementar cupom
+      await finalizePurchase(pedidoId, result.paymentIntent.id, 'card');
+
+    } catch (error) {
+      console.error("❌ Erro:", error);
+      showToast(`❌ ${error.message}`, 'error');
+      hideLoading();
+    }
+  }
+
+  // ========================
+  // PAGAMENTO COM PIX
+  // ========================
+
+  async function processPixPayment(name, email, pedidoId) {
+    showLoading('Gerando QR Code PIX...');
+
+    try {
+      // 1. Criar Payment Intent para PIX
+      const piResponse = await fetch(`${SUPABASE_URL}/functions/v1/create-payment-intent`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify({
+          amount: appliedCoupon ? finalPrice : originalPrice,
+          currency: 'brl',
+          customerName: name,
+          customerEmail: email,
+          orderId: pedidoId,
+          couponCode: appliedCoupon?.codigo || null,
+          paymentMethod: 'pix'
         })
       });
 
       const piData = await piResponse.json();
 
       if (!piResponse.ok) {
-        console.error("❌ Erro da Edge Function:", piData);
-        throw new Error(piData.error || `Erro HTTP ${piResponse.status}: ${piData.message}`);
+        throw new Error(piData.error || 'Erro ao gerar PIX');
       }
 
-      if (!piData.clientSecret) {
-        console.error("❌ clientSecret não retornado:", piData);
-        throw new Error('Resposta inválida do servidor');
-      }
+      pixPaymentIntentId = piData.paymentIntentId;
 
-      console.log("✅ Payment Intent criado:", piData.clientSecret);
+      // 2. Mostrar QR Code
+      document.getElementById('pix-qrcode-img').src = piData.qrCodeUrl;
+      document.getElementById('pix-code-text').textContent = piData.pixCode;
+      document.getElementById('pix-qrcode-container').style.display = 'block';
 
-      // ✅ 2. Confirmar pagamento com Stripe usando confirmCardPayment
-      console.log("💳 Confirmando pagamento com Stripe...");
-      
-      const result = await stripe.confirmCardPayment(piData.clientSecret, {
-        payment_method: {
-          card: cardElement,
-          billing_details: {
-            name: name,
-            email: email
-          }
+      hideLoading();
+      document.getElementById('pay-button').style.display = 'none';
+
+      // 3. Iniciar verificação de pagamento
+      startPixPaymentCheck(pedidoId);
+
+    } catch (error) {
+      console.error("❌ Erro PIX:", error);
+      showToast(`❌ ${error.message}`, 'error');
+      hideLoading();
+    }
+  }
+
+  // ========================
+  // VERIFICAR PAGAMENTO PIX
+  // ========================
+
+  function startPixPaymentCheck(pedidoId) {
+    pixCheckInterval = setInterval(async () => {
+      try {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/check-pix-payment`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+          },
+          body: JSON.stringify({ paymentIntentId: pixPaymentIntentId })
+        });
+
+        const data = await response.json();
+
+        if (data.status === 'succeeded') {
+          clearInterval(pixCheckInterval);
+          await finalizePurchase(pedidoId, pixPaymentIntentId, 'pix');
         }
-      });
-
-      console.log("Resultado Stripe:", result);
-
-      if (result.error) {
-        console.error("❌ Erro Stripe:", result.error);
-        throw new Error(result.error.message);
+      } catch (error) {
+        console.error('Erro ao verificar PIX:', error);
       }
+    }, 3000); // Verifica a cada 3 segundos
+  }
 
-      if (result.paymentIntent.status !== 'succeeded') {
-        console.error("❌ Pagamento não foi aprovado:", result.paymentIntent.status);
-        throw new Error(`Pagamento ${result.paymentIntent.status}`);
-      }
+  // ========================
+  // FINALIZAR COMPRA
+  // ========================
 
-      // ✅ 3. NOVO: Após pagamento aprovado
-      console.log("✅ Pagamento aprovado! ID:", result.paymentIntent.id);
+  async function finalizePurchase(pedidoId, paymentIntentId, paymentMethod) {
+    showLoading('Finalizando compra...');
 
-      // ✅ 3.1. Atualizar status para 'payment_received' no Supabase
-      console.log("📝 Atualizando status para 'payment_received'...");
-      
-      const updateResp = await fetch(`${SUPABASE_URL}/rest/v1/musicas_pedidos?id=eq.${pedidoId}`, {
-        method: 'PATCH',
-        headers: sbHeaders({ prefer: true }),
-        body: JSON.stringify({
+    try {
+      // 1. Atualizar pedido
+      const { error: updateError } = await sb
+        .from('musicas_pedidos')
+        .update({
           status: 'payment_received',
-          stripe_payment_intent_id: result.paymentIntent.id,
-          payment_date: new Date().toISOString()
+          stripe_payment_intent_id: paymentIntentId,
+          payment_date: new Date().toISOString(),
+          payment_method: paymentMethod,
+          cupom_usado: appliedCoupon?.codigo || null,
+          valor_original: originalPrice / 100,
+          valor_desconto: appliedCoupon ? (originalPrice - finalPrice) / 100 : 0,
+          valor_final: (appliedCoupon ? finalPrice : originalPrice) / 100
         })
-      });
+        .eq('id', pedidoId);
 
-      if (!updateResp.ok) {
-        const errText = await updateResp.text();
-        console.error("❌ Erro ao atualizar status:", updateResp.status, errText);
-        throw new Error(`Erro ao atualizar pedido: ${updateResp.status}`);
+      if (updateError) throw updateError;
+
+      // 2. Incrementar uso do cupom
+      if (appliedCoupon) {
+        await sb
+          .from('cupons')
+          .update({ 
+            usos_atuais: appliedCoupon.usos_atuais + 1 
+          })
+          .eq('id', appliedCoupon.id);
       }
 
-      console.log("✅ Status atualizado para 'payment_received'");
-
-      // ✅ 3.2. Chamar Edge Function para gerar letra
-      console.log("🎵 Chamando Edge Function: generate-lyrics...");
-      
+      // 3. Gerar letra
       const genResp = await fetch(`${SUPABASE_URL}/functions/v1/generate-lyrics`, {
         method: 'POST',
-        headers: sbHeaders({ prefer: false }),
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        },
         body: JSON.stringify({ pedidoId })
       });
 
       if (!genResp.ok) {
-        const errText = await genResp.text();
-        console.error("❌ Erro ao gerar letra:", genResp.status, errText);
-        throw new Error(`Erro ao gerar letra: ${genResp.status}`);
+        console.error('Erro ao gerar letra');
       }
-
-      const genData = await genResp.json();
-      console.log("✅ Letra gerada com sucesso:", genData);
 
       showToast("✅ Pagamento confirmado! Gerando letra...", "success");
 
-      // ✅ 3.3. Limpar localStorage
+      // 4. Limpar e redirecionar
       localStorage.removeItem('tuneCraft_pendingOrderId');
       localStorage.removeItem('tuneCraft_checkoutEmail');
       localStorage.removeItem('tuneCraft_checkoutName');
 
-      // ✅ 3.4. Redirecionar para dashboard (seção de letras para aprovar)
       setTimeout(() => {
         window.location.href = 'dashboard.html?section=pending';
       }, 2000);
 
     } catch (error) {
-      console.error("❌ Erro completo:", error);
-      
-      const errorDisplay = document.getElementById('card-errors');
-      errorDisplay.textContent = `❌ ${error.message}`;
-      errorDisplay.style.display = 'block';
-      
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('pay-button').disabled = false;
+      console.error('❌ Erro ao finalizar:', error);
+      showToast(`❌ Erro: ${error.message}`, 'error');
+      hideLoading();
     }
-  });
-
-  function showToast(message, type) {
-    const div = document.createElement('div');
-    div.textContent = message;
-    div.style.cssText = `
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: ${type === 'success' ? '#10b981' : '#ef4444'};
-      color: white;
-      padding: 15px 20px;
-      border-radius: 8px;
-      z-index: 9999;
-      font-weight: 600;
-    `;
-    document.body.appendChild(div);
-    setTimeout(() => div.remove(), 4000);
   }
 
-  // ✅ Carregar dados ao abrir página
+  // ========================
+  // VOLTAR AO DASHBOARD
+  // ========================
+
+  function voltarDashboard() {
+    if (confirm("Descartar esta compra e voltar?")) {
+      if (pixCheckInterval) clearInterval(pixCheckInterval);
+      localStorage.removeItem('tuneCraft_pendingOrderId');
+      localStorage.removeItem('tuneCraft_checkoutEmail');
+      localStorage.removeItem('tuneCraft_checkoutName');
+      window.location.href = "dashboard.html";
+    }
+  }
+
+  // Carregar dados ao iniciar
   window.addEventListener('load', loadCheckoutData);
+
+  // Limpar intervalo ao sair
+  window.addEventListener('beforeunload', () => {
+    if (pixCheckInterval) clearInterval(pixCheckInterval);
+  });
 </script>
 
 </body>
