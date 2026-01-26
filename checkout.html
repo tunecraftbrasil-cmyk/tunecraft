@@ -910,83 +910,90 @@
   // ========================
 
   async function processCardPayment() {
-    const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
-    const name = document.getElementById('customer-name').value.trim();
-    const email = document.getElementById('customer-email').value.trim();
+  const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
+  const name = document.getElementById('customer-name').value.trim();
+  const email = document.getElementById('customer-email').value.trim();
 
-    showLoading('Processando pagamento com cartão...');
+  showLoading('Processando pagamento com cartão...');
 
-    try {
-      const cardFormData = cardFormInstance.getCardFormData();
+  try {
+    // ✅ VALIDE OS INPUTS DIRETAMENTE, NÃO NO getCardFormData()
+    const cardNumber = document.getElementById('form-checkout__cardNumber').value.trim();
+    const cardholderName = document.getElementById('form-checkout__cardholderName').value.trim();
+    const expirationDate = document.getElementById('form-checkout__cardExpirationDate').value.trim();
+    const securityCode = document.getElementById('form-checkout__securityCode').value.trim();
+    const identificationNumber = document.getElementById('form-checkout__identificationNumber').value.trim();
+    const issuer = document.getElementById('form-checkout__issuer').value;
+    const installments = document.getElementById('form-checkout__installments').value;
+    const identificationType = document.getElementById('form-checkout__identificationType').value;
 
-      console.log('📤 Dados do formulário:', {
-        cardNumber: cardFormData.cardNumber ? '***' : 'VAZIO',
-        cardholderName: cardFormData.cardholderName,
-        expirationDate: cardFormData.expirationDate,
-        securityCode: cardFormData.securityCode ? '***' : 'VAZIO',
-        paymentMethodId: cardFormData.paymentMethodId,
-        issuerId: cardFormData.issuerId,
-        installments: cardFormData.installments,
-        identificationType: cardFormData.identificationType,
-        identificationNumber: cardFormData.identificationNumber ? '***' : 'VAZIO'
-      });
+    console.log('📤 Dados capturados direto dos inputs:', {
+      cardNumber: cardNumber ? '***' : 'VAZIO',
+      cardholderName,
+      expirationDate,
+      securityCode: securityCode ? '***' : 'VAZIO',
+      issuer,
+      installments,
+      identificationType,
+      identificationNumber: identificationNumber ? '***' : 'VAZIO'
+    });
 
-      if (!cardFormData.cardNumber || !cardFormData.expirationDate || !cardFormData.securityCode) {
-        throw new Error('Preencha todos os campos do cartão');
-      }
-
-      const paymentPayload = {
-        paymentData: {
-          cardNumber: cardFormData.cardNumber.replace(/\s/g, ''),
-          expirationDate: cardFormData.expirationDate,
-          securityCode: cardFormData.securityCode,
-          cardholderName: cardFormData.cardholderName,
-          paymentMethodId: cardFormData.paymentMethodId,
-          issuerId: cardFormData.issuerId,
-          installments: cardFormData.installments,
-          identificationType: cardFormData.identificationType,
-          identificationNumber: cardFormData.identificationNumber
-        },
-        amount: appliedCoupon ? finalPrice / 100 : originalPrice / 100,
-        customerName: name,
-        customerEmail: email,
-        orderId: pedidoId,
-        couponCode: appliedCoupon?.codigo || null,
-        paymentMethod: 'credit_card'
-      };
-
-      const response = await fetch(`${SUPABASE_URL}/functions/v1/process-mercadopago-payment`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-        },
-        body: JSON.stringify(paymentPayload)
-      });
-
-      const result = await response.json();
-
-      console.log('📥 Resposta pagamento:', {
-        ok: response.ok,
-        status: result.status,
-        id: result.id
-      });
-
-      if (!response.ok || result.status !== 'approved') {
-        throw new Error(result.error || result.status_detail || 'Pagamento recusado');
-      }
-
-      await finalizePurchase(pedidoId, result.id, 'credit_card');
-      hideLoading();
-
-    } catch (error) {
-      console.error("❌ Erro ao processar cartão:", error.message);
-      document.getElementById('card-errors').textContent = error.message;
-      document.getElementById('card-errors').style.display = 'block';
-      showToast(`❌ ${error.message}`, 'error');
-      hideLoading();
+    if (!cardNumber || !cardholderName || !expirationDate || !securityCode || !identificationNumber) {
+      throw new Error('Preencha todos os campos do cartão');
     }
+
+    const paymentPayload = {
+      paymentData: {
+        cardNumber: cardNumber.replace(/\s/g, ''),
+        expirationDate: expirationDate,
+        securityCode: securityCode,
+        cardholderName: cardholderName,
+        paymentMethodId: document.querySelector('.payment-method-btn.active').dataset.method === 'credit_card' ? 'master' : 'visa',
+        issuerId: issuer,
+        installments: installments,
+        identificationType: identificationType,
+        identificationNumber: identificationNumber
+      },
+      amount: appliedCoupon ? finalPrice / 100 : originalPrice / 100,
+      customerName: name,
+      customerEmail: email,
+      orderId: pedidoId,
+      couponCode: appliedCoupon?.codigo || null,
+      paymentMethod: 'credit_card'
+    };
+
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/process-mercadopago-payment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify(paymentPayload)
+    });
+
+    const result = await response.json();
+
+    console.log('📥 Resposta pagamento:', {
+      ok: response.ok,
+      status: result.status,
+      id: result.id
+    });
+
+    if (!response.ok || result.status !== 'approved') {
+      throw new Error(result.error || result.status_detail || 'Pagamento recusado');
+    }
+
+    await finalizePurchase(pedidoId, result.id, 'credit_card');
+    hideLoading();
+
+  } catch (error) {
+    console.error("❌ Erro ao processar cartão:", error.message);
+    document.getElementById('card-errors').textContent = error.message;
+    document.getElementById('card-errors').style.display = 'block';
+    showToast(`❌ ${error.message}`, 'error');
+    hideLoading();
   }
+}
 
   // ========================
   // PAGAMENTO PIX
