@@ -245,7 +245,6 @@
       display: none;
     }
 
-    /* Mercado Pago Card Form */
     #form-checkout {
       display: flex;
       flex-direction: column;
@@ -491,7 +490,7 @@
 
     <!-- Seção Cartão (Mercado Pago) -->
     <div id="card-section">
-      <div id="form-checkout">
+      <form id="form-checkout">
         <div class="mp-field">
           <label for="form-checkout__cardNumber">Número do Cartão</label>
           <input type="text" id="form-checkout__cardNumber" placeholder="0000 0000 0000 0000" />
@@ -533,7 +532,7 @@
           <label for="form-checkout__identificationNumber">CPF</label>
           <input type="text" id="form-checkout__identificationNumber" placeholder="000.000.000-00" />
         </div>
-      </div>
+      </form>
       <div class="error-message" id="card-errors"></div>
     </div>
 
@@ -583,72 +582,82 @@
   let finalPrice = 4990;
   let pixPaymentId = null;
   let pixCheckInterval = null;
+  let cardFormInstance = null; // Armazenar instância do cardForm
 
-  // Card Form do Mercado Pago
-  const cardForm = mp.cardForm({
-    amount: "49.90",
-    iframe: true,
-    form: {
-      id: "form-checkout",
-      cardNumber: {
-        id: "form-checkout__cardNumber",
-        placeholder: "0000 0000 0000 0000",
+  // ========================
+  // INICIALIZAR CARDFORM
+  // ========================
+  function initializeCardForm(amount) {
+    console.log('🔄 Inicializando cardForm com amount:', amount);
+    
+    cardFormInstance = mp.cardForm({
+      amount: amount.toFixed(2),
+      iframe: true,
+      form: {
+        id: "form-checkout",
+        cardNumber: {
+          id: "form-checkout__cardNumber",
+          placeholder: "0000 0000 0000 0000",
+        },
+        expirationDate: {
+          id: "form-checkout__cardExpirationDate",
+          placeholder: "MM/AA",
+        },
+        securityCode: {
+          id: "form-checkout__securityCode",
+          placeholder: "123",
+        },
+        cardholderName: {
+          id: "form-checkout__cardholderName",
+          placeholder: "NOME COMPLETO",
+        },
+        issuer: {
+          id: "form-checkout__issuer",
+          placeholder: "Banco emissor",
+        },
+        installments: {
+          id: "form-checkout__installments",
+          placeholder: "Parcelas",
+        },
+        identificationType: {
+          id: "form-checkout__identificationType",
+          placeholder: "Tipo de documento",
+        },
+        identificationNumber: {
+          id: "form-checkout__identificationNumber",
+          placeholder: "000.000.000-00",
+        },
       },
-      expirationDate: {
-        id: "form-checkout__cardExpirationDate",
-        placeholder: "MM/AA",
-      },
-      securityCode: {
-        id: "form-checkout__securityCode",
-        placeholder: "123",
-      },
-      cardholderName: {
-        id: "form-checkout__cardholderName",
-        placeholder: "NOME COMPLETO",
-      },
-      issuer: {
-        id: "form-checkout__issuer",
-        placeholder: "Banco emissor",
-      },
-      installments: {
-        id: "form-checkout__installments",
-        placeholder: "Parcelas",
-      },
-      identificationType: {
-        id: "form-checkout__identificationType",
-        placeholder: "Tipo de documento",
-      },
-      identificationNumber: {
-        id: "form-checkout__identificationNumber",
-        placeholder: "000.000.000-00",
-      },
-    },
-    callbacks: {
-      onFormMounted: error => {
-        if (error) console.error("Form Mounted handling error: ", error);
-        console.log("✅ Card form mounted");
-      },
-      // ✅ REMOVIDO: onSubmit (estava causando o erro)
-      // Agora vamos processar manualmente no evento do form
-
-      onBinChange: (bin) => {
-        console.log("🔍 BIN detectado:", bin);
-        setTimeout(() => {
-          updateInstallmentOptions();
-        }, 500);
-      },
-      onInstallmentsReceived: (error, installments) => {
-        if (error) {
-          console.error("Erro ao carregar parcelas:", error);
-          return;
+      callbacks: {
+        onFormMounted: error => {
+          if (error) console.error("❌ Erro ao montar form:", error);
+          console.log("✅ Card form mounted");
+        },
+        onSubmit: async (event) => {
+          event.preventDefault();
+          if (currentPaymentMethod === 'credit_card') {
+            await processCardPayment();
+          }
+        },
+        onBinChange: (bin) => {
+          console.log("🔍 BIN detectado:", bin);
+          setTimeout(() => {
+            updateInstallmentOptions();
+          }, 500);
+        },
+        onInstallmentsReceived: (error, installments) => {
+          if (error) {
+            console.error("❌ Erro ao carregar parcelas:", error);
+            return;
+          }
+          console.log("📦 Parcelas recebidas do MP:", installments);
+          setTimeout(() => {
+            updateInstallmentOptions();
+          }, 100);
         }
-        console.log("📦 Parcelas recebidas do MP:", installments);
-        setTimeout(() => {
-          updateInstallmentOptions();
-        }, 100);
-      }
-    },
-  });
+      },
+    });
+  }
 
   // ========================
   // FUNÇÕES AUXILIARES
@@ -702,7 +711,8 @@
       discountValue.textContent = `- ${formatBRL(discount)}`;
       finalPriceEl.textContent = formatBRL(finalPrice);
 
-      cardForm.update({ amount: (finalPrice / 100).toFixed(2) });
+      // ✅ Recria o cardForm com o novo valor
+      initializeCardForm(finalPrice / 100);
 
       setTimeout(updateInstallmentOptions, 300);
 
@@ -887,7 +897,7 @@
   });
 
   // ========================
-  // SUBMIT FORM - ✅ CORRIGIDO
+  // SUBMIT FORM
   // ========================
 
   document.getElementById('payment-form').addEventListener('submit', async (e) => {
@@ -902,15 +912,14 @@
     }
 
     if (currentPaymentMethod === 'credit_card') {
-      // ✅ USAR getCardFormData() ao invés de submit()
-      await processCardPayment();
+      cardFormInstance.submit();
     } else {
       await processPixPayment(name, email);
     }
   });
 
   // ========================
-  // PAGAMENTO CARTÃO - ✅ CORRIGIDO
+  // PAGAMENTO CARTÃO
   // ========================
 
   async function processCardPayment() {
@@ -921,10 +930,21 @@
     showLoading('Processando pagamento...');
 
     try {
-      // ✅ Pegar dados do formulário diretamente
-      const cardFormData = cardForm.getCardFormData();
+      // ✅ Obter dados do cardForm
+      const cardFormData = cardFormInstance.getCardFormData();
 
-      console.log('📤 Enviando dados do cartão:', cardFormData);
+      console.log('📤 Dados do cartão:', {
+        token: cardFormData.token ? '✅ Presente' : '❌ Vazio',
+        paymentMethodId: cardFormData.paymentMethodId,
+        issuerId: cardFormData.issuerId,
+        installments: cardFormData.installments,
+        amount: appliedCoupon ? finalPrice / 100 : originalPrice / 100
+      });
+
+      // ✅ Validar se tem token
+      if (!cardFormData.token) {
+        throw new Error('❌ Erro ao gerar token do cartão. Verifique os dados e tente novamente.');
+      }
 
       const response = await fetch(`${SUPABASE_URL}/functions/v1/process-mercadopago-payment`, {
         method: 'POST',
@@ -945,7 +965,7 @@
 
       const result = await response.json();
 
-      console.log('📥 Resposta do pagamento:', result);
+      console.log('📥 Resposta pagamento:', result);
 
       if (!response.ok || result.status !== 'approved') {
         throw new Error(result.error || result.status_detail || 'Pagamento recusado');
@@ -954,7 +974,7 @@
       await finalizePurchase(pedidoId, result.id, 'credit_card');
 
     } catch (error) {
-      console.error("❌ Erro:", error);
+      console.error("❌ Erro:", error.message);
       document.getElementById('card-errors').textContent = error.message;
       document.getElementById('card-errors').style.display = 'block';
       showToast(`❌ ${error.message}`, 'error');
@@ -1073,7 +1093,7 @@
           .eq('id', appliedCoupon.id);
       }
 
-      const genResp = await fetch(`${SUPABASE_URL}/functions/v1/generate-lyrics`, {
+      await fetch(`${SUPABASE_URL}/functions/v1/generate-lyrics`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -1109,9 +1129,16 @@
     }
   }
 
+  // ========================
+  // INICIALIZAÇÃO
+  // ========================
   window.addEventListener('load', () => {
     loadCheckoutData();
-    setTimeout(updateInstallmentOptions, 1500);
+    // Inicializar cardForm com preço padrão
+    setTimeout(() => {
+      initializeCardForm(originalPrice / 100);
+      updateInstallmentOptions();
+    }, 500);
   });
 
   window.addEventListener('beforeunload', () => {
