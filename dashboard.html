@@ -1455,6 +1455,89 @@ ${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
       }, 4000);
     }
 
+    // ============================================
+// FUNÇÃO: Converter asked[] → campos editáveis
+// ============================================
+
+function convertAskedToEditFormat(asked) {
+    /**
+     * Transforma o array asked[] em objeto com step0, step1, step2...
+     * Para compatibilidade com o formulário de edição
+     */
+    
+    const result = {};
+    
+    if (!asked || !Array.isArray(asked)) {
+        return result;
+    }
+
+    asked.forEach((item, index) => {
+        // Cada item tem:
+        // - fieldName: "recipient.name"
+        // - answerValue: "Maria"
+        
+        // Para manter compatibilidade com step0, step1, step2...
+        // Precisamos mapear o fieldName de volta para stepX
+        
+        const fieldName = item.fieldName; // ex: "recipient.name"
+        const answerValue = item.answerValue;
+        
+        // Mapeamento: tema → step0, recipient.name → step2, etc
+        const fieldToStepMap = {
+            "ai_metadata.themeId": "step0",
+            
+            // Birthday
+            "recipient.name": "step2",
+            "ai_metadata.relationship": "step1",
+            "lyricDetails.mainMessage": "step4",
+            "ai_metadata.pov": "step3",
+            "lyricDetails.specialMentions": "step5",
+            "recipient.personality": "step6",
+            "lyricDetails.secretDetail": "step7",
+            "recipient.specialCharacteristics": "step8",
+            "final.futureWish": "step9",
+            "musicStyle.primaryGenre": "step10",
+            "musicStyle.mood": "step11",
+            "musicStyle.tempo": "step12",
+            "lyricDetails.language": "step13",
+            "productionDetails.vocalApproach": "step14",
+            
+            // Pregnancy announcement
+            "ai_metadata.audience": "step1",
+            "ai_metadata.narratorRole": "step2",
+            "ai_metadata.pregnancyStage": "step3",
+            "lyricDetails.scene": "step5",
+            "lyricDetails.desiredImpact": "step6",
+            "lyricDetails.symbolicDetail": "step7",
+            "lyricDetails.announcementLine": "step8",
+            "lyricDetails.avoid": "step9",
+            
+            // Love declaration
+            "lyricDetails.origin": "step1",
+            "lyricDetails.turningPoint": "step2",
+            "lyricDetails.transformation": "step3",
+            "lyricDetails.unsaid": "step4",
+            "lyricDetails.simpleScene": "step5",
+            "lyricDetails.withYouI": "step7",
+        };
+        
+        const stepKey = fieldToStepMap[fieldName];
+        
+        if (stepKey) {
+            result[stepKey] = answerValue;
+        }
+        
+        // Adicionar também por índice original (segurança)
+        result[`asked_${index}`] = {
+            fieldName: fieldName,
+            value: answerValue,
+            question: item.question
+        };
+    });
+    
+    return result;
+}
+    
     async function openEditDraftModal(pedidoId) {
       editDraftCurrentPedidoId = pedidoId;
       const modal = document.getElementById('editDraftModal');
@@ -1766,6 +1849,7 @@ async function saveEditDraftNew() {
 
 </body>
 </html>
+
 
 
 
