@@ -824,9 +824,12 @@
   <script src="config.js"></script>
 
   <!-- Chat JS (agora sem redeclaração) -->
- 
-  <script src="chat_themes_full.js"></script>
   <script src="chat.js"></script>
+  <script src="chat_themes_full.js"></script>
+
+  <!-- Depois seu HTML com botão -->
+  <button onclick="openChat()">Abrir Chat</button>
+  
 
   <script>
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1799,6 +1802,7 @@ ${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
 
 </body>
 </html>
+
 
 
 
