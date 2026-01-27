@@ -1552,7 +1552,7 @@ function convertAskedToEditFormat(asked) {
       editDraftCurrentPedidoId = null;
     }
 
-    async function loadEditDraft(pedidoId) {
+   async function loadEditDraft(pedidoId) {
     const loading = document.getElementById("editDraftLoading");
     const form = document.getElementById("editDraftForm");
     
@@ -1575,115 +1575,89 @@ function convertAskedToEditFormat(asked) {
         console.log("📋 Array asked[]:", payload.asked);
         console.log("💾 Objeto answers{}:", payload.answers);
         
-        // 🔑 IMPORTANTE: Converter asked[] para formato de edição
-        const editFormat = convertAskedToEditFormat(payload.asked);
-        console.log("✅ Formato editável:", editFormat);
-        
         document.getElementById("editDraftHeaderInfo").innerText = 
             `Criado em ${new Date(data.created_at).toLocaleDateString("pt-BR")}`;
         
-        // ============================================
-        // USAR answers{} ESTRUTURADO (mais limpo!)
-        // ============================================
+        const asked = payload.asked || [];
         const answers = payload.answers || {};
         
-        form.innerHTML = `
-            <div class="edit-draft-section-title">Tema</div>
-            <div class="edit-draft-form-group">
-                <label>Tema da música</label>
-                <div class="field-name">ai_metadata.themeId</div>
-                <select id="editStep0">
-                    <option value="birthday" ${answers.ai_metadata?.themeId === "birthday" ? "selected" : ""}>🎂 Aniversário</option>
-                    <option value="love_declaration" ${answers.ai_metadata?.themeId === "love_declaration" ? "selected" : ""}>💌 Declaração de amor</option>
-                    <option value="proposal" ${answers.ai_metadata?.themeId === "proposal" ? "selected" : ""}>💍 Pedido de casamento</option>
-                    <option value="pregnancy_announcement" ${answers.ai_metadata?.themeId === "pregnancy_announcement" ? "selected" : ""}>📢 Anúncio de gravidez</option>
-                </select>
-            </div>
-
-            <div class="edit-draft-section-title">Informações Básicas</div>
+        if (!asked || asked.length === 0) {
+            throw new Error("Nenhuma resposta encontrada neste rascunho");
+        }
+        
+        // ============================================
+        // RENDERIZAR DINÂMICAMENTE A PARTIR DE asked[]
+        // ============================================
+        
+        let formHTML = "";
+        let currentSection = null;
+        
+        asked.forEach((item, index) => {
+            // Agrupar por seção
+            if (item.section !== currentSection) {
+                currentSection = item.section;
+                formHTML += `<div class="edit-draft-section-title">${currentSection}</div>`;
+            }
             
-            ${answers.recipient?.name ? `
-            <div class="edit-draft-form-group">
-                <label>Nome da pessoa</label>
-                <div class="field-name">recipient.name</div>
-                <input type="text" id="editRecipientName" value="${answers.recipient.name || ""}" />
-            </div>
-            ` : ""}
+            // Gerar ID único para o campo
+            const fieldId = `edit_${item.fieldName.replace(/\./g, "_")}`;
+            const fieldValue = item.answerValue || "";
+            const labelText = item.question || item.fieldName;
             
-            ${answers.ai_metadata?.relationship ? `
-            <div class="edit-draft-form-group">
-                <label>Relacionamento</label>
-                <div class="field-name">ai_metadata.relationship</div>
-                <input type="text" id="editRelationship" value="${answers.ai_metadata.relationship || ""}" />
-            </div>
-            ` : ""}
-
-            <div class="edit-draft-section-title">Narrativa</div>
+            // Renderizar de acordo com o tipo
+            formHTML += `
+                <div class="edit-draft-form-group">
+                    <label>${labelText}</label>
+                    <div class="field-name">${item.fieldName}</div>
+            `;
             
-            ${answers.lyricDetails?.mainMessage ? `
-            <div class="edit-draft-form-group">
-                <label>História / Mensagem Principal</label>
-                <div class="field-name">lyricDetails.mainMessage</div>
-                <textarea id="editMainMessage" rows="4">${answers.lyricDetails.mainMessage || ""}</textarea>
-            </div>
-            ` : ""}
+            // ✅ Se é um select com opções (dedu conforme answerValue)
+            if (item.answerValue && 
+                (item.fieldName.includes("themeId") || 
+                 item.fieldName.includes("mood") || 
+                 item.fieldName.includes("tempo") ||
+                 item.fieldName.includes("genre") ||
+                 item.fieldName.includes("audience") ||
+                 item.fieldName.includes("narratorRole") ||
+                 item.fieldName.includes("pregnancyStage") ||
+                 item.fieldName.includes("language") ||
+                 item.fieldName.includes("vocalApproach") ||
+                 item.fieldName.includes("pov"))) {
+                
+                formHTML += renderSelectField(fieldId, item.fieldName, fieldValue);
+            }
+            // ✅ Se é textarea (longo)
+            else if (item.answerValue && item.answerValue.length > 50) {
+                formHTML += `
+                    <textarea id="${fieldId}" rows="3">${escapeHtml(fieldValue)}</textarea>
+                `;
+            }
+            // ✅ Default: input text
+            else {
+                formHTML += `
+                    <input type="text" id="${fieldId}" value="${escapeHtml(fieldValue)}" />
+                `;
+            }
             
-            ${answers.lyricDetails?.scene ? `
-            <div class="edit-draft-form-group">
-                <label>Cena / Detalhe</label>
-                <div class="field-name">lyricDetails.scene</div>
-                <textarea id="editScene" rows="3">${answers.lyricDetails.scene || ""}</textarea>
-            </div>
-            ` : ""}
-            
-            ${answers.lyricDetails?.secretDetail ? `
-            <div class="edit-draft-form-group">
-                <label>Detalhe Secreto</label>
-                <div class="field-name">lyricDetails.secretDetail</div>
-                <input type="text" id="editSecretDetail" value="${answers.lyricDetails.secretDetail || ""}" />
-            </div>
-            ` : ""}
-
-            <div class="edit-draft-section-title">Estilo Musical</div>
-            
-            <div class="edit-draft-form-group">
-                <label>Gênero</label>
-                <div class="field-name">musicStyle.primaryGenre</div>
-                <select id="editGenre">
-                    <option value="mpb" ${answers.musicStyle?.primaryGenre === "mpb" ? "selected" : ""}>🎸 MPB</option>
-                    <option value="sertanejo" ${answers.musicStyle?.primaryGenre === "sertanejo" ? "selected" : ""}>🤠 Sertanejo</option>
-                    <option value="pop" ${answers.musicStyle?.primaryGenre === "pop" ? "selected" : ""}>🎤 Pop</option>
-                    <option value="acoustic" ${answers.musicStyle?.primaryGenre === "acoustic" ? "selected" : ""}>🎺 Acústico</option>
-                    <option value="rock" ${answers.musicStyle?.primaryGenre === "rock" ? "selected" : ""}>🎸 Rock</option>
-                </select>
-            </div>
-            
-            <div class="edit-draft-form-group">
-                <label>Impacto Emocional</label>
-                <div class="field-name">musicStyle.mood</div>
-                <select id="editMood">
-                    <option value="emotional" ${answers.musicStyle?.mood === "emotional" ? "selected" : ""}>😭 Emocionar</option>
-                    <option value="peace" ${answers.musicStyle?.mood === "peace" ? "selected" : ""}>☮️ Paz</option>
-                    <option value="goosebumps" ${answers.musicStyle?.mood === "goosebumps" ? "selected" : ""}>✨ Arrepio</option>
-                    <option value="smile" ${answers.musicStyle?.mood === "smile" ? "selected" : ""}>😊 Sorriso</option>
-                </select>
-            </div>
-            
-            <div class="edit-draft-form-group">
-                <label>Movimento/Tempo</label>
-                <div class="field-name">musicStyle.tempo</div>
-                <select id="editTempo">
-                    <option value="calm" ${answers.musicStyle?.tempo === "calm" ? "selected" : ""}>🌊 Calma</option>
-                    <option value="balanced" ${answers.musicStyle?.tempo === "balanced" ? "selected" : ""}>⚖️ Equilibrada</option>
-                    <option value="intense" ${answers.musicStyle?.tempo === "intense" ? "selected" : ""}>📈 Intensa</option>
-                </select>
-            </div>
-
+            formHTML += `</div>`;
+        });
+        
+        // BOTÕES
+        formHTML += `
             <div class="edit-draft-actions">
                 <button type="button" class="edit-draft-btn edit-draft-btn-cancel" onclick="closeEditDraftModal()">Cancelar</button>
-                <button type="button" class="edit-draft-btn edit-draft-btn-save" onclick="saveEditDraftNew()">Salvar Alteraes</button>
+                <button type="button" class="edit-draft-btn edit-draft-btn-save" onclick="saveEditDraftDynamic()">Salvar Alterações</button>
             </div>
         `;
+        
+        form.innerHTML = formHTML;
+        
+        // Guardar dados originais para facilitar salvamento
+        window.editDraftData = {
+            pedidoId: pedidoId,
+            asked: asked,
+            answers: answers
+        };
         
         loading.style.display = "none";
         form.style.display = "block";
@@ -1695,81 +1669,224 @@ function convertAskedToEditFormat(asked) {
     }
 }
 
+    // ============================================
+// HELPER: Renderizar select fields dinamicamente
+// ============================================
 
-   async function saveEditDraft() {
-  if (!editDraftCurrentPedidoId) return;
-
-  const btn = document.querySelector('.edit-draft-btn-save');
-  btn.disabled = true;
-  btn.innerText = '⏳ Salvando...';
-
-  try {
-    // Coletar referências
-    const references = [];
-    document.querySelectorAll('[data-ref-type="artist"]').forEach((artistInput, idx) => {
-      const songInput = document.querySelector(`[data-ref-idx="${idx}"][data-ref-type="song"]`);
-      const artist = artistInput.value.trim();
-      const song = songInput?.value.trim();
-      
-      if (artist && song) {
-        references.push({ artist, song });
-      }
+function renderSelectField(fieldId, fieldName, currentValue) {
+    const options = getOptionsForField(fieldName, currentValue);
+    
+    let html = `<select id="${fieldId}">`;
+    options.forEach(opt => {
+        const selected = currentValue === opt.value ? "selected" : "";
+        html += `<option value="${opt.value}" ${selected}>${opt.label}</option>`;
     });
-
-    const updatedPayload = {
-      step1: document.getElementById('edit_step1')?.value,
-      'step1.5': document.getElementById('edit_step1_5')?.value || undefined,
-      step2: document.getElementById('edit_step2')?.value,
-      step3: document.getElementById('edit_step3')?.value,
-      step4: document.getElementById('edit_step4')?.value,
-      step5: document.getElementById('edit_step5')?.value,
-      step6: document.getElementById('edit_step6')?.value,
-      'step6.5': document.getElementById('edit_step6_5')?.value || undefined,
-      step7: document.getElementById('edit_step7')?.value,
-      step8: document.getElementById('edit_step8')?.value,
-      'step8.5': document.getElementById('edit_step8_5')?.value || undefined,
-      step9: document.getElementById('edit_step9')?.value,
-      step10: document.getElementById('edit_step10')?.value,
-      step11: references.length > 0 ? references : undefined,
-      step12: document.getElementById('edit_step12')?.value,
-      step13: document.getElementById('edit_step13')?.value,
-      step14: document.getElementById('edit_step14')?.value,
-      step15: document.getElementById('edit_step15')?.value,
-      step16: document.getElementById('edit_step16')?.value
-    };
-
-    // Remove undefined values
-    Object.keys(updatedPayload).forEach(key => {
-      if (updatedPayload[key] === undefined || updatedPayload[key] === '') {
-        delete updatedPayload[key];
-      }
-    });
-
-    const { error } = await sb
-      .from('musicas_pedidos')
-      .update({ 
-        payload: updatedPayload,
-        
-      })
-      .eq('id', editDraftCurrentPedidoId);
-
-    if (error) throw error;
-
-    showEditDraftToast('✅ Rascunho atualizado com sucesso!', '');
-    closeEditDraftModal();
-
-    userData.orders = await loadOrdersFromSupabase();
-    localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
-    renderSections();
-
-  } catch (error) {
-    console.error('❌ Erro ao salvar:', error);
-    showEditDraftToast(`Erro: ${error.message}`, 'error');
-    btn.disabled = false;
-    btn.innerText = '💾 Salvar Alterações';
-  }
+    html += `</select>`;
+    
+    return html;
 }
 
+// ============================================
+// HELPER: Retornar opções de cada campo
+// ============================================
+
+function getOptionsForField(fieldName, currentValue) {
+    // Temas
+    if (fieldName.includes("themeId")) {
+        return [
+            { label: "🎂 Aniversário", value: "birthday" },
+            { label: "💌 Declaração de amor", value: "love_declaration" },
+            { label: "💍 Pedido de casamento", value: "proposal" },
+            { label: "📢 Anúncio de gravidez", value: "pregnancy_announcement" },
+            { label: "👶 Nascimento", value: "birth_child" },
+            { label: "🌹 Homenagem", value: "tribute" },
+            { label: "🤝 Amizade", value: "friendship" },
+        ];
+    }
+    
+    // Mood (emocional)
+    if (fieldName.includes("mood")) {
+        return [
+            { label: "😭 Emocionar", value: "emotional" },
+            { label: "☮️ Paz", value: "peace" },
+            { label: "✨ Arrepio", value: "goosebumps" },
+            { label: "😊 Sorriso", value: "smile" },
+            { label: "🌅 Esperança", value: "hope" },
+            { label: "💪 Força", value: "strength" },
+        ];
+    }
+    
+    // Tempo/Ritmo
+    if (fieldName.includes("tempo")) {
+        return [
+            { label: "🌊 Calma", value: "calm" },
+            { label: "⚖️ Equilibrada", value: "balanced" },
+            { label: "📈 Intensa", value: "intense" },
+            { label: "🧘 Meditativa", value: "meditative" },
+        ];
+    }
+    
+    // Gênero (genre)
+    if (fieldName.includes("genre") || fieldName.includes("Genre")) {
+        return [
+            { label: "🎸 MPB", value: "mpb" },
+            { label: "🤠 Sertanejo", value: "sertanejo" },
+            { label: "🎤 Pop", value: "pop" },
+            { label: "🎺 Acústico", value: "acoustic" },
+            { label: "🎸 Rock", value: "rock" },
+            { label: "✨ Gospel", value: "gospel" },
+            { label: "🎙️ Rap", value: "rap" },
+        ];
+    }
+    
+    // Audience (Para quem?)
+    if (fieldName.includes("audience")) {
+        return [
+            { label: "Meus pais", value: "parents" },
+            { label: "Família", value: "family" },
+            { label: "Amigos", value: "friends" },
+            { label: "Companheiro(a)", value: "partner" },
+        ];
+    }
+    
+    // Narrator Role (Quem fala?)
+    if (fieldName.includes("narratorRole")) {
+        return [
+            { label: "Casal", value: "couple" },
+            { label: "Pais", value: "parents" },
+            { label: "Amigo", value: "friend" },
+            { label: "Outro", value: "other" },
+        ];
+    }
+    
+    // Pregnancy Stage (Em qual momento?)
+    if (fieldName.includes("pregnancyStage")) {
+        return [
+            { label: "Ainda ninguém sabe", value: "secret" },
+            { label: "Apenas família sabe", value: "family" },
+            { label: "Já é público", value: "public" },
+        ];
+    }
+    
+    // Idioma
+    if (fieldName.includes("language")) {
+        return [
+            { label: "🇧🇷 Português (BR)", value: "pt_br" },
+            { label: "🇺🇸 Inglês", value: "en" },
+            { label: "🇪🇸 Espanhol", value: "es" },
+            { label: "🇮🇹 Italiano", value: "it" },
+        ];
+    }
+    
+    // Tipo de voz (vocalApproach)
+    if (fieldName.includes("vocalApproach")) {
+        return [
+            { label: "🎙️ Masc. suave", value: "male_soft" },
+            { label: "🎙️ Masc. intensa", value: "male_strong" },
+            { label: "🎤 Fem. delicada", value: "female_soft" },
+            { label: "🎤 Fem. poderosa", value: "female_strong" },
+            { label: "🎵 Dueto", value: "duo" },
+            { label: "👥 Coral", value: "choir" },
+        ];
+    }
+    
+    // Ponto de vista (pov)
+    if (fieldName.includes("pov")) {
+        return [
+            { label: "💬 Para essa pessoa", value: "second_person" },
+            { label: "🌍 Sobre", value: "third_person" },
+            { label: "🔄 Misto", value: "mixed" },
+        ];
+    }
+    
+    // Default: text input (retorna array vazio para não renderizar select)
+    return [];
+}
+
+// ============================================
+// HELPER: Escape HTML
+// ============================================
+
+function escapeHtml(str) {
+    if (!str) return "";
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+    async function saveEditDraftDynamic() {
+    if (!editDraftCurrentPedidoId || !window.editDraftData) return;
+    
+    const btn = document.querySelector(".edit-draft-btn-save");
+    btn.disabled = true;
+    btn.innerText = "Salvando...";
+    
+    try {
+        console.log("💾 Salvando draft:", editDraftCurrentPedidoId);
+        
+        const originalAsked = window.editDraftData.asked;
+        const updatedAnswers = {};
+        
+        // Iterar sobre CADA item respondido originalmente
+        originalAsked.forEach((item) => {
+            const fieldId = `edit_${item.fieldName.replace(/\./g, "_")}`;
+            const inputElement = document.getElementById(fieldId);
+            
+            if (inputElement) {
+                const newValue = inputElement.value || inputElement.textContent;
+                
+                // Organizar em estrutura de answers{}
+                const parts = item.fieldName.split(".");
+                if (parts.length === 2) {
+                    const [parent, child] = parts;
+                    if (!updatedAnswers[parent]) {
+                        updatedAnswers[parent] = {};
+                    }
+                    updatedAnswers[parent][child] = newValue;
+                } else {
+                    updatedAnswers[item.fieldName] = newValue;
+                }
+                
+                console.log(`✏️ ${item.fieldName} → ${newValue}`);
+            }
+        });
+        
+        console.log("📊 Answers atualizado:", updatedAnswers);
+        
+        // Salvar no Supabase
+        const { error } = await sb
+            .from("musicas_pedidos")
+            .update({
+                payload: {
+                    form_id: "tc_chat_v2",
+                    form_version: 2,
+                    asked: originalAsked,  // Manter o asked original
+                    answers: updatedAnswers,  // Atualizar answers
+                    updated_at: new Date().toISOString()
+                }
+            })
+            .eq("id", editDraftCurrentPedidoId);
+        
+        if (error) throw error;
+        
+        console.log("✅ Draft salvo!");
+        showEditDraftToast("Rascunho atualizado com sucesso!", "success");
+        closeEditDraftModal();
+        
+        // Recarregar dados
+        userData.orders = await loadOrdersFromSupabase();
+        localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
+        renderSections();
+        
+    } catch (error) {
+        console.error("❌ Erro ao salvar:", error);
+        showEditDraftToast(`Erro: ${error.message}`, "error");
+        btn.disabled = false;
+        btn.innerText = "Salvar Alterações";
+    }
+}
+    
+   
     // ============================================
 // NOVA FUNÇÃO: saveEditDraftNew() - Salvar formato correto
 // ============================================
@@ -1849,6 +1966,7 @@ async function saveEditDraftNew() {
 
 </body>
 </html>
+
 
 
 
