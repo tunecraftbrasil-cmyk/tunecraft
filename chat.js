@@ -444,4 +444,4 @@ if (!document.getElementById('chat-animations')) {
 // ============================================
 // LOG: Verificar quando elaboratedChatFlow é carregado
 // ============================================
-console.log("✅ chat_main.js carregado. Aguardando chat_themes_full.js...");
+console.log("✅ chat.js carregado. Aguardando chat_themes_full.js...");
