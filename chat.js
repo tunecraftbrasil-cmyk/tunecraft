@@ -272,6 +272,11 @@ function renderSaveButton(container) {
 
 async function saveDraftOnly() {
     try {
+        console.log("🔍 DEBUG: Começando salvamento...");
+        console.log("📊 formData completo:", formData);
+        console.log("📋 Array asked:", formData.asked);
+        console.log("💾 Objeto answers:", formData.answers);
+
         showToast("💾 Salvando formulário...", "info");
 
         const session = await getSessionOrRedirect();
@@ -291,6 +296,19 @@ async function saveDraftOnly() {
             return h;
         }
 
+        // ⚠️ IMPORTANTE: Verificar que formData tem tudo
+        const payloadToSave = {
+            form_id: formData.form_id || "tc_chat_v2",
+            form_version: formData.form_version || 2,
+            asked: formData.asked || [],
+            answers: formData.answers || {},
+            // Adicionar informações de meta
+            total_questions_answered: (formData.asked || []).length,
+            created_at: new Date().toISOString()
+        };
+
+        console.log("✅ Payload pronto para salvar:", payloadToSave);
+
         let pedidoId = draftBeingEdited?.pedidoId;
 
         if (draftBeingEdited && pedidoId) {
@@ -300,7 +318,7 @@ async function saveDraftOnly() {
                 method: 'PATCH',
                 headers: sbHeaders({ prefer: true }),
                 body: JSON.stringify({
-                    payload: formData,
+                    payload: payloadToSave,
                     updated_at: new Date().toISOString()
                 })
             });
@@ -311,11 +329,19 @@ async function saveDraftOnly() {
                 throw new Error(`Erro ao atualizar (${updateResponse.status}): ${errText}`);
             }
 
-            console.log('✅ Draft atualizado com ID:', pedidoId);
+            const updatedData = await updateResponse.json();
+            console.log('✅ Draft atualizado com sucesso:', updatedData);
             showToast("✅ Formulário atualizado!", "success");
 
         } else {
             console.log("📝 Criando novo draft...");
+            console.log("📤 POST Body:", JSON.stringify({
+                user_id: session.user.id,
+                user_email: session.user.email,
+                user_name: session.user.user_metadata?.full_name || "Usuário",
+                payload: payloadToSave,
+                status: 'draft'
+            }, null, 2));
 
             const insertResponse = await fetch(`${SUPABASE_URL}/rest/v1/musicas_pedidos`, {
                 method: 'POST',
@@ -324,7 +350,7 @@ async function saveDraftOnly() {
                     user_id: session.user.id,
                     user_email: session.user.email,
                     user_name: session.user.user_metadata?.full_name || "Usuário",
-                    payload: formData,
+                    payload: payloadToSave,
                     status: 'draft'
                 })
             });
@@ -336,9 +362,12 @@ async function saveDraftOnly() {
             }
 
             const data = await insertResponse.json();
+            console.log('📥 Resposta do servidor:', data);
+            
             pedidoId = data?.[0]?.id;
 
             if (!pedidoId) {
+                console.warn("⚠️ Aviso: ID não retornado. Procurando em data...", data);
                 throw new Error('Draft criado, mas ID não foi retornado');
             }
 
@@ -347,19 +376,24 @@ async function saveDraftOnly() {
         }
 
         localStorage.setItem('tuneCraft_lastDraftId', pedidoId);
+        console.log("💾 ID salvo em localStorage:", pedidoId);
+        
         closeChat();
         window.draftBeingEdited = null;
         draftBeingEdited = null;
 
         setTimeout(() => {
+            console.log("🔄 Redirecionando para dashboard...");
             window.location.href = 'dashboard.html';
         }, 1000);
 
     } catch (error) {
-        console.error('Erro fatal ao salvar draft:', error);
+        console.error('❌ ERRO FATAL ao salvar draft:', error);
+        console.error('Stack trace:', error.stack);
         showToast(`❌ Erro: ${error.message}`, "error");
     }
 }
+
 
 // ============================================
 // HELPER: VALIDAR SESSÃO
