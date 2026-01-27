@@ -868,14 +868,16 @@
     }
 
     function extractSummaryFromPayload(payload) {
-      return {
-        recipient: payload.step2 || "Indefinido",
-        ageGroup: payload.step3 || "Não especificado",
-        occasion: payload.step6 || "Não definida",
-        genre: payload.step8 || "Não definido",
-        message: payload.step12 ? payload.step12.substring(0, 80) + "..." : "Sem mensagem"
-      };
-    }
+    const answers = payload.answers || {};
+    
+    return {
+        recipient: answers.recipient?.name || "Indefinido",
+        ageGroup: answers.recipient?.ageGroup || "Não especificado",
+        occasion: answers.lyricDetails?.mainMessage ? answers.lyricDetails.mainMessage.substring(0, 60) : "Não definida",
+        genre: answers.musicStyle?.primaryGenre || "Não definido",
+        message: answers.lyricDetails?.mainMessage ? answers.lyricDetails.mainMessage.substring(0, 80) + "..." : "Sem mensagem"
+    };
+}
 
     async function getSessionOrRedirect() {
       const { data, error } = await sb.auth.getSession();
@@ -1868,6 +1870,7 @@ async function saveEditDraftNew() {
 
 </body>
 </html>
+
 
 
 
