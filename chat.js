@@ -3,6 +3,11 @@
 // ============================================
 
 // ============================================
+// VARIÁVEL GLOBAL: SERÁ DEFINIDA EM chat_themes_full.js
+// ============================================
+let elaboratedChatFlow = [];
+
+// ============================================
 // HELPERS: MANIPULAR OBJETOS ANINHADOS
 // ============================================
 
@@ -62,6 +67,13 @@ document.addEventListener("keydown", (e) => {
 function initChat() {
     currentStep = 0;
     
+    // DEBUG: Verificar se elaboratedChatFlow existe
+    if (!elaboratedChatFlow || elaboratedChatFlow.length === 0) {
+        console.error("❌ ERRO: elaboratedChatFlow não foi carregado! Verifique se chat_themes_full.js foi importado.");
+        alert("Erro ao carregar o chat. Verifique o console.");
+        return;
+    }
+    
     if (window.draftBeingEdited?.payload) {
         formData = { ...window.draftBeingEdited.payload };
         console.log("📝✅ Editando draft:", formData);
@@ -76,6 +88,7 @@ function initChat() {
     }
     
     document.getElementById("chatMessages").innerHTML = "";
+    console.log("🎯 Total de steps disponíveis:", elaboratedChatFlow.length);
     renderQuestion();
 }
 
@@ -91,6 +104,9 @@ function renderQuestion() {
         if (step.condition) return step.condition(formData);
         return true;
     });
+
+    console.log("📋 Steps válidos para este tema:", validSteps.length);
+    console.log("📍 Current step:", currentStep);
 
     if (currentStep >= validSteps.length) {
         renderSaveButton(inputContainer);
@@ -114,6 +130,11 @@ function renderQuestion() {
 
 function addMessage(sender, text) {
     const messagesContainer = document.getElementById("chatMessages");
+    if (!messagesContainer) {
+        console.error("❌ Elemento #chatMessages não encontrado!");
+        return;
+    }
+
     const messageEl = document.createElement("div");
     messageEl.className = "message";
 
@@ -128,6 +149,11 @@ function addMessage(sender, text) {
 }
 
 function renderInput(question, container) {
+    if (!question) {
+        console.error("❌ Pergunta não definida!");
+        return;
+    }
+
     let html = `<div class="input-label">SUA RESPOSTA</div>`;
 
     if (question.type === "select") {
@@ -164,6 +190,9 @@ function handleOption(val, label) {
     // Salvar no objeto answers (estruturado)
     setNestedValue(formData.answers, currentQuestion.metadata.fieldName, val);
     
+    // Salvar step0, step1, step2, etc para conditions dinâmicas
+    formData[`step${currentQuestion.step}`] = val;
+    
     // Registrar pergunta + resposta no array asked
     formData.asked = formData.asked || [];
     formData.asked.push({
@@ -175,6 +204,8 @@ function handleOption(val, label) {
         answerValue: val,
         timestamp: new Date().toISOString()
     });
+    
+    console.log("✅ Opção selecionada:", val, "Form agora tem:", formData);
     
     currentStep++;
     setTimeout(renderQuestion, 600);
@@ -193,6 +224,9 @@ function handleInput() {
     
     setNestedValue(formData.answers, currentQuestion.metadata.fieldName, val);
     
+    // Salvar step0, step1, step2, etc para conditions
+    formData[`step${currentQuestion.step}`] = val;
+    
     // Registrar pergunta + resposta
     formData.asked = formData.asked || [];
     formData.asked.push({
@@ -204,6 +238,8 @@ function handleInput() {
         answerValue: val,
         timestamp: new Date().toISOString()
     });
+    
+    console.log("✅ Input registrado:", val, "Form agora tem:", formData);
     
     currentStep++;
     setTimeout(renderQuestion, 600);
@@ -404,3 +440,8 @@ if (!document.getElementById('chat-animations')) {
     `;
     document.head.appendChild(style);
 }
+
+// ============================================
+// LOG: Verificar quando elaboratedChatFlow é carregado
+// ============================================
+console.log("✅ chat_main.js carregado. Aguardando chat_themes_full.js...");
