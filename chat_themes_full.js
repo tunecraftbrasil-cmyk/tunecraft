@@ -3,7 +3,7 @@
 // Importar após chat_main.js
 // ============================================
 
-const elaboratedChatFlow = [
+elaboratedChatFlow = [
     // ===== BLOCO UNIVERSAL =====
     { step: 0, section: "TEMA", question: "Qual é o tema da música? 🎵", type: "select", options: [
         { label: "🎂 Aniversário", value: "birthday" }, { label: "💌 Declaração de amor", value: "love_declaration" },
