@@ -869,13 +869,30 @@
 
     function extractSummaryFromPayload(payload) {
     const answers = payload.answers || {};
+    const asked = payload.asked || [];
+    const theme = answers.ai_metadata?.themeId || "indefinido";
+    const genre = answers.musicStyle?.primaryGenre || "indefinido";
+    
+    // ✅ Usar FORM_OPTIONS (vem de form_options.js)
+    
+    // Mapear tema usando FORM_OPTIONS.themes
+    const themeOption = FORM_OPTIONS.themes.find(t => t.value === theme);
+    const themeLabel = themeOption ? themeOption.label : "🎭 Indefinido";
+    
+    // Mapear gênero usando FORM_OPTIONS.genres
+    const genreOption = FORM_OPTIONS.genres.find(g => g.value === genre);
+    const genreLabel = genreOption ? genreOption.label : "Não definido";
+    
+    // Obter primeira linha da mensagem principal
+    const messagePreview = answers.lyricDetails?.mainMessage 
+        ? answers.lyricDetails.mainMessage.substring(0, 70) + "..."
+        : "Sem mensagem";
     
     return {
-        recipient: answers.recipient?.name || "Indefinido",
-        ageGroup: answers.recipient?.ageGroup || "Não especificado",
-        occasion: answers.lyricDetails?.mainMessage ? answers.lyricDetails.mainMessage.substring(0, 60) : "Não definida",
-        genre: answers.musicStyle?.primaryGenre || "Não definido",
-        message: answers.lyricDetails?.mainMessage ? answers.lyricDetails.mainMessage.substring(0, 80) + "..." : "Sem mensagem"
+        recipient: themeLabel,  // Tema com emoji
+        genre: genreLabel,      // Gênero com emoji
+        message: messagePreview,  // Prévia da mensagem
+        asked_count: asked.length  // Quantas perguntas respondidas
     };
 }
 
@@ -1870,6 +1887,7 @@ async function saveEditDraftNew() {
 
 </body>
 </html>
+
 
 
 
