@@ -145,7 +145,6 @@ function renderQuestion() {
         scrollToBottom();
     }, 500);
 }
-
 function addMessage(sender, text) {
     const messagesContainer = document.getElementById("chatMessages");
     if (!messagesContainer) {
