@@ -1,75 +1,7 @@
-// ============================================
-// CHAT_THEMES.JS v11 - NOMENCLATURA LINEAR SIMPLES
-// Sem decimais, sem strings confusas
-// Tema 1: 101-114
-// Tema 2: 201-213
-// Tema 3: 301-311
-// Etc
-// ============================================
-
-
-// ===== HELPER CLASSES =====
-
-class StepHierarchy {
-  // Encontra o próximo step baseado no fluxo
-  getNextStep = (currentStep, data) => {
-    const current = parseInt(currentStep);
-    
-    // Verificar se é um step com sub-pergunta condicional
-    // Ex: 109 tem 109.5 (em string: "109.5" ou simplificar para 1095)
-    
-    // Se resposta foi "other", pula para a versão .5
-    const dataKey = `step_${currentStep}`;
-    if (data[dataKey] === "other" && this.hasConditionalChild(currentStep)) {
-      return this.getConditionalChild(currentStep);
-    }
-    
-    // Senão, vai para o próximo step normal
-    return current + 1;
-  }
-  
-  // Verifica se um step tem pergunta condicional
-  hasConditionalChild = (step) => {
-    // Steps com "outro": 109 (estilo), 112 (idioma)
-    // Para Tema 1: 109, 112
-    // Para Tema 2: 208, 211
-    // Para Tema 3: 306, 309
-    const stepNum = parseInt(step);
-    
-    // Pega o tema (primeira digit)
-    const theme = Math.floor(stepNum / 100);
-    const stepInTheme = stepNum % 100;
-    
-    // Identifica steps que têm opção "outro"
-    // Tema padrão: step 9 (estilo) e step 12 (idioma)
-    // 109, 112, 209, 212, 309, 312, etc
-    
-    const conditionalSteps = [9, 12, 15, 18, 21];  // Ajuste conforme seu padrão
-    return conditionalSteps.includes(stepInTheme);
-  }
-  
-  // Retorna o step condicional (.5)
-  getConditionalChild = (step) => {
-    return `${step}.5`;
-  }
-  
-  // Pega o próximo step normal depois do condicional
-  getNextAfterConditional = (step) => {
-    // Se é "109.5", volta para step que vem depois de 109
-    if (String(step).includes('.')) {
-      const base = parseInt(step);
-      return base + 1;
-    }
-    return step + 1;
-  }
-}
-
-
-// ===== MAIN DATA STRUCTURE =====
 
 elaboratedChatFlow = [
     // ===== BLOCO UNIVERSAL =====
-    { step: 0, section: "TEMA", question: "Qual é o tema da música que você quer criar? 🎵", type: "select", options: [
+    { step: 100, section: "TEMA", question: "Qual é o tema da música que você quer criar? 🎵", type: "select", options: [
         { label: "🎂 Aniversário", value: "birthday" },
         { label: "💌 Declaração de amor", value: "love_declaration" },
         { label: "💍 Pedido de casamento", value: "proposal" },
@@ -84,149 +16,151 @@ elaboratedChatFlow = [
         { label: "🎭 Outro", value: "other" }
     ], metadata: { fieldName: "ai_metadata.themeId", required: true } },
 
+    
+  
 
     // ===== TEMA 1: ANIVERSÁRIO (101-114) =====
-    { step: 101, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Como essa pessoa se chama? 👤", type: "input", placeholder: "Ex.: Aline (Lili), João (Jô)", minLength: 2, metadata: { fieldName: "recipient.name", required: true } },
-    { step: 102, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Qual é a relação com você? 💝", type: "input", placeholder: "Ex.: namorado(a), esposo(a), amigo(a)…", minLength: 2, metadata: { fieldName: "ai_metadata.relationship", required: true } },
-    { step: 103, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Como é a sua história com essa pessoa? 📖", type: "textarea", placeholder: "Nos conhecemos na faculdade…", minLength: 15, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
-    { step: 104, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "De que ponto de vista você quer contar essa história? 🎤", type: "select", options: [
+    { step: 101, section: "ANIVERSÁRIO", condition: (d) => d.step_100 === "birthday", question: "Como essa pessoa se chama? 👤", type: "input", placeholder: "Ex.: Aline (Lili), João (Jô)", minLength: 2, metadata: { fieldName: "recipient.name", required: true } },
+    { step: 102, section: "ANIVERSÁRIO", condition: (d) => d.step_100 === "birthday", question: "Qual é a relação com você? 💝", type: "input", placeholder: "Ex.: namorado(a), esposo(a), amigo(a)…", minLength: 2, metadata: { fieldName: "ai_metadata.relationship", required: true } },
+    { step: 103, section: "ANIVERSÁRIO", condition: (d) => d.step_100 === "birthday", question: "Como é a sua história com essa pessoa? 📖", type: "textarea", placeholder: "Nos conhecemos na faculdade…", minLength: 15, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
+    { step: 104, section: "ANIVERSÁRIO", condition: (d) => d.step_100 === "birthday", question: "De que ponto de vista você quer contar essa história? 🎤", type: "select", options: [
         { label: "💬 Para essa pessoa", value: "second_person" }, { label: "🌍 Sobre ela", value: "third_person" }, { label: "🔄 Misto", value: "mixed" }
     ], metadata: { fieldName: "ai_metadata.pov", required: true } },
-    { step: 105, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Conte uma cena real de vocês 🎬", type: "textarea", placeholder: "Concreta, onde estavam, o que aconteceu…", minLength: 20, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
-    { step: 106, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "3 palavras não-clichês para descrever essa pessoa 📝", type: "input", placeholder: "Ex.: teimosa do bem, riso fácil", minLength: 5, metadata: { fieldName: "recipient.personality", required: true } },
-    { step: 107, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Um detalhe secreto ou piada interna entre vocês 🤫", type: "input", placeholder: "Piada interna, apelido…", minLength: 3, metadata: { fieldName: "lyricDetails.secretDetail", required: true } },
-    { step: 108, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "O que mais você admira nessa pessoa? ⭐", type: "textarea", placeholder: "Específico, não genérico…", minLength: 15, metadata: { fieldName: "recipient.specialCharacteristics", required: true } },
+    { step: 105, section: "ANIVERSÁRIO", condition: (d) => d.step_100 === "birthday", question: "Conte uma cena real de vocês 🎬", type: "textarea", placeholder: "Concreta, onde estavam, o que aconteceu…", minLength: 20, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
+    { step: 106, section: "ANIVERSÁRIO", condition: (d) => d.step_100 === "birthday", question: "3 palavras não-clichês para descrever essa pessoa 📝", type: "input", placeholder: "Ex.: teimosa do bem, riso fácil", minLength: 5, metadata: { fieldName: "recipient.personality", required: true } },
+    { step: 107, section: "ANIVERSÁRIO", condition: (d) => d.step_100 === "birthday", question: "Um detalhe secreto ou piada interna entre vocês 🤫", type: "input", placeholder: "Piada interna, apelido…", minLength: 3, metadata: { fieldName: "lyricDetails.secretDetail", required: true } },
+    { step: 108, section: "ANIVERSÁRIO", condition: (d) => d.step_100 === "birthday", question: "O que mais você admira nessa pessoa? ⭐", type: "textarea", placeholder: "Específico, não genérico…", minLength: 15, metadata: { fieldName: "recipient.specialCharacteristics", required: true } },
     
     // Step 109: Estilo musical (principal) - TEM opção "outro"
-    { step: 109, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Qual estilo musical combina mais com essa música? 🎸", type: "select", options: [
+    { step: 109, section: "ANIVERSÁRIO", condition: (d) => d.step_100 === "birthday", question: "Qual estilo musical combina mais com essa música? 🎸", type: "select", options: [
         { label: "🎸 MPB", value: "mpb" }, { label: "🤠 Sertanejo", value: "sertanejo" }, { label: "🎤 Pop", value: "pop" },
         { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" },
         { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }
     ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
     
     // ✅ Step 109.5: Sub-pergunta condicional (SÓ SE 109 === "other")
-    { step: "109.5", section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday" && d.step_109 === "other", question: "Qual outro estilo musical você tem em mente? 🎸", type: "input", placeholder: "Descreva o estilo…", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: "109.5", section: "ANIVERSÁRIO", condition: (d) => d.step_100 === "birthday" && d.step_109 === "other", question: "Qual outro estilo musical você tem em mente? 🎸", type: "input", placeholder: "Descreva o estilo…", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
     
     // Step 110: Impacto (SEMPRE vem depois, com ou sem 109.5)
-    { step: 110, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Qual impacto emocional você quer que essa música cause? 💖", type: "select", options: [
+    { step: 110, section: "ANIVERSÁRIO", condition: (d) => d.step_100 === "birthday", question: "Qual impacto emocional você quer que essa música cause? 💖", type: "select", options: [
         { label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" },
         { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }
     ], metadata: { fieldName: "musicStyle.mood", required: true } },
     
-    { step: 111, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Qual tipo de movimento você prefere para essa música? ⚡", type: "select", options: [
+    { step: 111, section: "ANIVERSÁRIO", condition: (d) => d.step_100 === "birthday", question: "Qual tipo de movimento você prefere para essa música? ⚡", type: "select", options: [
         { label: "🌊 Calma", value: "calm" }, { label: "⚖️ Equilibrada", value: "balanced" }, { label: "📈 Intensa", value: "intense" }, { label: "🧘 Meditativa", value: "meditative" }
     ], metadata: { fieldName: "musicStyle.tempo", required: true } },
     
     // Step 112: Idioma (principal) - TEM opção "outro"
-    { step: 112, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Em qual idioma você prefere a letra? 🌍", type: "select", options: [
+    { step: 112, section: "ANIVERSÁRIO", condition: (d) => d.step_100 === "birthday", question: "Em qual idioma você prefere a letra? 🌍", type: "select", options: [
         { label: "🇧🇷 Português (BR)", value: "pt_br" }, { label: "🇺🇸 Inglês", value: "en" }, { label: "🇪🇸 Espanhol", value: "es" },
         { label: "🇮🇹 Italiano", value: "it" }, { label: "🌍 Outro", value: "other" }
     ], metadata: { fieldName: "lyricDetails.language", required: true } },
     
     // ✅ Step 112.5: Sub-pergunta condicional (SÓ SE 112 === "other")
-    { step: "112.5", section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday" && d.step_112 === "other", question: "Qual outro idioma você prefere? 🌍", type: "input", placeholder: "Ex.: Francês, Alemão…", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: "112.5", section: "ANIVERSÁRIO", condition: (d) => d.step_100 === "birthday" && d.step_112 === "other", question: "Qual outro idioma você prefere? 🌍", type: "input", placeholder: "Ex.: Francês, Alemão…", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
     
-    { step: 113, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Qual tipo de voz você prefere ouvir cantando? 🎙️", type: "select", options: [
+    { step: 113, section: "ANIVERSÁRIO", condition: (d) => d.step_100 === "birthday", question: "Qual tipo de voz você prefere ouvir cantando? 🎙️", type: "select", options: [
         { label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" },
         { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" },
         { label: "🎵 Dueto", value: "duo" }, { label: "👥 Coral", value: "choir" }
     ], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
     
-    { step: 114, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "O que você prefere evitar nessa música? 🚫", type: "textarea", placeholder: "Evitar clichês, termos genéricos…", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } },
+    { step: 114, section: "ANIVERSÁRIO", condition: (d) => d.step_100 === "birthday", question: "O que você prefere evitar nessa música? 🚫", type: "textarea", placeholder: "Evitar clichês, termos genéricos…", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } },
 
 
     // ===== TEMA 2: DECLARAÇÃO DE AMOR (201-213) =====
-    { step: 201, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Como essa pessoa entrou na sua vida? 💕", type: "textarea", placeholder: "Conte a história…", minLength: 20, metadata: { fieldName: "lyricDetails.origin", required: true } },
-    { step: 202, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "De que ponto de vista você quer fazer essa declaração? 🎤", type: "select", options: [
+    { step: 201, section: "DECL. AMOR", condition: (d) => d.step_100 === "love_declaration", question: "Como essa pessoa entrou na sua vida? 💕", type: "textarea", placeholder: "Conte a história…", minLength: 20, metadata: { fieldName: "lyricDetails.origin", required: true } },
+    { step: 202, section: "DECL. AMOR", condition: (d) => d.step_100 === "love_declaration", question: "De que ponto de vista você quer fazer essa declaração? 🎤", type: "select", options: [
         { label: "💬 Para ela", value: "second_person" }, { label: "🌍 Sobre ela", value: "third_person" }, { label: "🔄 Misto", value: "mixed" }
     ], metadata: { fieldName: "ai_metadata.pov", required: true } },
-    { step: 203, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Quando você percebeu que era amor? ⚡", type: "textarea", placeholder: "Momento do 'clique'…", minLength: 15, metadata: { fieldName: "lyricDetails.turningPoint", required: true } },
-    { step: 204, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "O que mudou em você desde que essa pessoa chegou? 🌱", type: "textarea", placeholder: "Transformação…", minLength: 15, metadata: { fieldName: "lyricDetails.transformation", required: true } },
-    { step: 205, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "O que você precisa dizer que ainda não disse? 💭", type: "textarea", placeholder: "Sincero e direto…", minLength: 15, metadata: { fieldName: "lyricDetails.unsaid", required: true } },
-    { step: 206, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Descreva uma cena comum e especial de vocês 🎬", type: "textarea", placeholder: "Momento comum especial…", minLength: 15, metadata: { fieldName: "lyricDetails.simpleScene", required: true } },
-    { step: 207, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Qual é um detalhe secreto ou piada interna entre vocês? 🤫", type: "input", placeholder: "Piada interna…", minLength: 3, metadata: { fieldName: "lyricDetails.secretDetail", required: true } },
-    { step: 208, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Complete a frase: 'Com você eu me sinto / consigo / aprendi a...' ❤️", type: "input", placeholder: "Complete a frase…", minLength: 3, metadata: { fieldName: "lyricDetails.withYouI", required: true } },
+    { step: 203, section: "DECL. AMOR", condition: (d) => d.step_100 === "love_declaration", question: "Quando você percebeu que era amor? ⚡", type: "textarea", placeholder: "Momento do 'clique'…", minLength: 15, metadata: { fieldName: "lyricDetails.turningPoint", required: true } },
+    { step: 204, section: "DECL. AMOR", condition: (d) => d.step_100 === "love_declaration", question: "O que mudou em você desde que essa pessoa chegou? 🌱", type: "textarea", placeholder: "Transformação…", minLength: 15, metadata: { fieldName: "lyricDetails.transformation", required: true } },
+    { step: 205, section: "DECL. AMOR", condition: (d) => d.step_100 === "love_declaration", question: "O que você precisa dizer que ainda não disse? 💭", type: "textarea", placeholder: "Sincero e direto…", minLength: 15, metadata: { fieldName: "lyricDetails.unsaid", required: true } },
+    { step: 206, section: "DECL. AMOR", condition: (d) => d.step_100 === "love_declaration", question: "Descreva uma cena comum e especial de vocês 🎬", type: "textarea", placeholder: "Momento comum especial…", minLength: 15, metadata: { fieldName: "lyricDetails.simpleScene", required: true } },
+    { step: 207, section: "DECL. AMOR", condition: (d) => d.step_100 === "love_declaration", question: "Qual é um detalhe secreto ou piada interna entre vocês? 🤫", type: "input", placeholder: "Piada interna…", minLength: 3, metadata: { fieldName: "lyricDetails.secretDetail", required: true } },
+    { step: 208, section: "DECL. AMOR", condition: (d) => d.step_100 === "love_declaration", question: "Complete a frase: 'Com você eu me sinto / consigo / aprendi a...' ❤️", type: "input", placeholder: "Complete a frase…", minLength: 3, metadata: { fieldName: "lyricDetails.withYouI", required: true } },
     
     // Step 209: Estilo musical (principal) - TEM opção "outro"
-    { step: 209, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Qual estilo musical combina mais com essa declaração? 🎸", type: "select", options: [
+    { step: 209, section: "DECL. AMOR", condition: (d) => d.step_100 === "love_declaration", question: "Qual estilo musical combina mais com essa declaração? 🎸", type: "select", options: [
         { label: "🎸 MPB", value: "mpb" }, { label: "🤠 Sertanejo", value: "sertanejo" }, { label: "🎤 Pop", value: "pop" },
         { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" },
         { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }
     ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
     
     // ✅ Step 209.5: Sub-pergunta condicional
-    { step: "209.5", section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration" && d.step_209 === "other", question: "Qual outro estilo musical você tem em mente? 🎸", type: "input", placeholder: "Descreva o estilo…", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: "209.5", section: "DECL. AMOR", condition: (d) => d.step_100 === "love_declaration" && d.step_209 === "other", question: "Qual outro estilo musical você tem em mente? 🎸", type: "input", placeholder: "Descreva o estilo…", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
     
-    { step: 210, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Que tipo de impacto emocional você quer causar com essa declaração? 💖", type: "select", options: [
+    { step: 210, section: "DECL. AMOR", condition: (d) => d.step_100 === "love_declaration", question: "Que tipo de impacto emocional você quer causar com essa declaração? 💖", type: "select", options: [
         { label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" },
         { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }
     ], metadata: { fieldName: "musicStyle.mood", required: true } },
-    { step: 211, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Qual tipo de movimento você prefere para essa música? ⚡", type: "select", options: [
+    { step: 211, section: "DECL. AMOR", condition: (d) => d.step_100 === "love_declaration", question: "Qual tipo de movimento você prefere para essa música? ⚡", type: "select", options: [
         { label: "🌊 Calma", value: "calm" }, { label: "⚖️ Equilibrada", value: "balanced" }, { label: "📈 Intensa", value: "intense" }, { label: "🧘 Meditativa", value: "meditative" }
     ], metadata: { fieldName: "musicStyle.tempo", required: true } },
     
     // Step 212: Idioma (principal) - TEM opção "outro"
-    { step: 212, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Em qual idioma você prefere a letra? 🌍", type: "select", options: [
+    { step: 212, section: "DECL. AMOR", condition: (d) => d.step_100 === "love_declaration", question: "Em qual idioma você prefere a letra? 🌍", type: "select", options: [
         { label: "🇧🇷 PT-BR", value: "pt_br" }, { label: "🇺🇸 EN", value: "en" }, { label: "🇪🇸 ES", value: "es" },
         { label: "🇮🇹 IT", value: "it" }, { label: "🌍 Outro", value: "other" }
     ], metadata: { fieldName: "lyricDetails.language", required: true } },
     
     // ✅ Step 212.5: Sub-pergunta condicional
-    { step: "212.5", section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration" && d.step_212 === "other", question: "Qual outro idioma você prefere? 🌍", type: "input", placeholder: "Ex.: Francês, Alemão…", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: "212.5", section: "DECL. AMOR", condition: (d) => d.step_100 === "love_declaration" && d.step_212 === "other", question: "Qual outro idioma você prefere? 🌍", type: "input", placeholder: "Ex.: Francês, Alemão…", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
     
-    { step: 213, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
+    { step: 213, section: "DECL. AMOR", condition: (d) => d.step_100 === "love_declaration", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
         { label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" },
         { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" },
         { label: "🎵 Dueto", value: "duo" }, { label: "👥 Coral", value: "choir" }
     ], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
     
-    { step: 214, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "O que você prefere evitar nessa música? 🚫", type: "textarea", placeholder: "O que evitar…", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } },
+    { step: 214, section: "DECL. AMOR", condition: (d) => d.step_100 === "love_declaration", question: "O que você prefere evitar nessa música? 🚫", type: "textarea", placeholder: "O que evitar…", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } },
 
 
     // ===== TEMA 3: PEDIDO DE CASAMENTO (301-311) =====
-    { step: 301, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Como vocês se conheceram? 💍", type: "textarea", placeholder: "Conte a história…", minLength: 20, metadata: { fieldName: "lyricDetails.origin", required: true } },
-    { step: 302, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Qual será o papel dessa música no pedido? 🎶", type: "select", options: [
+    { step: 301, section: "CASAMENTO", condition: (d) => d.step_100 === "proposal", question: "Como vocês se conheceram? 💍", type: "textarea", placeholder: "Conte a história…", minLength: 20, metadata: { fieldName: "lyricDetails.origin", required: true } },
+    { step: 302, section: "CASAMENTO", condition: (d) => d.step_100 === "proposal", question: "Qual será o papel dessa música no pedido? 🎶", type: "select", options: [
         { label: "💍 É o pedido em si", value: "is_proposal" }, { label: "🎶 Abre espaço para o pedido", value: "opens_space" }, { label: "🔄 Misto", value: "mixed" }
     ], metadata: { fieldName: "lyricDetails.proposalStyle", required: true } },
-    { step: 303, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Qual é o momento de certeza de que quer casar com essa pessoa? ⚡", type: "textarea", placeholder: "Pra sempre…", minLength: 15, metadata: { fieldName: "lyricDetails.certaintyCue", required: true } },
-    { step: 304, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Quais são 2 promessas reais que você quer fazer? 📝", type: "textarea", placeholder: "Uma por linha…", minLength: 15, metadata: { fieldName: "lyricDetails.promises", required: true } },
-    { step: 305, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Existe algum ritual especial que só vocês fazem? 🕯️", type: "input", placeholder: "Só vocês fazem…", minLength: 3, metadata: { fieldName: "lyricDetails.ritual", required: true } },
-    { step: 306, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Como você imagina o futuro de vocês dois juntos? 🌅", type: "textarea", placeholder: "O que imagina…", minLength: 15, metadata: { fieldName: "lyricDetails.futureVision", required: true } },
+    { step: 303, section: "CASAMENTO", condition: (d) => d.step_100 === "proposal", question: "Qual é o momento de certeza de que quer casar com essa pessoa? ⚡", type: "textarea", placeholder: "Pra sempre…", minLength: 15, metadata: { fieldName: "lyricDetails.certaintyCue", required: true } },
+    { step: 304, section: "CASAMENTO", condition: (d) => d.step_100 === "proposal", question: "Quais são 2 promessas reais que você quer fazer? 📝", type: "textarea", placeholder: "Uma por linha…", minLength: 15, metadata: { fieldName: "lyricDetails.promises", required: true } },
+    { step: 305, section: "CASAMENTO", condition: (d) => d.step_100 === "proposal", question: "Existe algum ritual especial que só vocês fazem? 🕯️", type: "input", placeholder: "Só vocês fazem…", minLength: 3, metadata: { fieldName: "lyricDetails.ritual", required: true } },
+    { step: 306, section: "CASAMENTO", condition: (d) => d.step_100 === "proposal", question: "Como você imagina o futuro de vocês dois juntos? 🌅", type: "textarea", placeholder: "O que imagina…", minLength: 15, metadata: { fieldName: "lyricDetails.futureVision", required: true } },
     
     // Step 307: Estilo musical (principal) - TEM opção "outro"
-    { step: 307, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Qual estilo musical combina mais com essa música? 🎸", type: "select", options: [
+    { step: 307, section: "CASAMENTO", condition: (d) => d.step_100 === "proposal", question: "Qual estilo musical combina mais com essa música? 🎸", type: "select", options: [
         { label: "🎸 MPB", value: "mpb" }, { label: "🤠 Sertanejo", value: "sertanejo" }, { label: "🎤 Pop", value: "pop" },
         { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" },
         { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }
     ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
     
     // ✅ Step 307.5: Sub-pergunta condicional
-    { step: "307.5", section: "CASAMENTO", condition: (d) => d.step_0 === "proposal" && d.step_307 === "other", question: "Qual outro estilo musical você tem em mente? 🎸", type: "input", placeholder: "Descreva o estilo…", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: "307.5", section: "CASAMENTO", condition: (d) => d.step_100 === "proposal" && d.step_307 === "other", question: "Qual outro estilo musical você tem em mente? 🎸", type: "input", placeholder: "Descreva o estilo…", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
     
-    { step: 308, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Qual impacto emocional você quer que essa música cause? 💖", type: "select", options: [
+    { step: 308, section: "CASAMENTO", condition: (d) => d.step_100 === "proposal", question: "Qual impacto emocional você quer que essa música cause? 💖", type: "select", options: [
         { label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" },
         { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }
     ], metadata: { fieldName: "musicStyle.mood", required: true } },
-    { step: 309, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Qual tipo de movimento você prefere? ⚡", type: "select", options: [
+    { step: 309, section: "CASAMENTO", condition: (d) => d.step_100 === "proposal", question: "Qual tipo de movimento você prefere? ⚡", type: "select", options: [
         { label: "🌊 Calma", value: "calm" }, { label: "⚖️ Equilibrada", value: "balanced" }, { label: "📈 Intensa", value: "intense" }, { label: "🧘 Meditativa", value: "meditative" }
     ], metadata: { fieldName: "musicStyle.tempo", required: true } },
     
     // Step 310: Idioma (principal) - TEM opção "outro"
-    { step: 310, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Em qual idioma você prefere a letra? 🌍", type: "select", options: [
+    { step: 310, section: "CASAMENTO", condition: (d) => d.step_100 === "proposal", question: "Em qual idioma você prefere a letra? 🌍", type: "select", options: [
         { label: "🇧🇷 PT-BR", value: "pt_br" }, { label: "🇺🇸 EN", value: "en" }, { label: "🇪🇸 ES", value: "es" },
         { label: "🇮🇹 IT", value: "it" }, { label: "🌍 Outro", value: "other" }
     ], metadata: { fieldName: "lyricDetails.language", required: true } },
     
     // ✅ Step 310.5: Sub-pergunta condicional
-    { step: "310.5", section: "CASAMENTO", condition: (d) => d.step_0 === "proposal" && d.step_310 === "other", question: "Qual outro idioma você prefere? 🌍", type: "input", placeholder: "Ex.: Francês, Alemão…", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: "310.5", section: "CASAMENTO", condition: (d) => d.step_100 === "proposal" && d.step_310 === "other", question: "Qual outro idioma você prefere? 🌍", type: "input", placeholder: "Ex.: Francês, Alemão…", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
     
-    { step: 311, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
+    { step: 311, section: "CASAMENTO", condition: (d) => d.step_100 === "proposal", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
         { label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" },
         { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" },
         { label: "🎵 Dueto", value: "duo" }, { label: "👥 Coral", value: "choir" }
     ], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
     
-    { step: 312, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "O que você prefere evitar nessa música? 🚫", type: "textarea", placeholder: "O que evitar…", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } }
+    { step: 312, section: "CASAMENTO", condition: (d) => d.step_100 === "proposal", question: "O que você prefere evitar nessa música? 🚫", type: "textarea", placeholder: "O que evitar…", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } }
 ];
 
 
