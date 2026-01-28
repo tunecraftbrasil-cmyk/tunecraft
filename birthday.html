@@ -16,16 +16,10 @@
       --success:#10b981;
       --dark:#0a0e27;
       --dark2:#0f1629;
-      --light:#f8fafc;
-      --border:#2d3748;
       --t:#ffffff;
       --tl:#cbd5e1;
       --tm:#94a3b8;
-      --glass: rgba(255,255,255,.05);
       --shadow: 0 18px 60px rgba(0,0,0,.35);
-
-      --PRICE_OLD: "R$ 99,90";
-      --PRICE_NOW: "R$ 49,90";
     }
 
     html{ scroll-behavior: smooth; }
@@ -38,8 +32,6 @@
     }
 
     .container{ max-width: 1120px; margin: 0 auto; padding: 0 20px; }
-
-    /* ===== Sections (lean) ===== */
     .section{ padding: 68px 0; border-top: 1px solid rgba(255,255,255,.06); }
     .h2{
       font-size: 2rem; letter-spacing: -.5px; font-weight: 1000;
@@ -51,7 +43,7 @@
       font-size: 1.02rem;
     }
 
-    /* ===== Buttons ===== */
+    /* Buttons */
     .btn{
       appearance:none; border:none; cursor:pointer;
       border-radius: 12px; padding: 13px 18px;
@@ -73,7 +65,7 @@
     }
     .btn-ghost:hover{ transform: translateY(-2px); border-color: rgba(0,217,255,.45); }
 
-    /* ===== HERO ===== */
+    /* HERO */
     header.hero{
       position: relative;
       padding: 44px 0 28px 0;
@@ -93,9 +85,7 @@
     }
     header.hero .container{ position:relative; z-index:1; }
 
-    .brand{
-      display:flex; align-items:center; justify-content:center; gap:10px;
-    }
+    .brand{ display:flex; align-items:center; justify-content:center; gap:10px; }
     .brand img{ height:56px; filter: drop-shadow(0 10px 20px rgba(0,217,255,.16)); }
 
     .pill{
@@ -160,7 +150,7 @@
       backdrop-filter: blur(10px);
     }
 
-    /* ===== Demo Card ===== */
+    /* Demo Card */
     .card{
       background: rgba(255,255,255,.04);
       border: 1px solid rgba(255,255,255,.10);
@@ -197,7 +187,7 @@
       background: rgba(255,255,255,.03);
       padding:6px 10px; border-radius:999px; white-space:nowrap;
     }
-    .demo audio{ width: 100%; }
+    .demo audio{ width: 100%; display:block; }
     .mini-proof{
       margin-top: 12px;
       border-top: 1px solid rgba(255,255,255,.08);
@@ -211,7 +201,7 @@
     }
     .mini-proof b{ color: var(--tl); }
 
-    /* ===== Proof (short) ===== */
+    /* Proof */
     .proof-row{
       margin-top: 18px;
       display:grid;
@@ -228,7 +218,7 @@
     .proof .k{ font-weight:1100; font-size:1.15rem; letter-spacing:-.3px; margin-bottom: 4px; }
     .proof .v{ color: var(--tm); font-size:.92rem; }
 
-    /* ===== Steps (3) ===== */
+    /* Steps */
     .steps{
       display:grid;
       grid-template-columns: repeat(3, 1fr);
@@ -253,7 +243,7 @@
     .step h3{ font-size: 1.06rem; font-weight:1100; letter-spacing:-.2px; margin-bottom: 8px; }
     .step p{ color: var(--tm); font-size: .95rem; line-height: 1.6; }
 
-    /* ===== Pricing (single focus) ===== */
+    /* Pricing */
     .pricing-wrap{
       display:grid;
       grid-template-columns: 1.05fr .95fr;
@@ -332,7 +322,7 @@
     .quote{ color: var(--tl); font-style:italic; font-size:.94rem; line-height:1.55; }
     .who{ margin-top: 10px; color: var(--primary); font-weight:1100; font-size:.85rem; }
 
-    /* ===== FAQ ===== */
+    /* FAQ */
     .faq{
       max-width: 920px;
       margin: 0 auto;
@@ -358,7 +348,7 @@
     summary::-webkit-details-marker{ display:none; }
     details p{ margin-top: 10px; color: var(--tm); font-size:.94rem; line-height:1.65; }
 
-    /* ===== Footer ===== */
+    /* Footer */
     footer{
       padding: 44px 0;
       border-top: 1px solid rgba(255,255,255,.06);
@@ -368,15 +358,15 @@
     }
     footer img{ height: 30px; filter: drop-shadow(0 3px 8px rgba(0,217,255,.12)); }
 
-    /* ===== Sticky price bar (always show value, no repetition) ===== */
-    .page-pad{ padding-bottom: 86px; }
+    /* Sticky bar (mobile-first improvements + safe area) */
+    .page-pad{ padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
     .sticky-bar{
       position: fixed; left: 0; right: 0; bottom: 0;
       z-index: 9999;
-      background: rgba(10,14,39,.86);
+      background: rgba(10,14,39,.88);
       border-top: 1px solid rgba(255,255,255,.10);
       backdrop-filter: blur(12px);
-      padding: 10px 12px;
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom)) 12px;
     }
     .sticky-inner{
       max-width: 1120px;
@@ -413,7 +403,7 @@
     }
     .sticky-cta:hover{ transform: translateY(-1px); box-shadow: 0 16px 55px rgba(16,185,129,.24); }
 
-    /* ===== Responsive ===== */
+    /* Responsive breakpoints */
     @media (max-width: 980px){
       .hero-grid{ grid-template-columns: 1fr; }
       .proof-row{ grid-template-columns: 1fr; }
@@ -422,11 +412,37 @@
       .faq{ grid-template-columns: 1fr; }
       .hero h1{ font-size: 2.2rem; }
     }
-    @media (max-width: 480px){
-      header.hero{ padding: 38px 0 22px 0; }
-      .hero h1{ font-size: 1.82rem; }
-      .btn{ width: 100%; }
-      .sticky-title{ max-width: 52vw; }
+
+    /* MOBILE: refined spacing + full-width CTAs */
+    @media (max-width: 520px){
+      .container{ padding: 0 16px; }
+      .section{ padding: 54px 0; }
+      .h2{ font-size: 1.65rem; }
+      .desc{ font-size: .98rem; margin-bottom: 22px; }
+
+      header.hero{ padding: 36px 0 22px 0; }
+      .brand img{ height: 52px; }
+
+      .hero h1{ font-size: 1.78rem; line-height: 1.1; }
+      .hero .lead{ font-size: 1rem; }
+      .promise{ width: 100%; text-align: center; }
+
+      .hero-actions{ width: 100%; }
+      .hero-actions .btn{ width: 100%; }
+
+      .chips .chip{ width: 100%; justify-content:center; }
+
+      .demo-top{ flex-direction: column; align-items:flex-start; }
+      .demo-tag{ align-self:flex-start; }
+
+      /* Sticky: stack for tiny screens */
+      .sticky-inner{ align-items:flex-end; }
+      .sticky-title{ max-width: 54vw; }
+    }
+
+    @media (max-width: 380px){
+      .sticky-title{ max-width: 48vw; }
+      .sticky-cta{ padding: 12px 12px; }
     }
   </style>
 </head>
@@ -450,7 +466,7 @@
       </div>
     </div>
 
-    <!-- ===== HERO ===== -->
+    <!-- HERO -->
     <header class="hero" id="topo">
       <div class="container">
         <div class="brand">
@@ -462,10 +478,9 @@
         </div>
 
         <div class="hero-grid">
-          <!-- LEFT -->
+          <!-- Left -->
           <div>
             <h1>Um presente que acerta sem você “inventar moda”.</h1>
-
             <p class="lead">
               Você conta histórias reais (cenas, apelidos, piadas internas). A TuneCraft transforma isso em uma música
               com voz e arranjo — com a cara da pessoa.
@@ -504,7 +519,7 @@
             </div>
           </div>
 
-          <!-- RIGHT (demo + micro-proof) -->
+          <!-- Right -->
           <div class="card">
             <div class="badge">▶ Ouça um trecho (exemplo curto)</div>
             <h3>Entenda o “clima” em 20 segundos</h3>
@@ -515,7 +530,6 @@
                 <div class="demo-tag">~20s</div>
               </div>
 
-              <!-- Troque o src pelo seu mp3 real quando tiver -->
               <audio controls preload="none">
                 <source src="demo-exemplo.mp3" type="audio/mpeg" />
                 Seu navegador não suporta áudio.
@@ -532,7 +546,7 @@
       </div>
     </header>
 
-    <!-- ===== COMO FUNCIONA (enxuto) ===== -->
+    <!-- COMO FUNCIONA -->
     <section class="section" id="como-funciona">
       <div class="container">
         <div class="h2">Como funciona</div>
@@ -563,7 +577,7 @@
       </div>
     </section>
 
-    <!-- ===== PREÇO (single focus) ===== -->
+    <!-- PREÇO -->
     <section class="section" id="preco" style="background: rgba(255,255,255,.01);">
       <div class="container">
         <div class="h2">Preço e entrega</div>
@@ -617,7 +631,7 @@
       </div>
     </section>
 
-    <!-- ===== FAQ (curto) ===== -->
+    <!-- FAQ -->
     <section class="section" id="faq">
       <div class="container">
         <div class="h2">Perguntas rápidas</div>
@@ -663,11 +677,11 @@
 
   </div>
 
-  <!-- ===== Sticky (always show value, no page repetition) ===== -->
+  <!-- Sticky price/value (always visible) -->
   <div class="sticky-bar" role="region" aria-label="Preço e CTA fixos">
     <div class="sticky-inner">
       <div class="sticky-left">
-        <div class="sticky-title">Música de Aniversário • Áudio em até 10 min após aprovação</div>
+        <div class="sticky-title">Música de Aniversário • Áudio em até 10 min</div>
         <div class="sticky-price">
           <span class="sticky-old">R$ 99,90</span>
           <span class="sticky-now">R$ 49,90</span>
@@ -696,7 +710,6 @@
     function startThemeChatForTest() {
       persistLandingAttribution();
       localStorage.setItem("tunecraft_preselected_themeId", LANDING_THEME_ID);
-
       if (typeof openChat === "function") openChat();
       else alert("Função openChat() não encontrada. Verifique se chat.js foi carregado.");
     }
