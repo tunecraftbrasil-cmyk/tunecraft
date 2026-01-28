@@ -1030,8 +1030,12 @@ draftsContainer.innerHTML += `
             <p><strong>Descrição:</strong> "${summary.message}"</p>
         </div>
         <div class="action-row">
-            <button class="btn btn-revise" onclick="editarDraft(${order.id})">✏️ Editar Formulário</button>
-            <button class="btn btn-approve" onclick="irParaCheckout(${order.id})">💰 Pagar e Gerar Letra (R$ 49,90)</button>
+                  <button class="btn btn-revise" onclick="editarDraft('${order.id}')">
+                    ✏️ Editar Formulário
+                  </button>
+                  <button class="btn btn-approve" onclick="irParaCheckout('${order.id}')">
+                    💳 Pagar e Gerar Letra (R$ 49,90)
+                  </button>
         </div>
     </div>
 `;
@@ -1883,6 +1887,7 @@ async function saveEditDraftNew() {
 
 </body>
 </html>
+
 
 
 
