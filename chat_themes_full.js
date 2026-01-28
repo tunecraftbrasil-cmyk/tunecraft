@@ -11,7 +11,7 @@
 // PASSO 1: Definir elaboratedChatFlow GLOBAL
 // ============================================
 
-let elaboratedChatFlow = [
+elaboratedChatFlow = [
     // ===== BLOCO UNIVERSAL (step 0) =====
     { 
         step: 0, 
