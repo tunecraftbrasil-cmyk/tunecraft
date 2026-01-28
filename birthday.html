@@ -217,19 +217,12 @@
     .micro strong{ color:var(--tl); }
 
     /* FAQ */
-    .faq-wrap{
-      display:grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap:18px;
-      align-items:start;
-    }
-
     .faq-head{
       margin-bottom:14px;
+      text-align:center;
     }
     .faq-head h2{
-      text-align:left;
-      font-size:1.55rem;
+      font-size:1.65rem;
       letter-spacing:-.3px;
       margin-bottom:6px;
     }
@@ -240,27 +233,13 @@
       border:1px solid rgba(255,255,255,.10);
       border-radius:14px;
       padding:14px;
+      max-width: 920px;
+      margin: 0 auto;
     }
     details + details{ margin-top:10px; }
 
     summary{ cursor:pointer; font-weight:1100; color:var(--tl); }
     details p{ margin-top:8px; color:var(--tm); line-height:1.7; }
-
-    .faq-side{
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:18px;
-      padding:18px;
-      box-shadow:var(--shadow);
-    }
-    .faq-side h3{ font-size:1.1rem; letter-spacing:-.2px; margin-bottom:10px; }
-    .faq-side .mini{
-      display:grid; gap:10px;
-      color:var(--tm);
-      line-height:1.6;
-      font-size:.95rem;
-    }
-    .faq-side .mini b{ color:var(--tl); }
 
     /* Sticky */
     .pad-bottom{ padding-bottom: 92px; }
@@ -283,7 +262,6 @@
       h1{ font-size:1.85rem; }
       .btn-primary{ width:100%; }
       .price-how-grid{ grid-template-columns:1fr; }
-      .faq-wrap{ grid-template-columns:1fr; }
     }
   </style>
 </head>
@@ -365,22 +343,28 @@
 
       <!-- COMO FUNCIONA (AUTOEXPLICATIVO) -->
       <div class="howbox">
-        <h3>Como fica tão fácil (e tão específico)</h3>
+        <h3>Como fica fácil (e ao mesmo tempo completo)</h3>
 
         <div class="how-steps">
           <div class="hs">
             <div class="n">1</div>
             <div>
-              <b>Você só responde perguntas simples</b>
-              <p>Quem é a pessoa, como vocês se chamam, uma história marcante e o “clima” (emocionante ou divertido).</p>
+              <b>Você conta do seu jeito (o chat faz as perguntas certas)</b>
+              <p>
+                A conversa é intuitiva — mas passa por tudo que deixa a música perfeita:
+                quem é a pessoa, a relação, o clima, detalhes marcantes, referências que fazem sentido e o que evitar.
+              </p>
             </div>
           </div>
 
           <div class="hs">
             <div class="n">2</div>
             <div>
-              <b>A letra sai com cara de “vocês”</b>
-              <p>Usamos seus detalhes reais para evitar clichês e deixar a letra perfeita para a ocasião.</p>
+              <b>A letra nasce “usável” pra ocasião</b>
+              <p>
+                A gente encaixa seus detalhes em uma estrutura de música de verdade:
+                ritmo, refrão memorável e frases que funcionam na hora do parabéns (sem ficar esquisito).
+              </p>
             </div>
           </div>
 
@@ -388,7 +372,9 @@
             <div class="n">3</div>
             <div>
               <b>Você pede ajustes específicos</b>
-              <p>Mudar um verso, incluir uma frase, trocar um apelido, ajustar o tom… você aprova a versão final.</p>
+              <p>
+                Mudar um verso, incluir uma frase, trocar um apelido, ajustar o tom… você aprova a versão final da letra.
+              </p>
             </div>
           </div>
 
@@ -396,14 +382,16 @@
             <div class="n">4</div>
             <div>
               <b>Recebe 2 versões da música</b>
-              <p>Mesma letra, duas interpretações/arranjos. Você escolhe a que mais combina com a festa.</p>
+              <p>
+                Mesma letra, duas interpretações/arranjos. Você escolhe a que mais combina com a festa.
+              </p>
             </div>
           </div>
         </div>
 
         <div class="micro">
-          <div><strong>Dica:</strong> mesmo sem saber “escrever música”, o chat te guia e encaixa tudo no ritmo certo.</div>
-          <div><strong>Resultado:</strong> letra funcional pra tocar na hora do parabéns e fazer sentido pra quem conhece a história.</div>
+          <div><strong>Objetivo:</strong> letra única, com cara de vocês — e “redonda” musicalmente (não só bonita no texto).</div>
+          <div><strong>Resultado:</strong> pronta pra tocar na hora certa e boa de ouvir depois também.</div>
         </div>
       </div>
     </div>
@@ -413,89 +401,71 @@
 
 <section class="section" id="faq">
   <div class="container">
-    <div class="faq-wrap">
+    <div class="faq-head">
+      <h2>Perguntas frequentes</h2>
+      <p>Sem pegadinha. Só o que realmente importa antes de comprar.</p>
+    </div>
 
-      <div>
-        <div class="faq-head">
-          <h2>Perguntas frequentes</h2>
-          <p>Sem pegadinha. Só o que realmente importa antes de comprar.</p>
-        </div>
+    <details>
+      <summary>O que eu preciso mandar para começar?</summary>
+      <p>
+        Você só precisa contar do seu jeito. A conversa é guiada para coletar o que importa:
+        referências, detalhes marcantes, tom certo e o que evitar — pra letra ficar perfeita pra ocasião.
+      </p>
+    </details>
 
-        <details>
-          <summary>O que eu preciso mandar para começar?</summary>
-          <p>
-            Só informações simples: nome da pessoa, relação de vocês, 1–2 histórias marcantes, apelidos/piadas internas e o clima da música (emocionante ou divertida).
-            Se você não tiver tudo, pode responder o básico — a letra ainda sai boa e você ajusta depois.
-          </p>
-        </details>
+    <details>
+      <summary>Que tipo de “alterações específicas” eu posso pedir na letra?</summary>
+      <p>
+        Mudanças pontuais como: trocar uma frase, incluir uma lembrança, ajustar um verso para ficar mais engraçado/emocionante,
+        remover algo que você não quer citar, alterar apelidos, nomes, datas, lugares ou o jeito de chamar a pessoa.
+        Você aprova a letra final antes do áudio.
+      </p>
+    </details>
 
-        <details>
-          <summary>Que tipo de “alterações específicas” eu posso pedir na letra?</summary>
-          <p>
-            Mudanças pontuais como: trocar uma frase, incluir uma lembrança, ajustar um verso para ficar mais engraçado/emocionante, remover algo que não quer citar,
-            alterar apelidos, nomes, datas, lugares ou a forma de chamar a pessoa. Você aprova a letra final antes de gerar o áudio.
-          </p>
-        </details>
+    <details>
+      <summary>Como funcionam as 2 versões finais?</summary>
+      <p>
+        A letra é a mesma. O que muda é a interpretação/arranjo (ex.: uma versão mais suave e outra mais animada).
+        Assim você escolhe a que combina mais com a festa ou com a mensagem.
+      </p>
+    </details>
 
-        <details>
-          <summary>Como funcionam as 2 versões finais?</summary>
-          <p>
-            A letra é a mesma. O que muda é a interpretação/arranjo (por exemplo: uma mais “leve e romântica”, outra mais “animada”).
-            Assim você escolhe a versão ideal para tocar na festa ou mandar no WhatsApp.
-          </p>
-        </details>
+    <details>
+      <summary>Em quanto tempo fica pronto?</summary>
+      <p>
+        Depois que você aprova a letra, geramos o áudio em até <b>10 minutos</b>.
+        Se você pedir ajustes antes, isso só adiciona o tempo da sua revisão (você controla).
+      </p>
+    </details>
 
-        <details>
-          <summary>Em quanto tempo fica pronto?</summary>
-          <p>
-            Depois que você aprova a letra, geramos o áudio em até <b>10 minutos</b>.
-            Se você pedir ajustes antes, isso só adiciona o tempo da sua revisão (você controla).
-          </p>
-        </details>
+    <details>
+      <summary>Vai ficar genérico?</summary>
+      <p>
+        A ideia é o oposto: a letra gira em torno dos seus detalhes reais.
+        Quanto mais específico (uma cena, um apelido, uma história), mais a música fica com “cara de vocês”.
+        E como você aprova a letra, nada vai para o áudio final sem você gostar.
+      </p>
+    </details>
 
-        <details>
-          <summary>Vai ficar genérico?</summary>
-          <p>
-            A ideia é exatamente o contrário: a letra gira em torno dos seus detalhes reais.
-            Quanto mais específico (uma cena, um apelido, uma história), mais a música fica com “cara de vocês”.
-            E como você aprova a letra, nada vai para o áudio final sem você gostar.
-          </p>
-        </details>
+    <details>
+      <summary>O que eu recebo no final?</summary>
+      <p>
+        Você recebe a música pronta em <b>MP3 + WAV</b> e com <b>2 versões</b> (mesma letra).
+      </p>
+    </details>
 
-        <details>
-          <summary>O que eu recebo no final?</summary>
-          <p>
-            Você recebe a música pronta em <b>MP3 + WAV</b> e com <b>2 versões</b> (mesma letra). Perfeito para tocar na festa e também enviar por mensagem.
-          </p>
-        </details>
+    <details>
+      <summary>E se eu não gostar?</summary>
+      <p>
+        Você tem <b>30 dias de garantia</b>. E antes do áudio final, você ainda pode ajustar a letra até ficar do jeito certo.
+      </p>
+    </details>
 
-        <details>
-          <summary>E se eu não gostar?</summary>
-          <p>
-            Você tem <b>30 dias de garantia</b>. E antes do áudio final, você ainda pode ajustar a letra até ficar do jeito certo.
-          </p>
-        </details>
-
-        <div style="margin-top:16px;">
-          <button class="btn btn-primary" style="width:100%" onclick="goToCheckoutWithTheme()">
-            Criar minha música por R$ 49,90
-          </button>
-        </div>
-      </div>
-
-      <aside class="faq-side">
-        <h3>O que normalmente dá “cara de presente perfeito”</h3>
-        <div class="mini">
-          <div><b>1 detalhe específico</b> (uma cena real)</div>
-          <div><b>1 apelido</b> ou piada interna</div>
-          <div><b>1 momento marcante</b> (viagem, conquista, fase)</div>
-          <div><b>1 tom certo</b> (emociona ou diverte)</div>
-          <div style="border-top:1px solid rgba(255,255,255,.08); padding-top:10px;">
-            Com isso, a letra fica “funcional”: faz sentido na hora do parabéns e também quando a pessoa ouve sozinha depois.
-          </div>
-        </div>
-      </aside>
-
+    <div style="margin-top:16px; max-width: 920px; margin-left:auto; margin-right:auto;">
+      <button class="btn btn-primary" style="width:100%" onclick="goToCheckoutWithTheme()">
+        Criar minha música por R$ 49,90
+      </button>
     </div>
   </div>
 </section>
