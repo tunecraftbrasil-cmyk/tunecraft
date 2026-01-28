@@ -85,7 +85,7 @@ elaboratedChatFlow = [
         { label: "🇧🇷 PT-BR", value: "pt_br" }, { label: "🇺🇸 EN", value: "en" }, { label: "🇪🇸 ES", value: "es" },
         { label: "🇮🇹 IT", value: "it" }, { label: "🌍 Outro", value: "other" }
     ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "211.5", section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration" && d.step_212 === "other", question: "Qual outro idioma você prefere?", type: "input", placeholder: "Ex.: Francês, Alemão, Holandês...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },7
+    { step: "211.5", section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration" && d.step_212 === "other", question: "Qual outro idioma você prefere?", type: "input", placeholder: "Ex.: Francês, Alemão, Holandês...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
     { step: 212, section: "DECL. AMOR", condition: (d) => d.step0 === "love_declaration", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
         { label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" },
         { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" },
