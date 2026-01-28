@@ -10,625 +10,423 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    :root {
-      --primary: #00d9ff;
-      --secondary: #6366f1;
-      --success: #10b981;
-      --dark: #0a0e27;
-      --dark-secondary: #0f1629;
-      --dark-tertiary: #1a202c;
-      --light: #f8fafc;
-      --border: #2d3748;
-      --text-dark: #ffffff;
-      --text-light: #cbd5e1;
-      --text-muted: #94a3b8;
-      --glass: rgba(255, 255, 255, 0.05);
-      --shadow: 0 18px 60px rgba(0,0,0,0.35);
+    :root{
+      --primary:#00d9ff;
+      --secondary:#6366f1;
+      --success:#10b981;
+      --dark:#0a0e27;
+      --dark2:#0f1629;
+      --light:#f8fafc;
+      --border:#2d3748;
+      --t:#ffffff;
+      --tl:#cbd5e1;
+      --tm:#94a3b8;
+      --glass: rgba(255,255,255,.05);
+      --shadow: 0 18px 60px rgba(0,0,0,.35);
+
+      --PRICE_OLD: "R$ 99,90";
+      --PRICE_NOW: "R$ 49,90";
     }
 
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      line-height: 1.55;
-      color: var(--text-dark);
-      background: var(--dark);
-      overflow-x: hidden;
+    html{ scroll-behavior: smooth; }
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+      line-height:1.55;
+      color:var(--t);
+      background:var(--dark);
+      overflow-x:hidden;
     }
 
-    .container { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
-    .section { padding: 72px 0; border-top: 1px solid rgba(255,255,255,0.05); }
-    .muted { color: var(--text-muted); }
-    .sub { color: var(--text-light); opacity: .95; }
+    .container{ max-width: 1120px; margin: 0 auto; padding: 0 20px; }
 
-    /* --- no nav (single focus) --- */
-    .topline {
-      display: flex; align-items: center; justify-content: center;
-      gap: 10px; margin-top: 6px;
-      color: var(--text-muted); font-size: .9rem;
+    /* ===== Sections (lean) ===== */
+    .section{ padding: 68px 0; border-top: 1px solid rgba(255,255,255,.06); }
+    .h2{
+      font-size: 2rem; letter-spacing: -.5px; font-weight: 1000;
+      text-align:center; margin-bottom: 10px;
     }
+    .desc{
+      text-align:center; color: var(--tm);
+      max-width: 860px; margin: 0 auto 28px auto;
+      font-size: 1.02rem;
+    }
+
+    /* ===== Buttons ===== */
+    .btn{
+      appearance:none; border:none; cursor:pointer;
+      border-radius: 12px; padding: 13px 18px;
+      font-weight: 1000; font-size: .98rem;
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      text-decoration:none; user-select:none; white-space:nowrap;
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+    }
+    .btn-primary{
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff; box-shadow: 0 14px 40px rgba(0,217,255,.18);
+    }
+    .btn-primary:hover{ transform: translateY(-2px); box-shadow: 0 18px 55px rgba(0,217,255,.28); }
+    .btn-ghost{
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.10);
+      color: var(--t);
+      box-shadow: none;
+    }
+    .btn-ghost:hover{ transform: translateY(-2px); border-color: rgba(0,217,255,.45); }
 
     /* ===== HERO ===== */
-    header.hero {
+    header.hero{
       position: relative;
-      padding: 46px 0 26px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      overflow: hidden;
-      background: radial-gradient(1200px 500px at 25% 20%, rgba(0,217,255,0.12), transparent 55%),
-                  radial-gradient(900px 520px at 80% 55%, rgba(99,102,241,0.12), transparent 55%),
-                  linear-gradient(135deg, var(--dark) 0%, var(--dark-secondary) 100%);
-    }
-    .hero::before{
-      content:"";
-      position:absolute; inset:-2px;
+      padding: 44px 0 28px 0;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      overflow:hidden;
       background:
-        radial-gradient(circle at 30% 30%, rgba(0, 217, 255, 0.08) 0%, transparent 55%),
-        radial-gradient(circle at 70% 70%, rgba(99, 102, 241, 0.08) 0%, transparent 55%);
+        radial-gradient(1200px 520px at 25% 20%, rgba(0,217,255,.12), transparent 55%),
+        radial-gradient(900px 520px at 80% 55%, rgba(99,102,241,.12), transparent 55%),
+        linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%);
+    }
+    header.hero::before{
+      content:""; position:absolute; inset:-2px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(0,217,255,.08), transparent 55%),
+        radial-gradient(circle at 70% 70%, rgba(99,102,241,.08), transparent 55%);
       pointer-events:none;
     }
-    .hero .container { position: relative; z-index: 1; }
+    header.hero .container{ position:relative; z-index:1; }
 
-    .logo-header { display: inline-flex; align-items: center; gap: 10px; justify-content: center; width: 100%; }
-    .logo-header img { height: 56px; filter: drop-shadow(0 10px 20px rgba(0, 217, 255, 0.16)); }
+    .brand{
+      display:flex; align-items:center; justify-content:center; gap:10px;
+    }
+    .brand img{ height:56px; filter: drop-shadow(0 10px 20px rgba(0,217,255,.16)); }
 
-    .pill {
-      display: inline-flex; align-items: center; justify-content: center;
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
       margin: 14px auto 0 auto;
       padding: 7px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(0,217,255,0.25);
-      background: rgba(0,217,255,0.06);
-      color: var(--text-light);
-      font-size: 0.86rem;
-      gap: 8px;
+      border-radius:999px;
+      border:1px solid rgba(0,217,255,.25);
+      background: rgba(0,217,255,.06);
+      color: var(--tl);
+      font-size:.86rem;
     }
 
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 28px;
-      align-items: center;
+    .hero-grid{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 22px;
+      align-items:center;
       margin-top: 22px;
     }
 
-    .hero h1 {
-      font-size: 2.65rem;
-      line-height: 1.1;
-      letter-spacing: -0.7px;
+    .hero h1{
+      font-size: 2.55rem;
+      letter-spacing:-.7px;
+      line-height:1.08;
+      font-weight:1100;
       margin-bottom: 12px;
-      font-weight: 900;
     }
-
-    .hero p.lead {
+    .hero .lead{
       font-size: 1.06rem;
-      color: var(--text-light);
-      margin-bottom: 14px;
-      max-width: 56ch;
+      color: var(--tl);
+      margin-bottom: 12px;
+      max-width: 58ch;
     }
 
-    .hero p.promise {
-      font-size: 1.02rem;
-      color: rgba(183,255,227,0.98);
-      background: rgba(16,185,129,0.14);
-      border: 1px solid rgba(16,185,129,0.22);
-      border-radius: 14px;
-      padding: 12px 14px;
-      display: inline-block;
+    .promise{
+      display:inline-block;
       margin: 6px 0 16px 0;
-    }
-    .hero p.promise b { color: #b7ffe3; }
-
-    .hero-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 4px;
-    }
-
-    .btn {
-      appearance: none;
-      border: none;
-      cursor: pointer;
-      border-radius: 12px;
-      padding: 13px 18px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(16,185,129,.22);
+      background: rgba(16,185,129,.14);
+      color: rgba(183,255,227,.98);
       font-weight: 900;
-      font-size: .98rem;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
-      user-select: none;
-      white-space: nowrap;
     }
 
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      color: white;
-      box-shadow: 0 14px 40px rgba(0, 217, 255, 0.18);
+    .hero-actions{
+      display:flex; gap:10px; flex-wrap:wrap; margin-top: 4px;
     }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 18px 55px rgba(0, 217, 255, 0.28); }
 
-    .btn-ghost {
-      background: rgba(255,255,255,0.04);
-      color: var(--text-dark);
-      border: 1px solid rgba(255,255,255,0.10);
-    }
-    .btn-ghost:hover { transform: translateY(-2px); border-color: rgba(0,217,255,0.45); }
-
-    .hero-meta {
+    .chips{
       margin-top: 14px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
+      display:flex; gap:10px; flex-wrap:wrap;
     }
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
+    .chip{
       padding: 9px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.03);
-      color: var(--text-light);
-      font-size: 0.9rem;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      color: var(--tl);
+      font-size: .9rem;
       backdrop-filter: blur(10px);
     }
 
-    /* ===== HERO CARD (DEMO / VISUAL) ===== */
-    .hero-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.10);
+    /* ===== Demo Card ===== */
+    .card{
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.10);
       border-radius: 18px;
       padding: 18px;
       box-shadow: var(--shadow);
       backdrop-filter: blur(12px);
     }
-    .hero-card .badge {
-      display: inline-flex;
-      gap: 8px;
-      align-items: center;
+    .card .badge{
+      display:inline-flex; align-items:center; gap:8px;
       padding: 6px 10px;
-      border-radius: 999px;
-      font-size: .82rem;
-      font-weight: 900;
-      color: rgba(183,255,227,0.98);
-      border: 1px solid rgba(16,185,129,0.25);
-      background: rgba(16,185,129,0.12);
+      border-radius:999px;
+      font-size:.82rem;
+      font-weight:1000;
+      color: rgba(183,255,227,.98);
+      border:1px solid rgba(16,185,129,.25);
+      background: rgba(16,185,129,.12);
       margin-bottom: 12px;
     }
-    .hero-card h3 {
-      font-size: 1.1rem;
-      letter-spacing: -0.2px;
-      margin-bottom: 10px;
-      font-weight: 900;
-    }
-
-    .demo {
+    .card h3{ font-size:1.08rem; font-weight:1100; letter-spacing:-.2px; margin-bottom: 10px; }
+    .demo{
       border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(0,0,0,0.22);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
       padding: 14px;
     }
-    .demo .row {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 10px;
+    .demo-top{
+      display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom: 10px;
     }
-    .demo .title {
-      font-weight: 900;
-      color: var(--text-light);
-      font-size: .95rem;
+    .demo-title{ font-weight:1000; color: var(--tl); font-size:.95rem; }
+    .demo-tag{
+      font-size:.78rem; color: var(--tm);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      padding:6px 10px; border-radius:999px; white-space:nowrap;
     }
-    .demo .tag {
-      font-size: .78rem;
-      color: var(--text-muted);
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.03);
-      padding: 6px 10px;
-      border-radius: 999px;
-      white-space: nowrap;
+    .demo audio{ width: 100%; }
+    .mini-proof{
+      margin-top: 12px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding-top: 12px;
+      display:grid; gap:10px;
     }
-    .demo audio { width: 100%; }
-    .demo .note {
-      margin-top: 10px;
-      font-size: .88rem;
-      color: var(--text-muted);
-      line-height: 1.5;
+    .mini-proof p{
+      color: var(--tm);
+      font-size:.92rem;
+      line-height:1.55;
     }
+    .mini-proof b{ color: var(--tl); }
 
-    .mini-proof {
-      margin-top: 14px;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-    .proof-item {
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.03);
-      padding: 12px 12px;
-    }
-    .proof-item .q {
-      font-weight: 900;
-      font-size: .92rem;
-      color: var(--text-light);
-      margin-bottom: 6px;
-    }
-    .proof-item .a {
-      color: var(--text-muted);
-      font-size: .9rem;
-      line-height: 1.55;
-    }
-
-    /* ===== SOCIAL PROOF STRIP ===== */
-    .proof-strip {
+    /* ===== Proof (short) ===== */
+    .proof-row{
       margin-top: 18px;
-      padding-top: 18px;
-      border-top: 1px solid rgba(255,255,255,0.06);
-      display: grid;
+      display:grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 12px;
     }
-    .proof-box {
+    .proof{
       border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
       padding: 14px;
-      text-align: left;
+      text-align:left;
     }
-    .proof-box .k {
-      font-size: 1.25rem;
-      font-weight: 1000;
-      letter-spacing: -0.3px;
-      margin-bottom: 4px;
-      color: var(--text-dark);
-    }
-    .proof-box .v { color: var(--text-muted); font-size: .92rem; }
+    .proof .k{ font-weight:1100; font-size:1.15rem; letter-spacing:-.3px; margin-bottom: 4px; }
+    .proof .v{ color: var(--tm); font-size:.92rem; }
 
-    /* ===== SECTION TITLES ===== */
-    .h2 {
-      font-size: 2.05rem;
-      letter-spacing: -0.5px;
-      font-weight: 1000;
-      text-align: center;
-      margin-bottom: 10px;
-    }
-    .section-desc {
-      text-align: center;
-      max-width: 840px;
-      margin: 0 auto 34px auto;
-      color: var(--text-muted);
-      font-size: 1.02rem;
-    }
-
-    /* ===== BEFORE / AFTER ===== */
-    .ba-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-top: 22px;
-    }
-    .panel {
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.03);
-      padding: 18px;
-      backdrop-filter: blur(12px);
-    }
-    .panel .title {
-      font-weight: 1000;
-      letter-spacing: -0.2px;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .panel ul { margin-left: 18px; color: var(--text-light); }
-    .panel li { margin: 8px 0; color: var(--text-light); }
-    .panel .small { color: var(--text-muted); margin-top: 10px; font-size: .92rem; }
-
-    /* ===== HOW IT WORKS ===== */
-    .steps {
-      display: grid;
+    /* ===== Steps (3) ===== */
+    .steps{
+      display:grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-top: 18px;
-    }
-    .step {
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.03);
-      padding: 18px;
-    }
-    .step .n {
-      width: 34px; height: 34px;
-      border-radius: 10px;
-      display: inline-flex; align-items: center; justify-content: center;
-      background: rgba(0,217,255,0.12);
-      border: 1px solid rgba(0,217,255,0.18);
-      font-weight: 1000;
-      margin-bottom: 10px;
-    }
-    .step h3 { font-size: 1.06rem; letter-spacing: -0.2px; margin-bottom: 8px; font-weight: 1000; }
-    .step p { color: var(--text-muted); font-size: .95rem; line-height: 1.6; }
-
-    /* ===== BENEFITS (premium bullets) ===== */
-    .benefits {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
       gap: 14px;
       margin-top: 18px;
     }
-    .benefit {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.03);
-      padding: 14px 14px;
+    .step{
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      padding: 18px;
     }
-    .benefit .icon { font-size: 1.4rem; line-height: 1; margin-top: 2px; }
-    .benefit .txt b { display:block; font-weight: 1000; margin-bottom: 4px; letter-spacing: -0.2px; }
-    .benefit .txt { color: var(--text-muted); font-size: .95rem; line-height: 1.55; }
-    .benefit .txt b { color: var(--text-light); }
+    .step .n{
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      display:inline-flex; align-items:center; justify-content:center;
+      background: rgba(0,217,255,.12);
+      border: 1px solid rgba(0,217,255,.18);
+      font-weight:1100;
+      margin-bottom: 10px;
+    }
+    .step h3{ font-size: 1.06rem; font-weight:1100; letter-spacing:-.2px; margin-bottom: 8px; }
+    .step p{ color: var(--tm); font-size: .95rem; line-height: 1.6; }
 
-    /* ===== PRICING ===== */
-    .pricing-wrap {
-      display: grid;
-      grid-template-columns: 1.05fr 0.95fr;
-      gap: 18px;
+    /* ===== Pricing (single focus) ===== */
+    .pricing-wrap{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 16px;
       align-items: start;
       margin-top: 18px;
     }
-
-    .pricing-card {
+    .pricing{
       border-radius: 20px;
-      border: 1px solid rgba(0,217,255,0.35);
-      background: linear-gradient(135deg, rgba(0,217,255,0.10) 0%, rgba(99,102,241,0.07) 100%);
+      border: 1px solid rgba(0,217,255,.35);
+      background: linear-gradient(135deg, rgba(0,217,255,.10) 0%, rgba(99,102,241,.07) 100%);
       padding: 20px;
-      box-shadow: 0 26px 80px rgba(0,217,255,0.10);
+      box-shadow: 0 26px 80px rgba(0,217,255,.10);
     }
-    .pricing-card .top {
-      display:flex; justify-content: space-between; align-items: center; gap: 12px;
+    .pricing .top{
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
       margin-bottom: 10px;
     }
-    .pricing-card .label {
+    .pricing .label{
       padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.04);
-      color: var(--text-muted);
-      font-size: .82rem;
-      font-weight: 900;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: var(--tm);
+      font-size:.82rem;
+      font-weight:1000;
     }
-    .pricing-card h3 {
+    .pricing h3{
       font-size: 1.35rem;
-      font-weight: 1100;
-      letter-spacing: -0.3px;
+      font-weight:1100;
+      letter-spacing:-.3px;
       margin: 0;
     }
+    .price-row{ margin-top: 10px; display:flex; gap:12px; align-items:baseline; flex-wrap:wrap; }
+    .old{ text-decoration:line-through; color: rgba(239,68,68,.95); font-weight: 900; font-size: 1.05rem; }
+    .now{ font-size: 2.05rem; font-weight: 1100; letter-spacing:-.6px; color: rgba(183,255,227,.98); text-shadow: 0 0 18px rgba(16,185,129,.20); }
+    .off{ color:#f59e0b; font-weight:1100; font-size:.95rem; }
 
-    .price-row { margin-top: 10px; display:flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
-    .old {
-      text-decoration: line-through;
-      color: rgba(239,68,68,0.95);
-      font-weight: 800;
-      font-size: 1.05rem;
-    }
-    .now {
-      font-size: 2.1rem;
-      font-weight: 1100;
-      letter-spacing: -0.6px;
-      color: rgba(183,255,227,0.98);
-      text-shadow: 0 0 18px rgba(16,185,129,0.20);
-    }
-    .off { color: #f59e0b; font-weight: 1000; font-size: .95rem; }
-
-    .pricing-card .callout {
+    .callout{
       margin-top: 12px;
-      padding: 12px 12px;
+      padding: 12px;
       border-radius: 16px;
-      border: 1px solid rgba(16,185,129,0.22);
-      background: rgba(16,185,129,0.12);
-      color: rgba(183,255,227,0.98);
-      font-weight: 900;
-      line-height: 1.4;
+      border: 1px solid rgba(16,185,129,.22);
+      background: rgba(16,185,129,.12);
+      color: rgba(183,255,227,.98);
+      font-weight: 1000;
+      line-height:1.4;
     }
 
-    .feat-list { margin-top: 14px; padding-left: 0; list-style: none; }
-    .feat-list li {
+    .feat{
+      list-style:none; margin-top: 14px; padding-left: 0;
+    }
+    .feat li{
       padding: 9px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      color: var(--text-light);
-      display:flex; gap: 10px; align-items: flex-start;
-      font-size: .96rem;
-      line-height: 1.45;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      color: var(--tl);
+      display:flex; gap:10px; align-items:flex-start;
+      font-size:.96rem; line-height:1.45;
     }
-    .feat-list li:last-child { border-bottom: none; }
-    .feat-list li::before { content: "✓"; color: var(--success); font-weight: 1100; }
+    .feat li:last-child{ border-bottom:none; }
+    .feat li::before{ content:"✓"; color: var(--success); font-weight: 1100; }
 
-    .pricing-cta {
+    .cta-big{
       margin-top: 14px;
       width: 100%;
-      justify-content: center;
+      justify-content:center;
       padding: 14px 16px;
       background: linear-gradient(45deg, #10b981, #f59e0b);
-      box-shadow: 0 18px 55px rgba(16,185,129,0.18);
-      font-weight: 1100;
+      box-shadow: 0 18px 55px rgba(16,185,129,.18);
+      font-weight:1100;
     }
-    .pricing-cta:hover { transform: translateY(-2px); box-shadow: 0 22px 70px rgba(16,185,129,0.26); }
+    .cta-big:hover{ transform: translateY(-2px); box-shadow: 0 22px 70px rgba(16,185,129,.26); }
 
-    .guarantee {
-      margin-top: 10px;
-      color: rgba(183,255,227,0.95);
-      font-weight: 900;
-      font-size: .92rem;
-    }
-    .micro {
-      margin-top: 8px;
-      color: var(--text-muted);
-      font-size: .9rem;
-      line-height: 1.5;
-    }
-
-    /* right side: objections + compact testimonials */
-    .side {
-      display: grid;
-      gap: 12px;
-    }
-    .card {
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.03);
-      padding: 16px;
-    }
-    .card h4 {
-      font-size: 1rem;
-      letter-spacing: -0.2px;
-      font-weight: 1100;
-      margin-bottom: 8px;
-      color: var(--text-light);
-    }
-    .card p { color: var(--text-muted); font-size: .94rem; line-height: 1.6; }
-    .quote { color: var(--text-light); font-style: italic; font-size: .94rem; line-height: 1.55; }
-    .who { margin-top: 10px; color: var(--primary); font-weight: 1000; font-size: .85rem; }
+    .side{ display:grid; gap: 12px; }
+    .side p{ color: var(--tm); font-size:.94rem; line-height:1.6; }
+    .quote{ color: var(--tl); font-style:italic; font-size:.94rem; line-height:1.55; }
+    .who{ margin-top: 10px; color: var(--primary); font-weight:1100; font-size:.85rem; }
 
     /* ===== FAQ ===== */
-    .faq-grid {
+    .faq{
       max-width: 920px;
       margin: 0 auto;
-      display: grid;
+      display:grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
       margin-top: 18px;
     }
-    details {
+    details{
       border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
       padding: 14px;
       backdrop-filter: blur(10px);
     }
-    summary {
-      cursor: pointer;
-      list-style: none;
-      font-weight: 1100;
-      color: var(--text-light);
-      font-size: .98rem;
+    summary{
+      cursor:pointer;
+      list-style:none;
+      font-weight:1100;
+      color: var(--tl);
+      font-size:.98rem;
     }
-    summary::-webkit-details-marker { display:none; }
-    details p { margin-top: 10px; color: var(--text-muted); font-size: .94rem; line-height: 1.65; }
+    summary::-webkit-details-marker{ display:none; }
+    details p{ margin-top: 10px; color: var(--tm); font-size:.94rem; line-height:1.65; }
 
-    /* ===== CTA BAND ===== */
-    .cta-band {
-      border-top: 1px solid rgba(255,255,255,0.06);
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      background: radial-gradient(900px 280px at 20% 50%, rgba(0,217,255,0.12), transparent 60%),
-                  radial-gradient(900px 280px at 80% 50%, rgba(99,102,241,0.12), transparent 60%),
-                  rgba(255,255,255,0.02);
-      padding: 46px 0;
+    /* ===== Footer ===== */
+    footer{
+      padding: 44px 0;
+      border-top: 1px solid rgba(255,255,255,.06);
+      color: var(--tm);
+      text-align:center;
+      background: rgba(255,255,255,.01);
     }
-    .cta-band .wrap {
-      display:flex; flex-wrap: wrap; gap: 14px;
-      align-items: center; justify-content: space-between;
-    }
-    .cta-band h3 { font-size: 1.35rem; letter-spacing: -0.3px; font-weight: 1100; }
-    .cta-band p { color: var(--text-muted); max-width: 60ch; }
+    footer img{ height: 30px; filter: drop-shadow(0 3px 8px rgba(0,217,255,.12)); }
 
-    /* ===== FOOTER ===== */
-    footer {
-      padding: 46px 0;
-      border-top: 1px solid rgba(255,255,255,0.06);
-      color: var(--text-muted);
-      text-align: center;
-      background: rgba(255,255,255,0.01);
-    }
-    footer img { height: 30px; filter: drop-shadow(0 3px 8px rgba(0, 217, 255, 0.12)); }
-
-    /* ===== STICKY PRICE BAR (always show value) ===== */
-    .sticky-bar {
-      position: fixed;
-      left: 0; right: 0; bottom: 0;
+    /* ===== Sticky price bar (always show value, no repetition) ===== */
+    .page-pad{ padding-bottom: 86px; }
+    .sticky-bar{
+      position: fixed; left: 0; right: 0; bottom: 0;
       z-index: 9999;
-      background: rgba(10,14,39,0.86);
-      border-top: 1px solid rgba(255,255,255,0.10);
+      background: rgba(10,14,39,.86);
+      border-top: 1px solid rgba(255,255,255,.10);
       backdrop-filter: blur(12px);
       padding: 10px 12px;
     }
-    .sticky-inner {
-      max-width: 1180px;
+    .sticky-inner{
+      max-width: 1120px;
       margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
     }
-    .sticky-left {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      min-width: 0;
-    }
-    .sticky-title {
-      font-weight: 1000;
-      letter-spacing: -0.2px;
-      color: var(--text-light);
-      font-size: .92rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .sticky-left{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+    .sticky-title{
+      font-weight:1100; letter-spacing:-.2px;
+      color: var(--tl);
+      font-size:.92rem;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
       max-width: 56vw;
     }
-    .sticky-price {
-      display: flex;
-      gap: 10px;
-      align-items: baseline;
-      flex-wrap: wrap;
-    }
-    .sticky-old { text-decoration: line-through; color: rgba(239,68,68,0.95); font-weight: 900; font-size: .9rem; }
-    .sticky-now { color: rgba(183,255,227,0.98); font-weight: 1100; font-size: 1.2rem; }
-    .sticky-cta {
+    .sticky-price{ display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; }
+    .sticky-old{ text-decoration:line-through; color: rgba(239,68,68,.95); font-weight:1100; font-size:.9rem; }
+    .sticky-now{ color: rgba(183,255,227,.98); font-weight:1100; font-size:1.2rem; }
+    .sticky-cta{
       padding: 12px 14px;
       border-radius: 12px;
-      font-weight: 1100;
+      font-weight:1100;
       background: linear-gradient(45deg, #10b981, #f59e0b);
       color: #08101f;
-      border: none;
-      cursor: pointer;
-      white-space: nowrap;
-      box-shadow: 0 12px 40px rgba(16,185,129,0.16);
+      border:none;
+      cursor:pointer;
+      white-space:nowrap;
+      box-shadow: 0 12px 40px rgba(16,185,129,.16);
       transition: transform .2s ease, box-shadow .2s ease;
     }
-    .sticky-cta:hover { transform: translateY(-1px); box-shadow: 0 16px 55px rgba(16,185,129,0.24); }
+    .sticky-cta:hover{ transform: translateY(-1px); box-shadow: 0 16px 55px rgba(16,185,129,.24); }
 
-    /* add bottom padding so content doesn't hide behind sticky bar */
-    .page-pad { padding-bottom: 86px; }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 980px) {
-      .hero-grid { grid-template-columns: 1fr; }
-      .proof-strip { grid-template-columns: 1fr; }
-      .ba-grid { grid-template-columns: 1fr; }
-      .steps { grid-template-columns: 1fr; }
-      .benefits { grid-template-columns: 1fr; }
-      .pricing-wrap { grid-template-columns: 1fr; }
-      .faq-grid { grid-template-columns: 1fr; }
-      .hero h1 { font-size: 2.2rem; }
-      .cta-band .wrap { justify-content: center; text-align: center; }
-      .cta-band .wrap > div { width: 100%; }
-      .cta-band .wrap .btn { width: 100%; max-width: 460px; }
+    /* ===== Responsive ===== */
+    @media (max-width: 980px){
+      .hero-grid{ grid-template-columns: 1fr; }
+      .proof-row{ grid-template-columns: 1fr; }
+      .steps{ grid-template-columns: 1fr; }
+      .pricing-wrap{ grid-template-columns: 1fr; }
+      .faq{ grid-template-columns: 1fr; }
+      .hero h1{ font-size: 2.2rem; }
     }
-
-    @media (max-width: 480px) {
-      header.hero { padding: 38px 0 22px; }
-      .hero h1 { font-size: 1.85rem; }
-      .hero p.lead { font-size: 1.0rem; }
-      .btn { width: 100%; }
-      .hero-actions { width: 100%; }
-      .sticky-title { max-width: 52vw; }
+    @media (max-width: 480px){
+      header.hero{ padding: 38px 0 22px 0; }
+      .hero h1{ font-size: 1.82rem; }
+      .btn{ width: 100%; }
+      .sticky-title{ max-width: 52vw; }
     }
   </style>
 </head>
@@ -655,8 +453,8 @@
     <!-- ===== HERO ===== -->
     <header class="hero" id="topo">
       <div class="container">
-        <div class="logo-header">
-          <img src="https://i.ibb.co/wFFzDMy9/tunecraft-logo-transparente.png" alt="TuneCraft Logo" />
+        <div class="brand">
+          <img src="https://i.ibb.co/wFFzDMy9/tunecraft-logo-transparente.png" alt="TuneCraft" />
         </div>
 
         <div style="display:flex; justify-content:center;">
@@ -666,63 +464,55 @@
         <div class="hero-grid">
           <!-- LEFT -->
           <div>
-            <h1>O presente mais fácil de acertar: uma música que só faz sentido pra ela(e).</h1>
+            <h1>Um presente que acerta sem você “inventar moda”.</h1>
 
             <p class="lead">
-              Você conta histórias reais, piadas internas e momentos marcantes. A gente transforma isso em uma música
-              com voz e arranjo — com a “cara” da pessoa.
+              Você conta histórias reais (cenas, apelidos, piadas internas). A TuneCraft transforma isso em uma música
+              com voz e arranjo — com a cara da pessoa.
             </p>
 
-            <p class="promise">
-              ⚡ <b>Áudio em até 10 minutos</b> após você aprovar a letra.
-            </p>
+            <div class="promise">⚡ Música em até <b>10 minutos</b> após aprovação da letra.</div>
 
             <div class="hero-actions">
-              <button class="btn btn-primary" onclick="document.getElementById('preco').scrollIntoView({behavior:'smooth'})">
-                Criar minha música por <span style="opacity:.95;">R$ 49,90</span>
+              <button class="btn btn-primary" onclick="goToCheckoutWithTheme()">
+                Criar minha música por R$ 49,90
               </button>
-              <button class="btn btn-ghost" onclick="document.getElementById('como-fica').scrollIntoView({behavior:'smooth'})">
-                Ver como fica na prática
+              <button class="btn btn-ghost" onclick="document.getElementById('preco').scrollIntoView({behavior:'smooth'})">
+                Ver detalhes e preço
               </button>
             </div>
 
-            <div class="hero-meta">
-              <div class="chip">✅ Você aprova a letra antes do áudio</div>
+            <div class="chips">
+              <div class="chip">✅ Você aprova a letra antes</div>
               <div class="chip">🛡️ Garantia 30 dias</div>
               <div class="chip">🎧 MP3 + WAV</div>
             </div>
 
-            <div class="proof-strip">
-              <div class="proof-box">
-                <div class="k">10 min</div>
-                <div class="v">Após a aprovação, o áudio sai rápido (sem enrolação).</div>
+            <div class="proof-row">
+              <div class="proof">
+                <div class="k">Sem “template”</div>
+                <div class="v">Detalhes reais → letra com a identidade da pessoa.</div>
               </div>
-              <div class="proof-box">
-                <div class="k">Controle</div>
-                <div class="v">A letra é revisada com você — nada de “surpresa ruim”.</div>
+              <div class="proof">
+                <div class="k">Sob controle</div>
+                <div class="v">Você aprova a letra antes do áudio final.</div>
               </div>
-              <div class="proof-box">
-                <div class="k">Memória</div>
-                <div class="v">Feita pra tocar no parabéns e guardar de lembrança.</div>
+              <div class="proof">
+                <div class="k">Rápido</div>
+                <div class="v">Aprovou? Em até 10 minutos você recebe a música.</div>
               </div>
-            </div>
-
-            <div class="topline">
-              <span>Preço de hoje: <b style="color:rgba(183,255,227,0.98);">R$ 49,90</b></span>
-              <span>•</span>
-              <span>Antes: <span style="text-decoration:line-through;color:rgba(239,68,68,0.95);font-weight:900;">R$ 99,90</span></span>
             </div>
           </div>
 
-          <!-- RIGHT -->
-          <div class="hero-card">
-            <div class="badge">▶ Exemplo (curto) • só pra você entender o “clima”</div>
-            <h3>Ouça um trecho de demonstração</h3>
+          <!-- RIGHT (demo + micro-proof) -->
+          <div class="card">
+            <div class="badge">▶ Ouça um trecho (exemplo curto)</div>
+            <h3>Entenda o “clima” em 20 segundos</h3>
 
             <div class="demo">
-              <div class="row">
-                <div class="title">Exemplo: “Aniversário (Pop leve)”</div>
-                <div class="tag">~20s</div>
+              <div class="demo-top">
+                <div class="demo-title">Exemplo: “Aniversário (Pop leve)”</div>
+                <div class="demo-tag">~20s</div>
               </div>
 
               <!-- Troque o src pelo seu mp3 real quando tiver -->
@@ -731,21 +521,9 @@
                 Seu navegador não suporta áudio.
               </audio>
 
-              <div class="note">
-                Não é “música genérica”. O segredo está nas referências reais que você coloca no chat.
-                <br />Preço atual: <b style="color:rgba(183,255,227,0.98);">R$ 49,90</b>.
-              </div>
-            </div>
-
-            <div class="mini-proof">
-              <div class="proof-item">
-                <div class="q">“Isso vai ficar com cara de template?”</div>
-                <div class="a">Você aprova a letra antes — e ajusta o tom, frases e referências até ficar “com a cara” da pessoa.</div>
-              </div>
-
-              <div class="proof-item">
-                <div class="q">“Preciso escrever bonito?”</div>
-                <div class="a">Não. O chat te guia com perguntas simples pra extrair os detalhes certos.</div>
+              <div class="mini-proof">
+                <p><b>Você não precisa escrever bem.</b> O chat te guia com perguntas simples.</p>
+                <p><b>Não fica genérico.</b> Você ajusta e aprova a letra antes do áudio.</p>
               </div>
             </div>
           </div>
@@ -754,152 +532,45 @@
       </div>
     </header>
 
-    <!-- ===== COMO FICA NA PRÁTICA (BEFORE/AFTER) ===== -->
-    <section class="section" id="como-fica">
+    <!-- ===== COMO FUNCIONA (enxuto) ===== -->
+    <section class="section" id="como-funciona">
       <div class="container">
-        <div class="h2">Como fica na prática</div>
-        <div class="section-desc">
-          O que você envia é simples. O que você recebe tem “cara de música” — e fica pronto rápido.
-          <br />Preço sempre visível: <b style="color:rgba(183,255,227,0.98);">R$ 49,90</b>.
-        </div>
-
-        <div class="ba-grid">
-          <div class="panel">
-            <div class="title">📝 Você envia (no chat)</div>
-            <ul>
-              <li>Quem é a pessoa e como vocês se chamam</li>
-              <li>2–3 histórias marcantes (cenas reais)</li>
-              <li>1 piada interna / bordão / apelido</li>
-              <li>O “clima”: romântico, divertido, emocionante, etc.</li>
-              <li>Estilo musical (pop, MPB, sertanejo, acústico…)</li>
-            </ul>
-            <div class="small">Sem texto longo. É conversa guiada.</div>
-          </div>
-
-          <div class="panel">
-            <div class="title">🎧 Você recebe</div>
-            <ul>
-              <li>Letra sob medida (você aprova antes)</li>
-              <li>Áudio final com voz e arranjo</li>
-              <li>Arquivos em <b>MP3 + WAV</b></li>
-              <li><b>Áudio em até 10 minutos</b> após aprovação</li>
-            </ul>
-            <div class="small">Ideal pra tocar no parabéns e gravar a reação.</div>
-          </div>
-        </div>
-
-        <div style="margin-top:22px; display:flex; justify-content:center;">
-          <button class="btn btn-primary" onclick="document.getElementById('preco').scrollIntoView({behavior:'smooth'})">
-            Criar agora por R$ 49,90
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== COMO FUNCIONA (3 steps) ===== -->
-    <section class="section" style="background: rgba(255,255,255,0.01);" id="como-funciona">
-      <div class="container">
-        <div class="h2">Simples, rápido e sob controle</div>
-        <div class="section-desc">
-          Um fluxo direto: você inicia, conta a história, aprova a letra — e o áudio sai em seguida.
-          <br />Preço atual: <b style="color:rgba(183,255,227,0.98);">R$ 49,90</b>.
-        </div>
+        <div class="h2">Como funciona</div>
+        <div class="desc">Fluxo curto. Sem enrolação. Você mantém o controle.</div>
 
         <div class="steps">
           <div class="step">
             <div class="n">1</div>
             <h3>Você inicia o pedido</h3>
-            <p>Pagamento e cadastro rápidos — isso libera o chat de criação.</p>
+            <p>Pagamento e cadastro rápidos liberam o chat.</p>
           </div>
           <div class="step">
             <div class="n">2</div>
             <h3>Conta detalhes reais</h3>
-            <p>Piadas internas, cenas, apelidos e o estilo. O chat te guia (sem complicar).</p>
+            <p>Histórias, apelidos, piadas internas e o estilo musical.</p>
           </div>
           <div class="step">
             <div class="n">3</div>
             <h3>Você aprova a letra</h3>
-            <p>Aprovou? A gente gera o áudio — <b style="color:rgba(183,255,227,0.98);">em até 10 minutos</b> após a aprovação.</p>
+            <p>Aprovou? Geramos o áudio — em até <b style="color:rgba(183,255,227,.98);">10 minutos</b>.</p>
           </div>
         </div>
 
-        <div class="cta-band" style="margin-top: 28px; border-radius: 18px;">
-          <div class="container" style="padding:0 20px;">
-            <div class="wrap">
-              <div>
-                <h3>Pronto pra resolver o presente hoje?</h3>
-                <p>Você aprova a letra primeiro. Depois disso, o áudio sai rápido. Sem estresse.</p>
-              </div>
-              <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
-                <button class="btn btn-primary" onclick="document.getElementById('preco').scrollIntoView({behavior:'smooth'})">
-                  Criar por R$ 49,90
-                </button>
-                <button class="btn btn-ghost" onclick="startThemeChatForTest()">
-                  Testar chat (dev)
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- ===== BENEFITS (premium bullets) ===== -->
-    <section class="section" id="beneficios">
-      <div class="container">
-        <div class="h2">Por que isso converte (e surpreende)</div>
-        <div class="section-desc">
-          Não é “efeito especial”. É estrutura: detalhes reais + controle na aprovação + entrega rápida.
-          <br />Preço atual: <b style="color:rgba(183,255,227,0.98);">R$ 49,90</b>.
-        </div>
-
-        <div class="benefits">
-          <div class="benefit">
-            <div class="icon">🎯</div>
-            <div class="txt"><b>Sem clichês</b> Você decide o que entra e o que não entra. A música fica com a cara da pessoa.</div>
-          </div>
-          <div class="benefit">
-            <div class="icon">🧩</div>
-            <div class="txt"><b>Detalhes únicos</b> Apelidos, cenas e referências reais — isso é o que faz a pessoa “sentir” a música.</div>
-          </div>
-          <div class="benefit">
-            <div class="icon">✅</div>
-            <div class="txt"><b>Você aprova antes</b> Ajusta tom, frases e clima antes de gerar o áudio final.</div>
-          </div>
-          <div class="benefit">
-            <div class="icon">⚡</div>
-            <div class="txt"><b>Rápido de verdade</b> <b style="color:rgba(183,255,227,0.98);">Áudio em até 10 minutos</b> após aprovação.</div>
-          </div>
-          <div class="benefit">
-            <div class="icon">🎧</div>
-            <div class="txt"><b>Qualidade</b> Arquivo em MP3 + WAV, pronto pra festa e pra guardar.</div>
-          </div>
-          <div class="benefit">
-            <div class="icon">🛡️</div>
-            <div class="txt"><b>Garantia 30 dias</b> Se não fizer sentido pra você, não faz sentido a gente ficar com seu dinheiro.</div>
-          </div>
-        </div>
-
-        <div style="margin-top:22px; display:flex; justify-content:center;">
-          <button class="btn btn-primary" onclick="document.getElementById('preco').scrollIntoView({behavior:'smooth'})">
-            Quero criar por R$ 49,90
-          </button>
+        <div style="margin-top: 18px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="goToCheckoutWithTheme()">Criar por R$ 49,90</button>
+          <button class="btn btn-ghost" onclick="startThemeChatForTest()">Testar chat (dev)</button>
         </div>
       </div>
     </section>
 
-    <!-- ===== PRICING ===== -->
-    <section class="section" id="preco" style="background: rgba(255,255,255,0.01);">
+    <!-- ===== PREÇO (single focus) ===== -->
+    <section class="section" id="preco" style="background: rgba(255,255,255,.01);">
       <div class="container">
-        <div class="h2">Tudo pronto por um preço simples</div>
-        <div class="section-desc">
-          Uma música exclusiva, feita sob medida — com entrega rápida após a aprovação.
-          <br />Preço atual: <b style="color:rgba(183,255,227,0.98);">R$ 49,90</b>.
-        </div>
+        <div class="h2">Preço e entrega</div>
+        <div class="desc">Tudo que você precisa saber antes de clicar.</div>
 
         <div class="pricing-wrap">
-          <div class="pricing-card">
+          <div class="pricing">
             <div class="top">
               <h3>Single de Aniversário</h3>
               <div class="label">Condição atual</div>
@@ -911,110 +582,88 @@
               <span class="off">50% OFF</span>
             </div>
 
-            <div class="callout">⚡ Áudio em até 10 minutos após aprovação da letra.</div>
+            <div class="callout">⚡ Música em até 10 minutos após aprovação da letra.</div>
 
-            <ul class="feat-list">
+            <ul class="feat">
               <li>Música 100% original e exclusiva</li>
               <li>Letra sob medida (você aprova antes)</li>
               <li>Voz e estilo escolhidos</li>
               <li>MP3 + WAV (qualidade de estúdio)</li>
             </ul>
 
-            <button class="btn pricing-cta" onclick="goToCheckoutWithTheme()">
-              Criar minha música por R$ 49,90
-            </button>
-
-            <div class="guarantee">✓ Garantia 30 dias</div>
-            <div class="micro">Dica: muita gente toca no parabéns e grava a reação (fica inesquecível).</div>
+            <button class="btn cta-big" onclick="goToCheckoutWithTheme()">Criar minha música por R$ 49,90</button>
+            <div style="margin-top:10px; color: rgba(183,255,227,.95); font-weight: 1000; font-size:.92rem;">
+              ✓ Garantia 30 dias
+            </div>
           </div>
 
           <div class="side">
             <div class="card">
-              <h4>Objeções que a gente resolve</h4>
-              <p><b style="color:var(--text-light);">“Vai ficar genérico?”</b> Você aprova a letra antes do áudio final.</p>
-              <p style="margin-top:8px;"><b style="color:var(--text-light);">“Preciso escrever bem?”</b> Não. O chat te conduz.</p>
-              <p style="margin-top:8px;"><b style="color:var(--text-light);">“Dá tempo?”</b> Aprovou a letra, sai em até 10 minutos.</p>
-              <p style="margin-top:10px;">Preço atual: <b style="color:rgba(183,255,227,0.98);">R$ 49,90</b>.</p>
+              <div class="quote">“Tocou no parabéns e todo mundo entendeu a referência. Foi o momento mais comentado.”</div>
+              <div class="who">Rafael M. — Aniversário da namorada</div>
             </div>
 
             <div class="card">
-              <div class="quote">“A música citou uma viagem e um apelido que só a gente usa. Parecia que alguém nos conhecia.”</div>
+              <div class="quote">“A música citou um apelido que só a gente usa. Parecia que alguém nos conhecia.”</div>
               <div class="who">Mariana C. — Aniversário do esposo</div>
             </div>
 
             <div class="card">
-              <div class="quote">“Tocou no parabéns e todo mundo entendeu a referência. Foi o momento mais comentado.”</div>
-              <div class="who">Rafael M. — Aniversário da namorada</div>
+              <p><b style="color:var(--tl);">Por que funciona?</b> Porque não depende de “bom gosto”.
+                Depende de detalhes reais — e você aprova antes do áudio final.</p>
             </div>
           </div>
         </div>
-
       </div>
     </section>
 
-    <!-- ===== FAQ ===== -->
+    <!-- ===== FAQ (curto) ===== -->
     <section class="section" id="faq">
       <div class="container">
-        <div class="h2">Dúvidas rápidas</div>
-        <div class="section-desc">
-          Objetivo: você se sentir seguro antes de clicar.
-          <br />Preço atual: <b style="color:rgba(183,255,227,0.98);">R$ 49,90</b>.
-        </div>
+        <div class="h2">Perguntas rápidas</div>
+        <div class="desc">Poucas, mas as que importam.</div>
 
-        <div class="faq-grid">
+        <div class="faq">
           <details>
-            <summary>O que significa “10 minutos após aprovação”?</summary>
-            <p>Você aprova a letra primeiro. A partir dessa aprovação, a geração do áudio é rápida — em até 10 minutos.</p>
+            <summary>“10 minutos” é garantido?</summary>
+            <p>Após você aprovar a letra, a geração do áudio é rápida — em até 10 minutos.</p>
           </details>
 
           <details>
-            <summary>Posso pedir ajustes na letra antes do áudio?</summary>
-            <p>Sim. Você revisa e pode pedir mudanças no tom, frases e referências. Só depois disso a gente gera o áudio final.</p>
+            <summary>Posso pedir ajustes na letra?</summary>
+            <p>Sim. Você revisa e pede mudanças antes do áudio final.</p>
           </details>
 
           <details>
-            <summary>Preciso mandar um texto pronto?</summary>
-            <p>Não. O chat guia a conversa com perguntas simples para coletar detalhes reais e montar a letra.</p>
+            <summary>Preciso mandar texto pronto?</summary>
+            <p>Não. O chat te guia com perguntas simples.</p>
           </details>
 
           <details>
-            <summary>Quais arquivos eu recebo?</summary>
-            <p>Você recebe a música em MP3 e WAV (qualidade de estúdio), pronta para tocar e compartilhar.</p>
-          </details>
-
-          <details>
-            <summary>E se eu não gostar?</summary>
-            <p>Você tem 30 dias de garantia. Se não fizer sentido pra você, não faz sentido a gente ficar com seu dinheiro.</p>
-          </details>
-
-          <details>
-            <summary>Qual o valor mesmo?</summary>
-            <p>O preço atual é <b style="color:rgba(183,255,227,0.98);">R$ 49,90</b> (antes era R$ 99,90).</p>
+            <summary>O que eu recebo?</summary>
+            <p>Áudio final em MP3 + WAV (qualidade de estúdio).</p>
           </details>
         </div>
 
-        <div style="margin-top:22px; display:flex; justify-content:center;">
-          <button class="btn btn-primary" onclick="goToCheckoutWithTheme()">
-            Criar agora por R$ 49,90
-          </button>
+        <div style="margin-top: 18px; display:flex; justify-content:center;">
+          <button class="btn btn-primary" onclick="goToCheckoutWithTheme()">Criar por R$ 49,90</button>
         </div>
       </div>
     </section>
 
-    <!-- ===== FOOTER ===== -->
     <footer>
       <div class="container">
         <div style="margin-bottom: 14px;">
           <img src="https://i.ibb.co/wFFzDMy9/tunecraft-logo-transparente.png" alt="TuneCraft" />
         </div>
-        <div class="muted">Dados seguros • Garantia 30 dias</div>
+        <div>Dados seguros • Garantia 30 dias</div>
         <div style="margin-top: 10px; opacity: .85;">© 2026 TuneCraft. Todos os direitos reservados.</div>
       </div>
     </footer>
 
-  </div><!-- page-pad -->
+  </div>
 
-  <!-- ===== STICKY PRICE BAR (always show value) ===== -->
+  <!-- ===== Sticky (always show value, no page repetition) ===== -->
   <div class="sticky-bar" role="region" aria-label="Preço e CTA fixos">
     <div class="sticky-inner">
       <div class="sticky-left">
@@ -1029,7 +678,6 @@
   </div>
 
   <script>
-    // ===== Config da landing =====
     const LANDING_THEME_ID = "birthday";
     const LANDING_THEME_LABEL = "Aniversário";
 
@@ -1049,18 +697,12 @@
       persistLandingAttribution();
       localStorage.setItem("tunecraft_preselected_themeId", LANDING_THEME_ID);
 
-      if (typeof openChat === "function") {
-        openChat();
-      } else {
-        alert("Função openChat() não encontrada. Verifique se chat.js foi carregado.");
-      }
+      if (typeof openChat === "function") openChat();
+      else alert("Função openChat() não encontrada. Verifique se chat.js foi carregado.");
     }
   </script>
 
-  <!-- Supabase (mantido) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <!-- seu chat -->
   <script src="chat.js?v=2026-01-25T17:24"></script>
 </body>
 </html>
