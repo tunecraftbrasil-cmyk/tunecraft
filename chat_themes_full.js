@@ -106,8 +106,8 @@ elaboratedChatFlow = [
         { label: "🎸 MPB", value: "mpb" }, { label: "🤠 Sertanejo", value: "sertanejo" }, { label: "🎤 Pop", value: "pop" },
         { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" },
         { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }
+        ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
     { step: "306.5", section: "CASAMENTO", condition: (d) => d.step_0 === "proposal" && d.step_307 === "other", question: "Qual outro estilo musical você tem em mente?", type: "input", placeholder: "Ex: Funk, Eletrônico, Jazz, Bossa Nova...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
-    ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
     { step: 307, section: "CASAMENTO", condition: (d) => d.step0 === "proposal", question: "Qual impacto emocional você quer que essa música cause? 💖", type: "select", options: [
         { label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" },
         { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }
