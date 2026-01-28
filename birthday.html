@@ -22,7 +22,7 @@
       --shadow: 0 18px 60px rgba(0,0,0,.35);
     }
 
-    html{ scroll-behavior: smooth; }
+    html{ scroll-behavior:smooth; }
     body{
       font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
       line-height:1.55;
@@ -58,7 +58,7 @@
     }
 
     .brand{ display:flex; justify-content:center; }
-    .brand img{ height:54px; }
+    .brand img{ height:54px; filter: drop-shadow(0 10px 20px rgba(0,217,255,.14)); }
 
     .pill{
       margin:14px auto 0;
@@ -73,24 +73,25 @@
 
     .hero-grid{
       display:grid;
-      grid-template-columns:1fr 1fr;
+      grid-template-columns:1.1fr .9fr;
       gap:24px;
       margin-top:24px;
       align-items:center;
     }
 
     h1{
-      font-size:2.4rem;
+      font-size:2.35rem;
       line-height:1.1;
       font-weight:1100;
       margin-bottom:12px;
+      letter-spacing:-.4px;
     }
 
     .lead{
       color:var(--tl);
       font-size:1.05rem;
       margin-bottom:14px;
-      max-width:55ch;
+      max-width:58ch;
     }
 
     .promise{
@@ -98,7 +99,7 @@
       border:1px solid rgba(16,185,129,.25);
       padding:12px 14px;
       border-radius:14px;
-      font-weight:900;
+      font-weight:1000;
       color:#b7ffe3;
       margin-bottom:16px;
     }
@@ -120,7 +121,7 @@
 
     .card{
       background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.1);
+      border:1px solid rgba(255,255,255,.10);
       border-radius:18px;
       padding:18px;
       box-shadow:var(--shadow);
@@ -128,64 +129,171 @@
 
     audio{ width:100%; margin-top:10px; }
 
-    /* PREÇO */
-    .pricing{
-      border:1px solid rgba(0,217,255,.35);
-      background:linear-gradient(135deg,rgba(0,217,255,.1),rgba(99,102,241,.07));
-      border-radius:20px;
-      padding:22px;
-      max-width:520px;
-      margin:0 auto;
-      text-align:center;
-      box-shadow:0 30px 90px rgba(0,217,255,.12);
+    /* PRICING + HOW (SIDE) */
+    .price-how-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:18px;
+      align-items:stretch;
+      margin-top:10px;
     }
 
-    .old{ text-decoration:line-through; color:#ef4444; font-weight:900; }
-    .now{ font-size:2.1rem; font-weight:1100; color:#b7ffe3; }
-    .off{ color:#f59e0b; font-weight:900; }
+    .pricing{
+      border:1px solid rgba(0,217,255,.35);
+      background:linear-gradient(135deg,rgba(0,217,255,.10),rgba(99,102,241,.07));
+      border-radius:20px;
+      padding:22px;
+      text-align:center;
+      box-shadow:0 30px 90px rgba(0,217,255,.12);
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:14px;
+    }
 
-    ul{ list-style:none; margin-top:14px; text-align:left; }
-    li{ margin-bottom:8px; color:var(--tl); }
-    li::before{ content:"✓ "; color:var(--success); font-weight:900; }
+    .pricing h2{ font-size:1.35rem; letter-spacing:-.2px; }
+
+    .old{ text-decoration:line-through; color:#ef4444; font-weight:1000; }
+    .now{ font-size:2.15rem; font-weight:1100; color:#b7ffe3; letter-spacing:-.4px; }
+    .off{ color:#f59e0b; font-weight:1000; }
+
+    .bullets{ list-style:none; text-align:left; display:grid; gap:8px; }
+    .bullets li{ color:var(--tl); }
+    .bullets li::before{ content:"✓ "; color:var(--success); font-weight:1000; }
+
+    .howbox{
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:20px;
+      padding:22px;
+      box-shadow:var(--shadow);
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .howbox h3{
+      font-size:1.25rem;
+      font-weight:1100;
+      letter-spacing:-.2px;
+    }
+
+    .how-steps{
+      display:grid;
+      gap:10px;
+    }
+    .hs{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.02);
+    }
+    .hs .n{
+      width:30px; height:30px;
+      border-radius:10px;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:1100;
+      color:var(--tl);
+      background:rgba(0,217,255,.10);
+      border:1px solid rgba(0,217,255,.18);
+      flex:0 0 auto;
+      margin-top:2px;
+    }
+    .hs b{ color:var(--tl); font-weight:1100; }
+    .hs p{ color:var(--tm); font-size:.95rem; line-height:1.55; margin-top:2px; }
+
+    .micro{
+      border-top:1px solid rgba(255,255,255,.08);
+      padding-top:12px;
+      display:grid;
+      gap:8px;
+      color:var(--tm);
+      font-size:.95rem;
+      line-height:1.55;
+    }
+    .micro strong{ color:var(--tl); }
 
     /* FAQ */
+    .faq-wrap{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:18px;
+      align-items:start;
+    }
+
+    .faq-head{
+      margin-bottom:14px;
+    }
+    .faq-head h2{
+      text-align:left;
+      font-size:1.55rem;
+      letter-spacing:-.3px;
+      margin-bottom:6px;
+    }
+    .faq-head p{ color:var(--tm); }
+
     details{
       background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.1);
+      border:1px solid rgba(255,255,255,.10);
       border-radius:14px;
       padding:14px;
     }
-    summary{ cursor:pointer; font-weight:900; }
-    details p{ margin-top:8px; color:var(--tm); }
+    details + details{ margin-top:10px; }
 
-    /* STICKY */
+    summary{ cursor:pointer; font-weight:1100; color:var(--tl); }
+    details p{ margin-top:8px; color:var(--tm); line-height:1.7; }
+
+    .faq-side{
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:18px;
+      padding:18px;
+      box-shadow:var(--shadow);
+    }
+    .faq-side h3{ font-size:1.1rem; letter-spacing:-.2px; margin-bottom:10px; }
+    .faq-side .mini{
+      display:grid; gap:10px;
+      color:var(--tm);
+      line-height:1.6;
+      font-size:.95rem;
+    }
+    .faq-side .mini b{ color:var(--tl); }
+
+    /* Sticky */
+    .pad-bottom{ padding-bottom: 92px; }
     .sticky{
       position:fixed;
       bottom:0; left:0; right:0;
       background:rgba(10,14,39,.9);
       backdrop-filter:blur(12px);
-      border-top:1px solid rgba(255,255,255,.1);
+      border-top:1px solid rgba(255,255,255,.10);
       padding:12px;
       display:flex;
       justify-content:space-between;
       align-items:center;
       z-index:999;
     }
+    .sticky small{ color:var(--tm); }
 
-    @media(max-width:900px){
+    @media(max-width:980px){
       .hero-grid{ grid-template-columns:1fr; }
-      h1{ font-size:1.8rem; }
+      h1{ font-size:1.85rem; }
       .btn-primary{ width:100%; }
+      .price-how-grid{ grid-template-columns:1fr; }
+      .faq-wrap{ grid-template-columns:1fr; }
     }
   </style>
 </head>
 
-<body>
+<body class="pad-bottom">
 
 <header>
   <div class="container">
     <div class="brand">
-      <img src="https://i.ibb.co/wFFzDMy9/tunecraft-logo-transparente.png">
+      <img src="https://i.ibb.co/wFFzDMy9/tunecraft-logo-transparente.png" alt="TuneCraft" />
     </div>
 
     <div class="pill">🎂 Música de Aniversário</div>
@@ -194,21 +302,19 @@
       <div>
         <h1>Um presente diferente, sem risco de errar</h1>
         <p class="lead">
-          Você conta histórias reais. A TuneCraft transforma isso em uma música
-          personalizada, com voz e arranjo profissional.
+          Você conta histórias reais. A TuneCraft transforma isso em uma música personalizada
+          — com letra específica, pronta pra ocasião e fácil de emocionar (ou fazer rir).
         </p>
 
-        <div class="promise">
-          ⚡ Música em até <b>10 minutos</b> após aprovação da letra
-        </div>
+        <div class="promise">⚡ Música em até <b>10 minutos</b> após aprovação da letra</div>
 
         <button class="btn btn-primary" onclick="goToCheckoutWithTheme()">
           Criar minha música por R$ 49,90
         </button>
 
         <div class="chips">
-          <div class="chip">✍️ Você pode pedir ajustes específicos na letra</div>
-          <div class="chip">🎧 Recebe 2 versões da música</div>
+          <div class="chip">✍️ Ajustes específicos na letra antes do áudio</div>
+          <div class="chip">🎧 2 versões finais com a mesma letra</div>
           <div class="chip">🛡️ Garantia 30 dias</div>
         </div>
       </div>
@@ -219,7 +325,7 @@
           <source src="demo-exemplo.mp3" type="audio/mpeg">
         </audio>
         <p style="margin-top:10px;color:var(--tm)">
-          Mesmo clima, mesma letra — no final você escolhe a versão que mais gostar.
+          No final, você recebe duas versões com a mesma letra (interpretação/arranjo diferentes) e escolhe a melhor.
         </p>
       </div>
     </div>
@@ -228,54 +334,176 @@
 
 <section class="section" id="preco">
   <div class="container">
-    <div class="pricing">
-      <h2>Single de Aniversário</h2>
 
-      <p>
-        <span class="old">R$ 99,90</span><br>
-        <span class="now">R$ 49,90</span><br>
-        <span class="off">50% OFF</span>
-      </p>
+    <div class="price-how-grid">
+      <!-- PROMO -->
+      <div class="pricing">
+        <div>
+          <h2>Single de Aniversário</h2>
+          <p style="margin-top:10px">
+            <span class="old">R$ 99,90</span><br>
+            <span class="now">R$ 49,90</span><br>
+            <span class="off">50% OFF</span>
+          </p>
 
-      <ul>
-        <li>Letra personalizada (com ajustes antes do áudio)</li>
-        <li>2 versões finais da música</li>
-        <li>Voz e estilo escolhidos</li>
-        <li>Entrega rápida (até 10 minutos)</li>
-      </ul>
+          <div style="margin-top:12px; color:#b7ffe3; font-weight:1000;">
+            ✓ Entrega rápida • 2 versões • Ajustes na letra
+          </div>
+        </div>
 
-      <button class="btn btn-primary" onclick="goToCheckoutWithTheme()">
-        Criar minha música agora
-      </button>
+        <ul class="bullets">
+          <li>Letra personalizada (com ajustes antes do áudio)</li>
+          <li>2 versões finais da música (mesma letra)</li>
+          <li>Voz e estilo escolhidos</li>
+          <li>Entrega em até 10 minutos após aprovação</li>
+        </ul>
+
+        <button class="btn btn-primary" onclick="goToCheckoutWithTheme()">
+          Criar minha música agora
+        </button>
+      </div>
+
+      <!-- COMO FUNCIONA (AUTOEXPLICATIVO) -->
+      <div class="howbox">
+        <h3>Como fica tão fácil (e tão específico)</h3>
+
+        <div class="how-steps">
+          <div class="hs">
+            <div class="n">1</div>
+            <div>
+              <b>Você só responde perguntas simples</b>
+              <p>Quem é a pessoa, como vocês se chamam, uma história marcante e o “clima” (emocionante ou divertido).</p>
+            </div>
+          </div>
+
+          <div class="hs">
+            <div class="n">2</div>
+            <div>
+              <b>A letra sai com cara de “vocês”</b>
+              <p>Usamos seus detalhes reais para evitar clichês e deixar a letra perfeita para a ocasião.</p>
+            </div>
+          </div>
+
+          <div class="hs">
+            <div class="n">3</div>
+            <div>
+              <b>Você pede ajustes específicos</b>
+              <p>Mudar um verso, incluir uma frase, trocar um apelido, ajustar o tom… você aprova a versão final.</p>
+            </div>
+          </div>
+
+          <div class="hs">
+            <div class="n">4</div>
+            <div>
+              <b>Recebe 2 versões da música</b>
+              <p>Mesma letra, duas interpretações/arranjos. Você escolhe a que mais combina com a festa.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="micro">
+          <div><strong>Dica:</strong> mesmo sem saber “escrever música”, o chat te guia e encaixa tudo no ritmo certo.</div>
+          <div><strong>Resultado:</strong> letra funcional pra tocar na hora do parabéns e fazer sentido pra quem conhece a história.</div>
+        </div>
+      </div>
     </div>
+
   </div>
 </section>
 
-<section class="section">
+<section class="section" id="faq">
   <div class="container">
-    <h2 style="text-align:center;margin-bottom:20px">Perguntas frequentes</h2>
+    <div class="faq-wrap">
 
-    <details>
-      <summary>Posso pedir mudanças na letra?</summary>
-      <p>Sim. Você pode pedir ajustes específicos antes de aprovar a versão final.</p>
-    </details>
+      <div>
+        <div class="faq-head">
+          <h2>Perguntas frequentes</h2>
+          <p>Sem pegadinha. Só o que realmente importa antes de comprar.</p>
+        </div>
 
-    <details>
-      <summary>Como funcionam as 2 versões?</summary>
-      <p>A letra é a mesma. O que muda é interpretação/arranjo para você escolher.</p>
-    </details>
+        <details>
+          <summary>O que eu preciso mandar para começar?</summary>
+          <p>
+            Só informações simples: nome da pessoa, relação de vocês, 1–2 histórias marcantes, apelidos/piadas internas e o clima da música (emocionante ou divertida).
+            Se você não tiver tudo, pode responder o básico — a letra ainda sai boa e você ajusta depois.
+          </p>
+        </details>
 
-    <details>
-      <summary>Quanto tempo demora?</summary>
-      <p>Após aprovação da letra, o áudio é gerado em até 10 minutos.</p>
-    </details>
+        <details>
+          <summary>Que tipo de “alterações específicas” eu posso pedir na letra?</summary>
+          <p>
+            Mudanças pontuais como: trocar uma frase, incluir uma lembrança, ajustar um verso para ficar mais engraçado/emocionante, remover algo que não quer citar,
+            alterar apelidos, nomes, datas, lugares ou a forma de chamar a pessoa. Você aprova a letra final antes de gerar o áudio.
+          </p>
+        </details>
+
+        <details>
+          <summary>Como funcionam as 2 versões finais?</summary>
+          <p>
+            A letra é a mesma. O que muda é a interpretação/arranjo (por exemplo: uma mais “leve e romântica”, outra mais “animada”).
+            Assim você escolhe a versão ideal para tocar na festa ou mandar no WhatsApp.
+          </p>
+        </details>
+
+        <details>
+          <summary>Em quanto tempo fica pronto?</summary>
+          <p>
+            Depois que você aprova a letra, geramos o áudio em até <b>10 minutos</b>.
+            Se você pedir ajustes antes, isso só adiciona o tempo da sua revisão (você controla).
+          </p>
+        </details>
+
+        <details>
+          <summary>Vai ficar genérico?</summary>
+          <p>
+            A ideia é exatamente o contrário: a letra gira em torno dos seus detalhes reais.
+            Quanto mais específico (uma cena, um apelido, uma história), mais a música fica com “cara de vocês”.
+            E como você aprova a letra, nada vai para o áudio final sem você gostar.
+          </p>
+        </details>
+
+        <details>
+          <summary>O que eu recebo no final?</summary>
+          <p>
+            Você recebe a música pronta em <b>MP3 + WAV</b> e com <b>2 versões</b> (mesma letra). Perfeito para tocar na festa e também enviar por mensagem.
+          </p>
+        </details>
+
+        <details>
+          <summary>E se eu não gostar?</summary>
+          <p>
+            Você tem <b>30 dias de garantia</b>. E antes do áudio final, você ainda pode ajustar a letra até ficar do jeito certo.
+          </p>
+        </details>
+
+        <div style="margin-top:16px;">
+          <button class="btn btn-primary" style="width:100%" onclick="goToCheckoutWithTheme()">
+            Criar minha música por R$ 49,90
+          </button>
+        </div>
+      </div>
+
+      <aside class="faq-side">
+        <h3>O que normalmente dá “cara de presente perfeito”</h3>
+        <div class="mini">
+          <div><b>1 detalhe específico</b> (uma cena real)</div>
+          <div><b>1 apelido</b> ou piada interna</div>
+          <div><b>1 momento marcante</b> (viagem, conquista, fase)</div>
+          <div><b>1 tom certo</b> (emociona ou diverte)</div>
+          <div style="border-top:1px solid rgba(255,255,255,.08); padding-top:10px;">
+            Com isso, a letra fica “funcional”: faz sentido na hora do parabéns e também quando a pessoa ouve sozinha depois.
+          </div>
+        </div>
+      </aside>
+
+    </div>
   </div>
 </section>
 
 <div class="sticky">
   <div>
     <b>R$ 49,90</b><br>
-    <small style="color:var(--tm)">2 versões • até 10 min</small>
+    <small>2 versões • ajustes na letra • até 10 min</small>
   </div>
   <button class="btn btn-primary" onclick="goToCheckoutWithTheme()">Criar agora</button>
 </div>
