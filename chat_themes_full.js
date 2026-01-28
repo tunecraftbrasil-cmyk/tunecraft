@@ -37,7 +37,7 @@ elaboratedChatFlow = [
         { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" },
         { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }
     ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "109.5", section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday" && d.step_109 === "other", question: "Qual outro estilo musical você tem em mente?", type: "input", placeholder: "Ex: Funk, Eletrônico, Jazz, Samba...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: "109.5", section: "ANIVERSÁRIO", condition: (d) => d.step0 === "birthday" && d.step109 === "other", question: "Qual outro estilo musical você tem em mente?", type: "input", placeholder: "Ex: Funk, Eletrônico, Jazz, Samba...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
     { step: 110, section: "ANIVERSÁRIO", condition: (d) => d.step0 === "birthday", question: "Qual impacto emocional você quer que essa música cause? 💖", type: "select", options: [
         { label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" },
         { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }
@@ -49,7 +49,7 @@ elaboratedChatFlow = [
         { label: "🇧🇷 Português (BR)", value: "pt_br" }, { label: "🇺🇸 Inglês", value: "en" }, { label: "🇪🇸 Espanhol", value: "es" },
         { label: "🇮🇹 Italiano", value: "it" }, { label: "🌍 Outro", value: "other" }
     ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "112.5", section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday" && d.step_112 === "other", question: "Qual outro idioma você prefere?", type: "input", placeholder: "Ex.: Francês, Alemão, Holandês...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: "112.5", section: "ANIVERSÁRIO", condition: (d) => d.step0 === "birthday" && d.step112 === "other", question: "Qual outro idioma você prefere?", type: "input", placeholder: "Ex.: Francês, Alemão, Holandês...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
     { step: 113, section: "ANIVERSÁRIO", condition: (d) => d.step0 === "birthday", question: "Qual tipo de voz você prefere ouvir cantando? 🎙️", type: "select", options: [
         { label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" },
         { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" },
@@ -73,7 +73,7 @@ elaboratedChatFlow = [
         { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" },
         { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }
     ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "208.5", section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration" && d.step_209 === "other", question: "Qual outro estilo musical você tem em mente?", type: "input", placeholder: "Ex: Funk, Eletrônico, Jazz, Bossa Nova...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: "208.5", section: "DECL. AMOR", condition: (d) => d.step0 === "love_declaration" && d.step208 === "other", question: "Qual outro estilo musical você tem em mente?", type: "input", placeholder: "Ex: Funk, Eletrônico, Jazz, Bossa Nova...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
     { step: 209, section: "DECL. AMOR", condition: (d) => d.step0 === "love_declaration", question: "Que tipo de impacto emocional você quer causar com essa declaração? 💖", type: "select", options: [
         { label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" },
         { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }
@@ -85,7 +85,7 @@ elaboratedChatFlow = [
         { label: "🇧🇷 PT-BR", value: "pt_br" }, { label: "🇺🇸 EN", value: "en" }, { label: "🇪🇸 ES", value: "es" },
         { label: "🇮🇹 IT", value: "it" }, { label: "🌍 Outro", value: "other" }
     ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "211.5", section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration" && d.step_212 === "other", question: "Qual outro idioma você prefere?", type: "input", placeholder: "Ex.: Francês, Alemão, Holandês...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: "211.5", section: "DECL. AMOR", condition: (d) => d.step0 === "love_declaration" && d.step211 === "other", question: "Qual outro idioma você prefere?", type: "input", placeholder: "Ex.: Francês, Alemão, Holandês...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
     { step: 212, section: "DECL. AMOR", condition: (d) => d.step0 === "love_declaration", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
         { label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" },
         { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" },
@@ -107,7 +107,7 @@ elaboratedChatFlow = [
         { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" },
         { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }
         ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "306.5", section: "CASAMENTO", condition: (d) => d.step_0 === "proposal" && d.step_307 === "other", question: "Qual outro estilo musical você tem em mente?", type: "input", placeholder: "Ex: Funk, Eletrônico, Jazz, Bossa Nova...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: "306.5", section: "CASAMENTO", condition: (d) => d.step0 === "proposal" && d.step306 === "other", question: "Qual outro estilo musical você tem em mente?", type: "input", placeholder: "Ex: Funk, Eletrônico, Jazz, Bossa Nova...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
     { step: 307, section: "CASAMENTO", condition: (d) => d.step0 === "proposal", question: "Qual impacto emocional você quer que essa música cause? 💖", type: "select", options: [
         { label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" },
         { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }
@@ -119,7 +119,7 @@ elaboratedChatFlow = [
         { label: "🇧🇷 PT-BR", value: "pt_br" }, { label: "🇺🇸 EN", value: "en" }, { label: "🇪🇸 ES", value: "es" },
         { label: "🇮🇹 IT", value: "it" }, { label: "🌍 Outro", value: "other" }
     ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "309.5", section: "CASAMENTO", condition: (d) => d.step_0 === "proposal" && d.step_310 === "other", question: "Qual outro idioma você prefere?", type: "input", placeholder: "Ex.: Francês, Alemão, Holandês...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: "309.5", section: "CASAMENTO", condition: (d) => d.step0 === "proposal" && d.step309 === "other", question: "Qual outro idioma você prefere?", type: "input", placeholder: "Ex.: Francês, Alemão, Holandês...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
     { step: 310, section: "CASAMENTO", condition: (d) => d.step0 === "proposal", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
         { label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" },
         { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" },
@@ -148,7 +148,7 @@ elaboratedChatFlow = [
         { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" },
         { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }
     ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "409.5", section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_405 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: "409.5", section: "FILHO", condition: (d) => d.step0 === "birth_child" && d.step409 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
     { step: 410, section: "FILHO", condition: (d) => d.step0 === "birth_child" && d.step4 === "life_song", question: "Qual impacto emocional você quer que essa música cause? 💖", type: "select", options: [
         { label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" },
         { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }
@@ -160,7 +160,7 @@ elaboratedChatFlow = [
         { label: "🇧🇷 PT-BR", value: "pt_br" }, { label: "🇺🇸 EN", value: "en" }, { label: "🇪🇸 ES", value: "es" },
         { label: "🇮🇹 IT", value: "it" }, { label: "🌍 Outro", value: "other" }
     ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "412.5", section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_408 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: "412.5", section: "FILHO", condition: (d) => d.step0 === "birth_child" && d.step412 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
     { step: 413, section: "FILHO", condition: (d) => d.step0 === "birth_child" && d.step4 === "life_song", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
         { label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" },
         { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" },
@@ -187,7 +187,7 @@ elaboratedChatFlow = [
         { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" },
         { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }
     ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "419.5", section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_405 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: "419.5", section: "NINAR", condition: (d) => d.step0 === "birth_child" && d.step419 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
     { step: 420, section: "NINAR", condition: (d) => d.step0 === "birth_child" && d.step4 === "lullaby", question: "Qual impacto emocional você quer? 💖", type: "select", options: [
         { label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" },
         { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }
@@ -199,7 +199,7 @@ elaboratedChatFlow = [
         { label: "🇧🇷 PT-BR", value: "pt_br" }, { label: "🇺🇸 EN", value: "en" }, { label: "🇪🇸 ES", value: "es" },
         { label: "🇮🇹 IT", value: "it" }, { label: "🌍 Outro", value: "other" }
     ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "422.5", section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_408 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: "422.5", section: "NINAR", condition: (d) => d.step0 === "birth_child" && d.step422 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
     { step: 423, section: "NINAR", condition: (d) => d.step0 === "birth_child" && d.step4 === "lullaby", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
         { label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" },
         { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" },
@@ -227,7 +227,7 @@ elaboratedChatFlow = [
         { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" },
         { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }
     ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "508.5", section: "NETO", condition: (d) => d.step_0 === "birth_child" && d.step_405 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: "508.5", section: "NETO", condition: (d) => d.step0 === "birth_child" && d.step508 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
     { step: 509, section: "NETO", condition: (d) => d.step0 === "birth_grandchild", question: "Qual impacto emocional você quer? 💖", type: "select", options: [
         { label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" },
         { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }
@@ -239,7 +239,7 @@ elaboratedChatFlow = [
         { label: "🇧🇷 PT-BR", value: "pt_br" }, { label: "🇺🇸 EN", value: "en" }, { label: "🇪🇸 ES", value: "es" },
         { label: "🇮🇹 IT", value: "it" }, { label: "🌍 Outro", value: "other" }
     ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "511.5", section: "NETO", condition: (d) => d.step_0 === "birth_grandchild" && d.step_408 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: "511.5", section: "NETO", condition: (d) => d.step0 === "birth_grandchild" && d.step511 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
     { step: 512, section: "NETO", condition: (d) => d.step0 === "birth_grandchild", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
         { label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" },
         { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" },
@@ -265,7 +265,7 @@ elaboratedChatFlow = [
         { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" },
         { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }
     ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "608.5", section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute" && d.step_405 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: "608.5", section: "HOMENAGEM", condition: (d) => d.step0 === "tribute" && d.step608 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
     { step: 609, section: "HOMENAGEM", condition: (d) => d.step0 === "tribute", question: "Qual impacto emocional você quer? 💖", type: "select", options: [
         { label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" },
         { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }
@@ -277,7 +277,7 @@ elaboratedChatFlow = [
         { label: "🇧🇷 PT-BR", value: "pt_br" }, { label: "🇺🇸 EN", value: "en" }, { label: "🇪🇸 ES", value: "es" },
         { label: "🇮🇹 IT", value: "it" }, { label: "🌍 Outro", value: "other" }
     ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "611.5", section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute" && d.step_408 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: "611.5", section: "HOMENAGEM", condition: (d) => d.step0 === "tribute" && d.step611 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
     { step: 612, section: "HOMENAGEM", condition: (d) => d.step0 === "tribute", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
         { label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" },
         { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" },
@@ -301,7 +301,7 @@ elaboratedChatFlow = [
         { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" },
         { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }
     ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "708.5", section: "AMIZADE", condition: (d) => d.step_0 === "friendship" && d.step_405 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: "708.5", section: "AMIZADE", condition: (d) => d.step0 === "friendship" && d.step708 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
     { step: 709, section: "AMIZADE", condition: (d) => d.step0 === "friendship", question: "Qual impacto emocional você quer? 💖", type: "select", options: [
         { label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" },
         { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }
@@ -313,7 +313,7 @@ elaboratedChatFlow = [
         { label: "🇧🇷 PT-BR", value: "pt_br" }, { label: "🇺🇸 EN", value: "en" }, { label: "🇪🇸 ES", value: "es" },
         { label: "🇮🇹 IT", value: "it" }, { label: "🌍 Outro", value: "other" }
     ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "711.5", section: "FILHO", condition: (d) => d.step_0 === "friendship" && d.step_408 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: "711.5", section: "FILHO", condition: (d) => d.step0 === "friendship" && d.step711 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
     { step: 712, section: "AMIZADE", condition: (d) => d.step0 === "friendship", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
         { label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" },
         { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" },
@@ -339,7 +339,7 @@ elaboratedChatFlow = [
         { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" },
         { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }
     ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "808.5", section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate" && d.step_405 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: "808.5", section: "CORPORATIVO", condition: (d) => d.step0 === "corporate" && d.step808 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
     { step: 809, section: "CORPORATIVO", condition: (d) => d.step0 === "corporate", question: "Qual impacto emocional você quer? 💖", type: "select", options: [
         { label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" },
         { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }
@@ -351,7 +351,7 @@ elaboratedChatFlow = [
         { label: "🇧🇷 PT-BR", value: "pt_br" }, { label: "🇺🇸 EN", value: "en" }, { label: "🇪🇸 ES", value: "es" },
         { label: "🇮🇹 IT", value: "it" }, { label: "🌍 Outro", value: "other" }
     ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "811.5", section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate" && d.step_408 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: "811.5", section: "CORPORATIVO", condition: (d) => d.step0 === "corporate" && d.step811 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
     { step: 812, section: "CORPORATIVO", condition: (d) => d.step0 === "corporate", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
         { label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" },
         { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" },
@@ -379,7 +379,7 @@ elaboratedChatFlow = [
         { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" },
         { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }
     ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "909.5", section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer" && d.step_405 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: "909.5", section: "ORAÇÃO", condition: (d) => d.step0 === "prayer" && d.step909 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
     { step: 910, section: "ORAÇÃO", condition: (d) => d.step0 === "prayer", question: "Qual impacto emocional você quer? 💖", type: "select", options: [
         { label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" },
         { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }
@@ -388,7 +388,7 @@ elaboratedChatFlow = [
         { label: "🇧🇷 PT-BR", value: "pt_br" }, { label: "🇺🇸 EN", value: "en" }, { label: "🇪🇸 ES", value: "es" },
         { label: "🇮🇹 IT", value: "it" }, { label: "🌍 Outro", value: "other" }
     ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "911.5", section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer" && d.step_408 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: "911.5", section: "ORAÇÃO", condition: (d) => d.step0 === "prayer" && d.step911 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
     { step: 912, section: "ORAÇÃO", condition: (d) => d.step0 === "prayer", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
         { label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" },
         { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" },
@@ -418,7 +418,7 @@ elaboratedChatFlow = [
         { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" },
         { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }
     ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "1010.5", section: "FILGRAVIDEZHO", condition: (d) => d.step_0 === "pregnancy_announcement" && d.step_405 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: "1010.5", section: "FILGRAVIDEZHO", condition: (d) => d.step0 === "pregnancy_announcement" && d.step1010 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
     { step: 1011, section: "GRAVIDEZ", condition: (d) => d.step0 === "pregnancy_announcement", question: "Qual impacto emocional você quer? 💖", type: "select", options: [
         { label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" },
         { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }
@@ -430,7 +430,7 @@ elaboratedChatFlow = [
         { label: "🇧🇷 PT-BR", value: "pt_br" }, { label: "🇺🇸 EN", value: "en" }, { label: "🇪🇸 ES", value: "es" },
         { label: "🇮🇹 IT", value: "it" }, { label: "🌍 Outro", value: "other" }
     ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "1013.5", section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement" && d.step_408 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: "1013.5", section: "GRAVIDEZ", condition: (d) => d.step0 === "pregnancy_announcement" && d.step1013 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
     { step: 1014, section: "GRAVIDEZ", condition: (d) => d.step0 === "pregnancy_announcement", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
         { label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" },
         { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" },
@@ -456,7 +456,7 @@ elaboratedChatFlow = [
         { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" },
         { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }
     ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "1109.5", section: "OUTRO", condition: (d) => d.step_0 === "other" && d.step_405 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: "1109.5", section: "OUTRO", condition: (d) => d.step0 === "other" && d.step1109 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
     { step: 1110, section: "OUTRO", condition: (d) => d.step0 === "other", question: "Qual impacto emocional você quer? 💖", type: "select", options: [
         { label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" },
         { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }
@@ -468,7 +468,7 @@ elaboratedChatFlow = [
         { label: "🇧🇷 PT-BR", value: "pt_br" }, { label: "🇺🇸 EN", value: "en" }, { label: "🇪🇸 ES", value: "es" },
         { label: "🇮🇹 IT", value: "it" }, { label: "🌍 Outro", value: "other" }
     ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "1112.5", section: "OUTRO", condition: (d) => d.step_0 === "other" && d.step_408 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: "1112.5", section: "OUTRO", condition: (d) => d.step0 === "other" && d.step1112 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
     { step: 1113, section: "OUTRO", condition: (d) => d.step0 === "other", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
         { label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" },
         { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" },
@@ -478,18 +478,18 @@ elaboratedChatFlow = [
 
 
     // ===== TEMA 1: PET 
-    { step: 1200, section: "PET", condition: (d) => d.step_0 === "pet", question: "Qual é o nome do seu pet?", type: "input", placeholder: "Ex: Nome...", minLength: 1, metadata: { fieldName: "recipient.name", required: true } },
-    { step: 1201, section: "PET", condition: (d) => d.step_0 === "pet", question: "Que animal é seu pet?", type: "input", placeholder: "Ex: Cachorro, gato, etc...", minLength: 2, metadata: { fieldName: "ai_metadata.relationship", required: true } },
-    { step: 1202, section: "PET", condition: (d) => d.step_0 === "pet", question: "Cite algumas características especiais do seu pet.", type: "textarea", placeholder: "Ex: Personalidade...", minLength: 15, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
-    { step: 1203, section: "PET", condition: (d) => d.step_0 === "pet", question: "Conte algumas memórias marcantes sua com seu pet?", type: "textarea", placeholder: "Ex: Momentos...", minLength: 15, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
-    { step: 1204, section: "PET", condition: (d) => d.step_0 === "pet", question: "Escreva uma mensagem pro seu pet.", type: "textarea", placeholder: "Ex: O que quer dizer...", minLength: 15, metadata: { fieldName: "lyricDetails.withYouI", required: true } },
-    { step: 1205, section: "PET", condition: (d) => d.step_0 === "pet", question: "Qual estilo musical combina? 🎸", type: "select", options: [{ label: "🎸 MPB", value: "mpb" }, { label: "🤠 Sertanejo", value: "sertanejo" }, { label: "🎤 Pop", value: "pop" }, { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" }, { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "1205.5", section: "PET", condition: (d) => d.step_0 === "pet" && d.step_805 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
-    { step: 1206, section: "PET", condition: (d) => d.step_0 === "pet", question: "Que tipo de impacto emocional você gostaria que a música trouxesse", type: "select", options: [{ label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" }, { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }], metadata: { fieldName: "musicStyle.mood", required: true } },
-    { step: 1207, section: "PET", condition: (d) => d.step_0 === "pet", question: "Qual tipo de movimento você prefere? ⚡", type: "select", options: [{ label: "🌊 Calma", value: "calm" }, { label: "⚖️ Equilibrada", value: "balanced" }, { label: "📈 Intensa", value: "intense" }, { label: "🧘 Meditativa", value: "meditative" }], metadata: { fieldName: "musicStyle.tempo", required: true } },
-    { step: 1208, section: "PET", condition: (d) => d.step_0 === "pet", question: "Em qual idioma você prefere a letra? 🌍", type: "select", options: [{ label: "🇧🇷 Português", value: "pt_br" }, { label: "🇺🇸 Inglês", value: "en" }, { label: "🇪🇸 Espanhol", value: "es" }, { label: "🇮🇹 Italiano", value: "it" }, { label: "🌍 Outro", value: "other" }], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "1208.5", section: "PET", condition: (d) => d.step_0 === "pet" && d.step_808 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
-    { step: 1209, section: "PET", condition: (d) => d.step_0 === "pet", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [{ label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" }, { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" }, { label: "🎵 Dueto", value: "duo" }, { label: "👥 Coral", value: "choir" }], metadata: { fieldName: "productionDetails.vocalApproach", required: true } }
+    { step: 1200, section: "PET", condition: (d) => d.step0 === "pet", question: "Qual é o nome do seu pet?", type: "input", placeholder: "Ex: Nome...", minLength: 1, metadata: { fieldName: "recipient.name", required: true } },
+    { step: 1201, section: "PET", condition: (d) => d.step0 === "pet", question: "Que animal é seu pet?", type: "input", placeholder: "Ex: Cachorro, gato, etc...", minLength: 2, metadata: { fieldName: "ai_metadata.relationship", required: true } },
+    { step: 1202, section: "PET", condition: (d) => d.step0 === "pet", question: "Cite algumas características especiais do seu pet.", type: "textarea", placeholder: "Ex: Personalidade...", minLength: 15, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
+    { step: 1203, section: "PET", condition: (d) => d.step0 === "pet", question: "Conte algumas memórias marcantes sua com seu pet?", type: "textarea", placeholder: "Ex: Momentos...", minLength: 15, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
+    { step: 1204, section: "PET", condition: (d) => d.step0 === "pet", question: "Escreva uma mensagem pro seu pet.", type: "textarea", placeholder: "Ex: O que quer dizer...", minLength: 15, metadata: { fieldName: "lyricDetails.withYouI", required: true } },
+    { step: 1205, section: "PET", condition: (d) => d.step0 === "pet", question: "Qual estilo musical combina? 🎸", type: "select", options: [{ label: "🎸 MPB", value: "mpb" }, { label: "🤠 Sertanejo", value: "sertanejo" }, { label: "🎤 Pop", value: "pop" }, { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" }, { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
+    { step: "1205.5", section: "PET", condition: (d) => d.step0 === "pet" && d.step1205 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: 1206, section: "PET", condition: (d) => d.step0 === "pet", question: "Que tipo de impacto emocional você gostaria que a música trouxesse", type: "select", options: [{ label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" }, { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }], metadata: { fieldName: "musicStyle.mood", required: true } },
+    { step: 1207, section: "PET", condition: (d) => d.step0 === "pet", question: "Qual tipo de movimento você prefere? ⚡", type: "select", options: [{ label: "🌊 Calma", value: "calm" }, { label: "⚖️ Equilibrada", value: "balanced" }, { label: "📈 Intensa", value: "intense" }, { label: "🧘 Meditativa", value: "meditative" }], metadata: { fieldName: "musicStyle.tempo", required: true } },
+    { step: 1208, section: "PET", condition: (d) => d.step0 === "pet", question: "Em qual idioma você prefere a letra? 🌍", type: "select", options: [{ label: "🇧🇷 Português", value: "pt_br" }, { label: "🇺🇸 Inglês", value: "en" }, { label: "🇪🇸 Espanhol", value: "es" }, { label: "🇮🇹 Italiano", value: "it" }, { label: "🌍 Outro", value: "other" }], metadata: { fieldName: "lyricDetails.language", required: true } },
+    { step: "1208.5", section: "PET", condition: (d) => d.step0 === "pet" && d.step1208 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: 1209, section: "PET", condition: (d) => d.step0 === "pet", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [{ label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" }, { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" }, { label: "🎵 Dueto", value: "duo" }, { label: "👥 Coral", value: "choir" }], metadata: { fieldName: "productionDetails.vocalApproach", required: true } }
 ];
 
 console.log('✅ CHAT_THEMES_12_TEMAS_COMPLETO.js carregado!');
