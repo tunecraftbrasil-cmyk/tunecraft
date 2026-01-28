@@ -1210,60 +1210,26 @@ draftsContainer.innerHTML += `
     }
 
     async function irParaCheckout(pedidoId) {
-  try {
-    if (!pedidoId) {
-      console.error("❌ Pedido ID não fornecido");
-      showToast("❌ Erro: ID do pedido não encontrado", "error");
-      return;
-    }
+      try {
+        localStorage.setItem('tuneCraft_pendingOrderId', pedidoId);
+        localStorage.setItem('tuneCraft_checkoutEmail', userData.email);
+        localStorage.setItem('tuneCraft_checkoutName', userData.name);
 
-    console.log("💳 Iniciando checkout para pedido:", pedidoId);
 
-    let userData = JSON.parse(localStorage.getItem("tuneCraftUser")) || {};
-    
-    if (!userData.email || !userData.name) {
-      const { data, error } = await sb.auth.getSession();
-      
-      if (error || !data?.session?.user) {
-        console.error("❌ Sessão inválida");
-        showToast("❌ Erro: Sessão expirada. Faça login novamente.", "error");
-        window.location.href = "login.html";
-        return;
+        console.log("💳 Redirecionando para checkout:", pedidoId);
+        showToast("Redirecionando para checkout...", "info");
+
+
+        setTimeout(() => {
+          window.location.href = 'checkout.html';
+        }, 500);
+
+
+      } catch (error) {
+        console.error("Erro ao redirecionar:", error);
+        showToast(`❌ Erro: ${error.message}`, "error");
       }
-
-      const session = data.session;
-      userData = {
-        email: session.user.email || "",
-        name: session.user.user_metadata?.full_name || "Usuário",
-        user_id: session.user.id
-      };
-
-      localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
     }
-
-    if (!userData.email) {
-      showToast("❌ Erro: Email não encontrado. Faça login novamente.", "error");
-      window.location.href = "login.html";
-      return;
-    }
-
-    localStorage.setItem("tuneCraft_pendingOrderId", pedidoId);
-    localStorage.setItem("tuneCraft_checkoutEmail", userData.email);
-    localStorage.setItem("tuneCraft_checkoutName", userData.name);
-
-    console.log("💳 Redirecionando para checkout:", pedidoId);
-    showToast("🔄 Redirecionando para checkout...", "info");
-
-    setTimeout(() => {
-      window.location.href = "checkout.html";
-    }, 600);
-
-  } catch (error) {
-    console.error("❌ ERRO em irParaCheckout:", error);
-    showToast(`❌ ${error.message}`, "error");
-  }
-}
-
 
     function abrirModalAlteracao(pedidoId) {
       currentAlterandoId = pedidoId;
