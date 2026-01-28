@@ -1,5 +1,6 @@
 // ============================================
 // CHAT_THEMES_COMPLETO.JS - TODOS OS 12 TEMAS
+// COM HINTS (ADENDO CONTEXTUAL)
 // ============================================
 
 elaboratedChatFlow = [
@@ -7,7 +8,8 @@ elaboratedChatFlow = [
     { 
         step: 0, 
         section: "TEMA", 
-        question: "Qual é o tema da música que você quer criar? 🎵", 
+        question: "Qual é o tema da música que você quer criar?",
+        hint: "",
         type: "select", 
         options: [
             { label: "🎂 Aniversário", value: "birthday" },
@@ -27,599 +29,185 @@ elaboratedChatFlow = [
     },
 
     // ===== TEMA 1: ANIVERSÁRIO (100-114) =====
-    { step: 100, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Como essa pessoa se chama? 👤", type: "input", placeholder: "Ex.: Aline (Lili), João (Jô)", minLength: 2, metadata: { fieldName: "recipient.name", required: true } },
-    { step: 101, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Qual é a relação com você? 💝", type: "input", placeholder: "Ex.: namorado(a), esposo(a), amigo(a)…", minLength: 2, metadata: { fieldName: "ai_metadata.relationship", required: true } },
-    { step: 102, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Como é a sua história com essa pessoa? 📖", type: "textarea", placeholder: "Nos conhecemos na faculdade…", minLength: 15, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
-    { step: 103, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "De que ponto de vista você quer contar essa história? 🎤", type: "select", options: [
-        { label: "💬 Para essa pessoa", value: "second_person" }, 
-        { label: "🌍 Sobre ela", value: "third_person" }, 
-        { label: "🔄 Misto", value: "mixed" }
-    ], metadata: { fieldName: "ai_metadata.pov", required: true } },
-    { step: 104, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Conte uma cena real de vocês 🎬", type: "textarea", placeholder: "Concreta, onde estavam, o que aconteceu…", minLength: 20, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
-    { step: 105, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "3 palavras não-clichês para descrever essa pessoa 📝", type: "input", placeholder: "Ex.: teimosa do bem, riso fácil", minLength: 5, metadata: { fieldName: "recipient.personality", required: true } },
-    { step: 106, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Um detalhe secreto ou piada interna entre vocês 🤫", type: "input", placeholder: "Piada interna, apelido…", minLength: 3, metadata: { fieldName: "lyricDetails.secretDetail", required: true } },
-    { step: 107, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "O que mais você admira nessa pessoa? ⭐", type: "textarea", placeholder: "Específico, não genérico…", minLength: 15, metadata: { fieldName: "recipient.specialCharacteristics", required: true } },
-    { step: 108, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Qual seu desejo para o futuro dessa pessoa? 🌟", type: "textarea", placeholder: "Planos, sonhos…", minLength: 15, metadata: { fieldName: "final.futureWish", required: true } },
-    { step: 109, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Qual estilo musical combina mais com essa música? 🎸", type: "select", options: [
-        { label: "🎸 MPB", value: "mpb" }, 
-        { label: "🤠 Sertanejo", value: "sertanejo" }, 
-        { label: "🎤 Pop", value: "pop" },
-        { label: "🎺 Acústico", value: "acoustic" }, 
-        { label: "🎸 Rock", value: "rock" }, 
-        { label: "✨ Gospel", value: "gospel" },
-        { label: "🎙️ Rap", value: "rap" }, 
-        { label: "🌌 Outro", value: "other" }
-    ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "109.5", section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday" && d.step_109 === "other", question: "Qual outro estilo musical você tem em mente? 🎸", type: "input", placeholder: "Descreva o estilo…", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
-    { step: 110, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Qual impacto emocional você quer que essa música cause? 💖", type: "select", options: [
-        { label: "😭 Emocionar", value: "emotional" }, 
-        { label: "☮️ Paz", value: "peace" }, 
-        { label: "✨ Arrepio", value: "goosebumps" },
-        { label: "😊 Sorriso", value: "smile" }, 
-        { label: "🌅 Esperança", value: "hope" }, 
-        { label: "💪 Força", value: "strength" }
-    ], metadata: { fieldName: "musicStyle.mood", required: true } },
-    { step: 111, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Qual tipo de movimento você prefere para essa música? ⚡", type: "select", options: [
-        { label: "🌊 Calma", value: "calm" }, 
-        { label: "⚖️ Equilibrada", value: "balanced" }, 
-        { label: "📈 Intensa", value: "intense" }, 
-        { label: "🧘 Meditativa", value: "meditative" }
-    ], metadata: { fieldName: "musicStyle.tempo", required: true } },
-    { step: 112, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Em qual idioma você prefere a letra? 🌍", type: "select", options: [
-        { label: "🇧🇷 Português (BR)", value: "pt_br" }, 
-        { label: "🇺🇸 Inglês", value: "en" }, 
-        { label: "🇪🇸 Espanhol", value: "es" },
-        { label: "🇮🇹 Italiano", value: "it" }, 
-        { label: "🌍 Outro", value: "other" }
-    ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "112.5", section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday" && d.step_112 === "other", question: "Qual outro idioma você prefere? 🌍", type: "input", placeholder: "Ex.: Francês, Alemão…", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
-    { step: 113, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Qual tipo de voz você prefere ouvir cantando? 🎙️", type: "select", options: [
-        { label: "🎙️ Masc. suave", value: "male_soft" }, 
-        { label: "🎙️ Masc. intensa", value: "male_strong" },
-        { label: "🎤 Fem. delicada", value: "female_soft" }, 
-        { label: "🎤 Fem. poderosa", value: "female_strong" },
-        { label: "🎵 Dueto", value: "duo" }, 
-        { label: "👥 Coral", value: "choir" }
-    ], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
-    { step: 114, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "O que você prefere evitar nessa música? 🚫", type: "textarea", placeholder: "Evitar clichês, termos genéricos…", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } },
+    { step: 100, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Como essa pessoa se chama?", hint: "Digite o nome completo ou apelido. Se ela tem um apelido carinhoso, pode usar também (como 'Aline (Lili)' ou 'João (Jô)'). Isso nos ajuda a personalizar a música.", type: "input", placeholder: "Ex.: Aline (Lili), João (Jô)", minLength: 2, metadata: { fieldName: "recipient.name", required: true } },
+    { step: 101, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Qual é a relação com você?", hint: "Quem é essa pessoa para você? Namorado(a)? Esposo(a)? Amigo(a) do coração? Esse contexto ajuda a gente a caprichar na emoção da letra.", type: "input", placeholder: "Ex.: namorado(a), esposo(a), amigo(a), irmão(ã)", minLength: 2, metadata: { fieldName: "ai_metadata.relationship", required: true } },
+    { step: 102, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Como é a sua história com essa pessoa?", hint: "Conte de forma natural como vocês se conheceram e se relacionam. Esse contexto vira o coração da música. Pode falar sobre o começo, como se conheceram, o que os uniu...", type: "textarea", placeholder: "Ex: Nos conhecemos na faculdade durante um projeto... Era noite e...", minLength: 15, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
+    { step: 103, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "De que ponto de vista você quer contar essa história?", hint: "Escolha como prefere que a letra seja escrita:\n• Para essa pessoa: Você fala diretamente com ela ('Você é...')\n• Sobre ela: Você fala dela, na terceira pessoa ('Ela é...')\n• Misto: Um pouco dos dois", type: "select", options: [{ label: "💬 Para essa pessoa", value: "second_person" }, { label: "🌍 Sobre ela", value: "third_person" }, { label: "🔄 Misto", value: "mixed" }], metadata: { fieldName: "ai_metadata.pov", required: true } },
+    { step: 104, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Conte uma cena real de vocês.", hint: "Pense em um momento específico, concreto. Onde estavam? O que vocês estavam fazendo? Qual foi o clima? Detalhes assim fazem a música ficar viva e única.", type: "textarea", placeholder: "Ex: Estávamos na praia ao pôr do sol, você me pegou na mão e disse... ou naquele dia chuvoso quando...", minLength: 20, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
+    { step: 105, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "3 palavras não-clichês para descrever essa pessoa.", hint: "Evite 'legal' ou 'bonita'. Pense em características únicas dela. Como ela é mesmo? Teimosa do bem? Riso fácil? Coração de ouro?", type: "input", placeholder: "Ex.: teimosa do bem, riso fácil, generosa demais", minLength: 5, metadata: { fieldName: "recipient.personality", required: true } },
+    { step: 106, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Um detalhe secreto ou piada interna entre vocês.", hint: "Tem alguma piada que só vocês entendem? Um apelido carinhoso que ninguém mais usa? Uma brincadeira que sempre fazem? Esses detalhes deixam a música muito mais especial e íntima.", type: "input", placeholder: "Ex: Piada interna, apelido secreto, referência que só vocês sabem", minLength: 3, metadata: { fieldName: "lyricDetails.secretDetail", required: true } },
+    { step: 107, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "O que mais você admira nessa pessoa?", hint: "Seja específico e honesto. Não é uma descrição superficial. O que de verdade te impacta nela? O que você acha inspirador ou admirável?", type: "textarea", placeholder: "Ex: Admiro como ela enfrenta os desafios com coragem, como se dedica aos amigos...", minLength: 15, metadata: { fieldName: "recipient.specialCharacteristics", required: true } },
+    { step: 108, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Qual é seu desejo para o futuro dessa pessoa?", hint: "Sonha com algo para ela? Um projeto que ela quer realizar? Uma conquista que você deseja que ela alcance? Conte seus desejos sinceros.", type: "textarea", placeholder: "Ex: Sonho que ela realize seu trabalho dos sonhos, que encontre ainda mais felicidade...", minLength: 15, metadata: { fieldName: "final.futureWish", required: true } },
+    { step: 109, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Qual estilo musical combina mais com essa música?", hint: "Pense no que remete a essa pessoa ou ao momento de vocês. O que faz sentido para ela? MPB para aqueles momentos nostálgicos? Pop para algo mais alegre e moderno?", type: "select", options: [{ label: "🎸 MPB", value: "mpb" }, { label: "🤠 Sertanejo", value: "sertanejo" }, { label: "🎤 Pop", value: "pop" }, { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" }, { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
+    { step: "109.5", section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday" && d.step_109 === "other", question: "Qual outro estilo musical você tem em mente?", hint: "Descreva o estilo que você está pensando. Pode ser uma mistura, algo mais específico, ou um gênero que não está na lista.", type: "input", placeholder: "Ex: Funk, Eletrônico, Jazz, Samba...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: 110, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Qual impacto emocional você quer que essa música cause?", hint: "Como você quer que a pessoa se sinta ouvindo isso? Emocionada até as lágrimas? Sorrindo de orelha a orelha? Em paz consigo mesma?", type: "select", options: [{ label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" }, { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }], metadata: { fieldName: "musicStyle.mood", required: true } },
+    { step: 111, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Qual tipo de movimento você prefere para essa música?", hint: "Você quer algo tranquilo e relaxante? Ou prefere um ritmo que te faz dançar? Algo equilibrado no meio termo?", type: "select", options: [{ label: "🌊 Calma", value: "calm" }, { label: "⚖️ Equilibrada", value: "balanced" }, { label: "📈 Intensa", value: "intense" }, { label: "🧘 Meditativa", value: "meditative" }], metadata: { fieldName: "musicStyle.tempo", required: true } },
+    { step: 112, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Em qual idioma você prefere a letra?", hint: "A música será cantada em qual idioma? Português para que seja mais intimista? Inglês para algo mais universal?", type: "select", options: [{ label: "🇧🇷 Português (BR)", value: "pt_br" }, { label: "🇺🇸 Inglês", value: "en" }, { label: "🇪🇸 Espanhol", value: "es" }, { label: "🇮🇹 Italiano", value: "it" }, { label: "🌍 Outro", value: "other" }], metadata: { fieldName: "lyricDetails.language", required: true } },
+    { step: "112.5", section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday" && d.step_112 === "other", question: "Qual outro idioma você prefere?", hint: "Qual idioma você gostaria? Francês para algo romântico? Alemão para algo mais forte?", type: "input", placeholder: "Ex.: Francês, Alemão, Holandês...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: 113, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "Qual tipo de voz você prefere ouvir cantando?", hint: "Qual timbre combina com a sua música? Uma voz masculina suave? Feminina poderosa? Um dueto que representa os dois?", type: "select", options: [{ label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" }, { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" }, { label: "🎵 Dueto", value: "duo" }, { label: "👥 Coral", value: "choir" }], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
+    { step: 114, section: "ANIVERSÁRIO", condition: (d) => d.step_0 === "birthday", question: "O que você prefere evitar nessa música?", hint: "Tem algo que você não quer que apareça? Clichês demais? Termos genéricos? Nos ajude a caprichar nos detalhes!", type: "textarea", placeholder: "Ex: Evitar clichês como 'você é meu tudo', termos muito genéricos...", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } },
 
     // ===== TEMA 2: DECLARAÇÃO DE AMOR (200-214) =====
-    { step: 200, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Como essa pessoa entrou na sua vida? 💕", type: "textarea", placeholder: "Conte a história…", minLength: 20, metadata: { fieldName: "lyricDetails.origin", required: true } },
-    { step: 201, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "De que ponto de vista você quer fazer essa declaração? 🎤", type: "select", options: [
-        { label: "💬 Para ela", value: "second_person" }, 
-        { label: "🌍 Sobre ela", value: "third_person" }, 
-        { label: "🔄 Misto", value: "mixed" }
-    ], metadata: { fieldName: "ai_metadata.pov", required: true } },
-    { step: 202, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Quando você percebeu que era amor? ⚡", type: "textarea", placeholder: "Momento do 'clique'…", minLength: 15, metadata: { fieldName: "lyricDetails.turningPoint", required: true } },
-    { step: 203, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "O que mudou em você desde que essa pessoa chegou? 🌱", type: "textarea", placeholder: "Transformação…", minLength: 15, metadata: { fieldName: "lyricDetails.transformation", required: true } },
-    { step: 204, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "O que você precisa dizer que ainda não disse? 💭", type: "textarea", placeholder: "Sincero e direto…", minLength: 15, metadata: { fieldName: "lyricDetails.unsaid", required: true } },
-    { step: 205, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Descreva uma cena comum e especial de vocês 🎬", type: "textarea", placeholder: "Momento comum especial…", minLength: 15, metadata: { fieldName: "lyricDetails.simpleScene", required: true } },
-    { step: 206, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Qual é um detalhe secreto ou piada interna entre vocês? 🤫", type: "input", placeholder: "Piada interna…", minLength: 3, metadata: { fieldName: "lyricDetails.secretDetail", required: true } },
-    { step: 207, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Complete a frase: 'Com você eu me sinto / consigo / aprendi a...' ❤️", type: "input", placeholder: "Complete a frase…", minLength: 3, metadata: { fieldName: "lyricDetails.withYouI", required: true } },
-    { step: 209, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Qual estilo musical combina mais com essa declaração? 🎸", type: "select", options: [
-        { label: "🎸 MPB", value: "mpb" }, 
-        { label: "🤠 Sertanejo", value: "sertanejo" }, 
-        { label: "🎤 Pop", value: "pop" },
-        { label: "🎺 Acústico", value: "acoustic" }, 
-        { label: "🎸 Rock", value: "rock" }, 
-        { label: "✨ Gospel", value: "gospel" },
-        { label: "🎙️ Rap", value: "rap" }, 
-        { label: "🌌 Outro", value: "other" }
-    ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "209.5", section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration" && d.step_209 === "other", question: "Qual outro estilo musical você tem em mente? 🎸", type: "input", placeholder: "Descreva o estilo…", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
-    { step: 210, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Que tipo de impacto emocional você quer causar com essa declaração? 💖", type: "select", options: [
-        { label: "😭 Emocionar", value: "emotional" }, 
-        { label: "☮️ Paz", value: "peace" }, 
-        { label: "✨ Arrepio", value: "goosebumps" },
-        { label: "😊 Sorriso", value: "smile" }, 
-        { label: "🌅 Esperança", value: "hope" }, 
-        { label: "💪 Força", value: "strength" }
-    ], metadata: { fieldName: "musicStyle.mood", required: true } },
-    { step: 211, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Qual tipo de movimento você prefere para essa música? ⚡", type: "select", options: [
-        { label: "🌊 Calma", value: "calm" }, 
-        { label: "⚖️ Equilibrada", value: "balanced" }, 
-        { label: "📈 Intensa", value: "intense" }, 
-        { label: "🧘 Meditativa", value: "meditative" }
-    ], metadata: { fieldName: "musicStyle.tempo", required: true } },
-    { step: 212, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Em qual idioma você prefere a letra? 🌍", type: "select", options: [
-        { label: "🇧🇷 PT-BR", value: "pt_br" }, 
-        { label: "🇺🇸 EN", value: "en" }, 
-        { label: "🇪🇸 ES", value: "es" },
-        { label: "🇮🇹 IT", value: "it" }, 
-        { label: "🌍 Outro", value: "other" }
-    ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "212.5", section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration" && d.step_212 === "other", question: "Qual outro idioma você prefere? 🌍", type: "input", placeholder: "Ex.: Francês, Alemão…", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
-    { step: 213, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
-        { label: "🎙️ Masc. suave", value: "male_soft" }, 
-        { label: "🎙️ Masc. intensa", value: "male_strong" },
-        { label: "🎤 Fem. delicada", value: "female_soft" }, 
-        { label: "🎤 Fem. poderosa", value: "female_strong" },
-        { label: "🎵 Dueto", value: "duo" }, 
-        { label: "👥 Coral", value: "choir" }
-    ], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
-    { step: 214, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "O que você prefere evitar nessa música? 🚫", type: "textarea", placeholder: "O que evitar…", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } },
+    { step: 200, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Como essa pessoa entrou na sua vida?", hint: "Conte a história de como vocês se conheceram. Qual foi o contexto? O que fez você reparar nela? Como começou tudo?", type: "textarea", placeholder: "Ex: Nos encontramos em uma festa, foi amor à primeira vista quando... ou Nos conhecemos no trabalho e...", minLength: 20, metadata: { fieldName: "lyricDetails.origin", required: true } },
+    { step: 201, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "De que ponto de vista você quer fazer essa declaração?", hint: "Como você quer se expressar?\n• Para ela: Você fala diretamente com ela ('Te amo porque...')\n• Sobre ela: Você fala dela para os outros ('Ela é...')\n• Misto: Um pouco dos dois", type: "select", options: [{ label: "💬 Para ela", value: "second_person" }, { label: "🌍 Sobre ela", value: "third_person" }, { label: "🔄 Misto", value: "mixed" }], metadata: { fieldName: "ai_metadata.pov", required: true } },
+    { step: 202, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Quando você percebeu que era amor?", hint: "Tem um momento específico em que você pensou 'é, eu amo essa pessoa'? Um olhar? Uma conversa? Um detalhe que fez você entender que era verdadeiro?", type: "textarea", placeholder: "Ex: No dia que ela riu daquele jeito e eu pensei... ou quando ela me ouviu sem julgamentos e...", minLength: 15, metadata: { fieldName: "lyricDetails.turningPoint", required: true } },
+    { step: 203, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "O que mudou em você desde que essa pessoa chegou?", hint: "Como você era antes dela? Como você é agora? Que transformação aconteceu dentro de você?", type: "textarea", placeholder: "Ex: Eu era mais fechado, e com ela aprendi a ser vulnerável... ou ela me inspirou a sonhar maior...", minLength: 15, metadata: { fieldName: "lyricDetails.transformation", required: true } },
+    { step: 204, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "O que você precisa dizer que ainda não disse?", hint: "Tem algo no seu coração que você não consegue colocar em palavras no dia a dia? Medos, esperanças, sonhos que você guarda? Coloque aqui com sinceridade.", type: "textarea", placeholder: "Ex: Tenho medo de te perder... ou sonho em construir uma vida inteira com você...", minLength: 15, metadata: { fieldName: "lyricDetails.unsaid", required: true } },
+    { step: 205, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Descreva uma cena comum e especial de vocês.", hint: "Um momento do dia a dia que te faz feliz. Pode ser algo simples, como um café da manhã juntos, uma brincadeira rotineira, um abraço. O que torna esses momentos especiais?", type: "textarea", placeholder: "Ex: Toda manhã ela faz meu café do jeito que eu gosto... ou quando ela dorme na minha ombro...", minLength: 15, metadata: { fieldName: "lyricDetails.simpleScene", required: true } },
+    { step: 206, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Qual é um detalhe secreto ou piada interna entre vocês?", hint: "Tem alguma piada que só vocês dois sabem? Uma piada que ninguém mais entende? Um ritual que vocês fazem juntos?", type: "input", placeholder: "Ex: Nossa piada sobre aquele dia... ou nosso apelido secreto um do outro...", minLength: 3, metadata: { fieldName: "lyricDetails.secretDetail", required: true } },
+    { step: 207, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Complete a frase: 'Com você eu me sinto / consigo / aprendi a...'", hint: "Termine essa frase com sinceridade. Pode ser:\n• Com você eu me sinto em casa\n• Com você eu consigo ser eu mesmo\n• Com você eu aprendi a amar", type: "input", placeholder: "Ex: completo, inteiro, seguro, verdadeiro...", minLength: 3, metadata: { fieldName: "lyricDetails.withYouI", required: true } },
+    { step: 209, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Qual estilo musical combina mais com essa declaração?", hint: "Que tipo de música representa esse amor? MPB para algo mais poético? Sertanejo para algo mais nostálgico? Pop para algo mais moderno?", type: "select", options: [{ label: "🎸 MPB", value: "mpb" }, { label: "🤠 Sertanejo", value: "sertanejo" }, { label: "🎤 Pop", value: "pop" }, { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" }, { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
+    { step: "209.5", section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration" && d.step_209 === "other", question: "Qual outro estilo musical você tem em mente?", hint: "Descreva o estilo que você está imaginando para essa declaração.", type: "input", placeholder: "Ex: Funk, Eletrônico, Jazz, Bossa Nova...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: 210, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Que tipo de impacto emocional você quer causar com essa declaração?", hint: "Como você quer que ela se sinta ouvindo?\n• Chorar de emoção?\n• Coração acelerado e arrepio?\n• Calma e paz?\n• Riso sincero?\n• Cheia de esperança?", type: "select", options: [{ label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" }, { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }], metadata: { fieldName: "musicStyle.mood", required: true } },
+    { step: 211, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Qual tipo de movimento você prefere para essa música?", hint: "Quer algo calmo e intimista? Ou um ritmo que pulsa e energiza? Algo suave ou envolvente?", type: "select", options: [{ label: "🌊 Calma", value: "calm" }, { label: "⚖️ Equilibrada", value: "balanced" }, { label: "📈 Intensa", value: "intense" }, { label: "🧘 Meditativa", value: "meditative" }], metadata: { fieldName: "musicStyle.tempo", required: true } },
+    { step: 212, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Em qual idioma você prefere a letra?", hint: "Se for para ela ouvir, talvez português seja mais intimista. Mas se for em outro idioma, pode ficar mais poético e universal.", type: "select", options: [{ label: "🇧🇷 PT-BR", value: "pt_br" }, { label: "🇺🇸 EN", value: "en" }, { label: "🇪🇸 ES", value: "es" }, { label: "🇮🇹 IT", value: "it" }, { label: "🌍 Outro", value: "other" }], metadata: { fieldName: "lyricDetails.language", required: true } },
+    { step: "212.5", section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration" && d.step_212 === "other", question: "Qual outro idioma você prefere?", hint: "Escolha o idioma em que quer que a música seja cantada.", type: "input", placeholder: "Ex.: Francês, Alemão, Holandês...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: 213, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "Qual tipo de voz você prefere ouvir?", hint: "Qual timbre combina com a sua declaração? Uma voz masculina rouca e profunda? Delicada e suave? Um dueto que representa os dois?", type: "select", options: [{ label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" }, { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" }, { label: "🎵 Dueto", value: "duo" }, { label: "👥 Coral", value: "choir" }], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
+    { step: 214, section: "DECL. AMOR", condition: (d) => d.step_0 === "love_declaration", question: "O que você prefere evitar nessa música?", hint: "Tem algo que você não quer que apareça? Clichês de amor demais? Referências que podem soar falsas?", type: "textarea", placeholder: "Ex: Evitar clichês como 'você é meu tudo', ser muito genérico...", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } },
 
     // ===== TEMA 3: PEDIDO DE CASAMENTO (300-312) =====
-    { step: 300, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Como vocês se conheceram? 💍", type: "textarea", placeholder: "Conte a história…", minLength: 20, metadata: { fieldName: "lyricDetails.origin", required: true } },
-    { step: 301, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Qual será o papel dessa música no pedido? 🎶", type: "select", options: [
-        { label: "💍 É o pedido em si", value: "is_proposal" }, 
-        { label: "🎶 Abre espaço para o pedido", value: "opens_space" }, 
-        { label: "🔄 Misto", value: "mixed" }
-    ], metadata: { fieldName: "lyricDetails.proposalStyle", required: true } },
-    { step: 302, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Qual é o momento de certeza de que quer casar com essa pessoa? ⚡", type: "textarea", placeholder: "Pra sempre…", minLength: 15, metadata: { fieldName: "lyricDetails.certaintyCue", required: true } },
-    { step: 303, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Quais são 2 promessas reais que você quer fazer? 📝", type: "textarea", placeholder: "Uma por linha…", minLength: 15, metadata: { fieldName: "lyricDetails.promises", required: true } },
-    { step: 304, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Existe algum ritual especial que só vocês fazem? 🕯️", type: "input", placeholder: "Só vocês fazem…", minLength: 3, metadata: { fieldName: "lyricDetails.ritual", required: true } },
-    { step: 305, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Como você imagina o futuro de vocês dois juntos? 🌅", type: "textarea", placeholder: "O que imagina…", minLength: 15, metadata: { fieldName: "lyricDetails.futureVision", required: true } },
-    { step: 307, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Qual estilo musical combina mais com essa música? 🎸", type: "select", options: [
-        { label: "🎸 MPB", value: "mpb" }, 
-        { label: "🤠 Sertanejo", value: "sertanejo" }, 
-        { label: "🎤 Pop", value: "pop" },
-        { label: "🎺 Acústico", value: "acoustic" }, 
-        { label: "🎸 Rock", value: "rock" }, 
-        { label: "✨ Gospel", value: "gospel" },
-        { label: "🎙️ Rap", value: "rap" }, 
-        { label: "🌌 Outro", value: "other" }
-    ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "307.5", section: "CASAMENTO", condition: (d) => d.step_0 === "proposal" && d.step_307 === "other", question: "Qual outro estilo musical você tem em mente? 🎸", type: "input", placeholder: "Descreva o estilo…", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
-    { step: 308, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Qual impacto emocional você quer que essa música cause? 💖", type: "select", options: [
-        { label: "😭 Emocionar", value: "emotional" }, 
-        { label: "☮️ Paz", value: "peace" }, 
-        { label: "✨ Arrepio", value: "goosebumps" },
-        { label: "😊 Sorriso", value: "smile" }, 
-        { label: "🌅 Esperança", value: "hope" }, 
-        { label: "💪 Força", value: "strength" }
-    ], metadata: { fieldName: "musicStyle.mood", required: true } },
-    { step: 309, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Qual tipo de movimento você prefere? ⚡", type: "select", options: [
-        { label: "🌊 Calma", value: "calm" }, 
-        { label: "⚖️ Equilibrada", value: "balanced" }, 
-        { label: "📈 Intensa", value: "intense" }, 
-        { label: "🧘 Meditativa", value: "meditative" }
-    ], metadata: { fieldName: "musicStyle.tempo", required: true } },
-    { step: 310, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Em qual idioma você prefere a letra? 🌍", type: "select", options: [
-        { label: "🇧🇷 PT-BR", value: "pt_br" }, 
-        { label: "🇺🇸 EN", value: "en" }, 
-        { label: "🇪🇸 ES", value: "es" },
-        { label: "🇮🇹 IT", value: "it" }, 
-        { label: "🌍 Outro", value: "other" }
-    ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "310.5", section: "CASAMENTO", condition: (d) => d.step_0 === "proposal" && d.step_310 === "other", question: "Qual outro idioma você prefere? 🌍", type: "input", placeholder: "Ex.: Francês, Alemão…", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
-    { step: 311, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
-        { label: "🎙️ Masc. suave", value: "male_soft" }, 
-        { label: "🎙️ Masc. intensa", value: "male_strong" },
-        { label: "🎤 Fem. delicada", value: "female_soft" }, 
-        { label: "🎤 Fem. poderosa", value: "female_strong" },
-        { label: "🎵 Dueto", value: "duo" }, 
-        { label: "👥 Coral", value: "choir" }
-    ], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
-    { step: 312, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "O que você prefere evitar nessa música? 🚫", type: "textarea", placeholder: "O que evitar…", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } },
+    { step: 300, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Como vocês se conheceram?", hint: "Conte a história do começo. Como tudo começou? Qual era o contexto quando se conheceram? O que fez vocês se apaixonarem?", type: "textarea", placeholder: "Ex: Nos conhecemos em uma festa... ou no trabalho quando... ou em um acaso que parecia destino...", minLength: 20, metadata: { fieldName: "lyricDetails.origin", required: true } },
+    { step: 301, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Qual será o papel dessa música no pedido?", hint: "Como você imagina usar essa música?\n• É o pedido em si\n• Abre espaço para o pedido\n• Misto", type: "select", options: [{ label: "💍 É o pedido em si", value: "is_proposal" }, { label: "🎶 Abre espaço para o pedido", value: "opens_space" }, { label: "🔄 Misto", value: "mixed" }], metadata: { fieldName: "lyricDetails.proposalStyle", required: true } },
+    { step: 302, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Qual é o momento de certeza de que quer casar com essa pessoa?", hint: "Tem um momento em que você REALMENTE percebeu que queria isso para sempre? Um olhar? Uma conversa? Um detalhe que fez você entender que era para a vida toda?", type: "textarea", placeholder: "Ex: Foi quando ela me abraçou e disse... ou quando eu a vi dançando e pensei... ou num dia comum quando...", minLength: 15, metadata: { fieldName: "lyricDetails.certaintyCue", required: true } },
+    { step: 303, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Quais são 2 promessas reais que você quer fazer?", hint: "Pense em 2 promessas genuínas que você quer fazer nesse casamento. Podem ser sobre o futuro, sobre como você a tratará, sobre sonhos juntos. Seja sincero.", type: "textarea", placeholder: "Ex: Prometo estar ao seu lado nos bons e maus momentos... Prometo fazer você sorrir todos os dias...", minLength: 15, metadata: { fieldName: "lyricDetails.promises", required: true } },
+    { step: 304, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Existe algum ritual especial que só vocês fazem?", hint: "Tem algo único entre vocês dois? Um ritual que vocês criaram juntos? Uma brincadeira que repete? Um lugar especial? Isso faz a música ser única.", type: "input", placeholder: "Ex: Tomar café da manhã no balcão... ou aquele ritual que só nós sabemos...", minLength: 3, metadata: { fieldName: "lyricDetails.ritual", required: true } },
+    { step: 305, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Como você imagina o futuro de vocês dois juntos?", hint: "Sonhe um pouco. Como vocês vão estar em 5, 10, 20 anos? Que tipo de vida vocês constroem? Quais são os sonhos de vocês juntos?", type: "textarea", placeholder: "Ex: Imagino a gente em uma casa, com uma família... ou viajando o mundo... ou envelhecendo juntos...", minLength: 15, metadata: { fieldName: "lyricDetails.futureVision", required: true } },
+    { step: 307, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Qual estilo musical combina mais com essa música?", hint: "Que tipo de som representa esse amor eterno? MPB para algo épico e nostálgico? Acústico para algo intimista? Pop para algo alegre e moderno?", type: "select", options: [{ label: "🎸 MPB", value: "mpb" }, { label: "🤠 Sertanejo", value: "sertanejo" }, { label: "🎤 Pop", value: "pop" }, { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" }, { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
+    { step: "307.5", section: "CASAMENTO", condition: (d) => d.step_0 === "proposal" && d.step_307 === "other", question: "Qual outro estilo musical você tem em mente?", hint: "Descreva o estilo que você imagina para esse momento especial.", type: "input", placeholder: "Ex: Funk, Eletrônico, Jazz, Bossa Nova...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: 308, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Qual impacto emocional você quer que essa música cause?", hint: "Como você quer que ela se sinta?\n• Chorando de felicidade?\n• Coração acelerado e arrepio?\n• Em paz e segurança?\n• Rindo de alegria?", type: "select", options: [{ label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" }, { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }], metadata: { fieldName: "musicStyle.mood", required: true } },
+    { step: 309, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Qual tipo de movimento você prefere?", hint: "Quer um ritmo que enche de energia e força? Ou algo mais calmo e envolvente? Algo que dá para dançar ou algo para apenas sentir?", type: "select", options: [{ label: "🌊 Calma", value: "calm" }, { label: "⚖️ Equilibrada", value: "balanced" }, { label: "📈 Intensa", value: "intense" }, { label: "🧘 Meditativa", value: "meditative" }], metadata: { fieldName: "musicStyle.tempo", required: true } },
+    { step: 310, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Em qual idioma você prefere a letra?", hint: "Português para algo intímista? Ou outro idioma que seja especial para vocês?", type: "select", options: [{ label: "🇧🇷 PT-BR", value: "pt_br" }, { label: "🇺🇸 EN", value: "en" }, { label: "🇪🇸 ES", value: "es" }, { label: "🇮🇹 IT", value: "it" }, { label: "🌍 Outro", value: "other" }], metadata: { fieldName: "lyricDetails.language", required: true } },
+    { step: "310.5", section: "CASAMENTO", condition: (d) => d.step_0 === "proposal" && d.step_310 === "other", question: "Qual outro idioma você prefere?", hint: "Escolha o idioma para esse momento.", type: "input", placeholder: "Ex.: Francês, Alemão, Holandês...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: 311, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "Qual tipo de voz você prefere ouvir?", hint: "Uma voz masculina? Feminina? Um dueto que representa os dois? Qual timbre combina com esse pedido?", type: "select", options: [{ label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" }, { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" }, { label: "🎵 Dueto", value: "duo" }, { label: "👥 Coral", value: "choir" }], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
+    { step: 312, section: "CASAMENTO", condition: (d) => d.step_0 === "proposal", question: "O que você prefere evitar nessa música?", hint: "Tem algo que não quer que apareça? Clichês? Termos muito óbvios? Nos ajude a caprichar!", type: "textarea", placeholder: "Ex: Evitar clichês como 'você é o amor da minha vida', ser muito genérico...", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } },
 
     // ===== TEMA 4: NASCIMENTO DE FILHO (400-410) =====
-    { step: 400, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "Como vão chamar o(a) filhão(a)? 👶", type: "input", placeholder: "Nome ou apelido", minLength: 2, metadata: { fieldName: "recipient.name", required: true } },
-    { step: 401, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "Como vocês imaginam o futuro dessa criança? 🌟", type: "textarea", placeholder: "Esperanças e sonhos…", minLength: 20, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
-    { step: 402, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "Que valores vocês querem passar? 💫", type: "textarea", placeholder: "Valores importantes…", minLength: 15, metadata: { fieldName: "lyricDetails.transformation", required: true } },
-    { step: 403, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "Como a chegada muda sua vida? 🏡", type: "textarea", placeholder: "Transformação familiar…", minLength: 15, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
-    { step: 404, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "Alguma promessa que faz para essa criança? 🤝", type: "textarea", placeholder: "Promessas e compromissos…", minLength: 15, metadata: { fieldName: "lyricDetails.promises", required: true } },
-    { step: 405, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "Qual estilo musical combina? 🎸", type: "select", options: [
-        { label: "🎸 MPB", value: "mpb" }, 
-        { label: "🤠 Sertanejo", value: "sertanejo" }, 
-        { label: "🎤 Pop", value: "pop" },
-        { label: "🎺 Acústico", value: "acoustic" }, 
-        { label: "🎸 Rock", value: "rock" }, 
-        { label: "✨ Gospel", value: "gospel" },
-        { label: "🎙️ Rap", value: "rap" }, 
-        { label: "🌌 Outro", value: "other" }
-    ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "405.5", section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child" && d.step_405 === "other", question: "Qual outro estilo? 🎸", type: "input", placeholder: "Estilo…", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
-    { step: 406, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "Impacto emocional? 💖", type: "select", options: [
-        { label: "😭 Emocionar", value: "emotional" }, 
-        { label: "☮️ Paz", value: "peace" }, 
-        { label: "✨ Arrepio", value: "goosebumps" },
-        { label: "😊 Sorriso", value: "smile" }, 
-        { label: "🌅 Esperança", value: "hope" }, 
-        { label: "💪 Força", value: "strength" }
-    ], metadata: { fieldName: "musicStyle.mood", required: true } },
-    { step: 407, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "Tipo de movimento? ⚡", type: "select", options: [
-        { label: "🌊 Calma", value: "calm" }, 
-        { label: "⚖️ Equilibrada", value: "balanced" }, 
-        { label: "📈 Intensa", value: "intense" }, 
-        { label: "🧘 Meditativa", value: "meditative" }
-    ], metadata: { fieldName: "musicStyle.tempo", required: true } },
-    { step: 408, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "Idioma? 🌍", type: "select", options: [
-        { label: "🇧🇷 Português", value: "pt_br" }, 
-        { label: "🇺🇸 Inglês", value: "en" }, 
-        { label: "🇪🇸 Espanhol", value: "es" },
-        { label: "🇮🇹 Italiano", value: "it" }, 
-        { label: "🌍 Outro", value: "other" }
-    ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "408.5", section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child" && d.step_408 === "other", question: "Qual outro idioma? 🌍", type: "input", placeholder: "Idioma…", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
-    { step: 409, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "Tipo de voz? 🎙️", type: "select", options: [
-        { label: "🎙️ Masc. suave", value: "male_soft" }, 
-        { label: "🎙️ Masc. intensa", value: "male_strong" },
-        { label: "🎤 Fem. delicada", value: "female_soft" }, 
-        { label: "🎤 Fem. poderosa", value: "female_strong" },
-        { label: "🎵 Dueto", value: "duo" }, 
-        { label: "👥 Coral", value: "choir" }
-    ], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
-    { step: 410, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "O que evitar? 🚫", type: "textarea", placeholder: "Evitar…", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } },
+    { step: 400, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "Como vão chamar o(a) filhão(a)?", hint: "Digite o nome ou o apelido que vocês escolheram. Se ainda não decidiram, descreva o estilo de nome que vocês gostam.", type: "input", placeholder: "Ex: Nome ou apelido", minLength: 2, metadata: { fieldName: "recipient.name", required: true } },
+    { step: 401, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "Como vocês imaginam o futuro dessa criança?", hint: "Quais são seus sonhos para ele/ela? Que tipo de pessoa você espera que ele/ela seja? Quais são suas esperanças?", type: "textarea", placeholder: "Ex: Esperanças e sonhos...", minLength: 20, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
+    { step: 402, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "Que valores vocês querem passar?", hint: "Quais são os valores mais importantes para vocês como pais? Amor, honestidade, coragem, compaixão? Como vocês querem que ele/ela seja no mundo?", type: "textarea", placeholder: "Ex: Valores importantes...", minLength: 15, metadata: { fieldName: "lyricDetails.transformation", required: true } },
+    { step: 403, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "Como a chegada muda sua vida?", hint: "O que muda em vocês como casal e como pessoas? Como essa criança transforma tudo? Qual é a emoção mais forte?", type: "textarea", placeholder: "Ex: Transformação familiar...", minLength: 15, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
+    { step: 404, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "Alguma promessa que faz para essa criança?", hint: "Quais são suas promessas como pai/mãe? O que você se compromete a fazer por essa criança?", type: "textarea", placeholder: "Ex: Promessas e compromissos...", minLength: 15, metadata: { fieldName: "lyricDetails.promises", required: true } },
+    { step: 405, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "Qual estilo musical combina?", hint: "Que tipo de música combina com esse momento especial? Algo suave e relaxante? Algo alegre e energético?", type: "select", options: [{ label: "🎸 MPB", value: "mpb" }, { label: "🤠 Sertanejo", value: "sertanejo" }, { label: "🎤 Pop", value: "pop" }, { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" }, { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
+    { step: "405.5", section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child" && d.step_405 === "other", question: "Qual outro estilo?", hint: "Descreva o estilo que você tem em mente.", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: 406, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "Impacto emocional?", hint: "Como você quer que essa música faz as pessoas se sentirem ao ouvir? Emocionadas? Em paz? Esperançosas?", type: "select", options: [{ label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" }, { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }], metadata: { fieldName: "musicStyle.mood", required: true } },
+    { step: 407, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "Tipo de movimento?", hint: "Você prefere algo calmo ou algo com mais energia?", type: "select", options: [{ label: "🌊 Calma", value: "calm" }, { label: "⚖️ Equilibrada", value: "balanced" }, { label: "📈 Intensa", value: "intense" }, { label: "🧘 Meditativa", value: "meditative" }], metadata: { fieldName: "musicStyle.tempo", required: true } },
+    { step: 408, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "Idioma?", hint: "Em qual idioma você prefere a letra?", type: "select", options: [{ label: "🇧🇷 Português", value: "pt_br" }, { label: "🇺🇸 Inglês", value: "en" }, { label: "🇪🇸 Espanhol", value: "es" }, { label: "🇮🇹 Italiano", value: "it" }, { label: "🌍 Outro", value: "other" }], metadata: { fieldName: "lyricDetails.language", required: true } },
+    { step: "408.5", section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child" && d.step_408 === "other", question: "Qual outro idioma?", hint: "Escolha o idioma desejado.", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: 409, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "Tipo de voz?", hint: "Qual timbre combina? Masculino, feminino ou dueto?", type: "select", options: [{ label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" }, { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" }, { label: "🎵 Dueto", value: "duo" }, { label: "👥 Coral", value: "choir" }], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
+    { step: 410, section: "NASCIMENTO", condition: (d) => d.step_0 === "birth_child", question: "O que evitar?", hint: "Tem algo que você não quer que apareça na música?", type: "textarea", placeholder: "Ex: Evitar...", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } },
 
     // ===== TEMA 5: HOMENAGEM (500-510) =====
-    { step: 500, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Quem você quer homenagear? 👤", type: "input", placeholder: "Nome da pessoa", minLength: 2, metadata: { fieldName: "recipient.name", required: true } },
-    { step: 501, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Qual sua relação com essa pessoa? 💝", type: "input", placeholder: "Relação…", minLength: 2, metadata: { fieldName: "ai_metadata.relationship", required: true } },
-    { step: 502, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Por que quer homenagear? 🎯", type: "textarea", placeholder: "Motivos…", minLength: 20, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
-    { step: 503, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Histórias marcantes? 📖", type: "textarea", placeholder: "Momentos importantes…", minLength: 15, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
-    { step: 504, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Qualidades admiráveis? ⭐", type: "textarea", placeholder: "Qualidades…", minLength: 15, metadata: { fieldName: "recipient.specialCharacteristics", required: true } },
-    { step: 505, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Legado dessa pessoa? 🌟", type: "textarea", placeholder: "Impacto…", minLength: 15, metadata: { fieldName: "lyricDetails.transformation", required: true } },
-    { step: 506, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Estilo musical? 🎸", type: "select", options: [
-        { label: "🎸 MPB", value: "mpb" }, 
-        { label: "🤠 Sertanejo", value: "sertanejo" }, 
-        { label: "🎤 Pop", value: "pop" },
-        { label: "🎺 Acústico", value: "acoustic" }, 
-        { label: "🎸 Rock", value: "rock" }, 
-        { label: "✨ Gospel", value: "gospel" },
-        { label: "🎙️ Rap", value: "rap" }, 
-        { label: "🌌 Outro", value: "other" }
-    ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "506.5", section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute" && d.step_506 === "other", question: "Qual outro estilo? 🎸", type: "input", placeholder: "Estilo…", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
-    { step: 507, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Impacto emocional? 💖", type: "select", options: [
-        { label: "😭 Emocionar", value: "emotional" }, 
-        { label: "☮️ Paz", value: "peace" }, 
-        { label: "✨ Arrepio", value: "goosebumps" },
-        { label: "😊 Sorriso", value: "smile" }, 
-        { label: "🌅 Esperança", value: "hope" }, 
-        { label: "💪 Força", value: "strength" }
-    ], metadata: { fieldName: "musicStyle.mood", required: true } },
-    { step: 508, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Tipo de movimento? ⚡", type: "select", options: [
-        { label: "🌊 Calma", value: "calm" }, 
-        { label: "⚖️ Equilibrada", value: "balanced" }, 
-        { label: "📈 Intensa", value: "intense" }, 
-        { label: "🧘 Meditativa", value: "meditative" }
-    ], metadata: { fieldName: "musicStyle.tempo", required: true } },
-    { step: 509, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Idioma? 🌍", type: "select", options: [
-        { label: "🇧🇷 Português", value: "pt_br" }, 
-        { label: "🇺🇸 Inglês", value: "en" }, 
-        { label: "🇪🇸 Espanhol", value: "es" },
-        { label: "🇮🇹 Italiano", value: "it" }, 
-        { label: "🌍 Outro", value: "other" }
-    ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "509.5", section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute" && d.step_509 === "other", question: "Qual outro idioma? 🌍", type: "input", placeholder: "Idioma…", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
-    { step: 510, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Tipo de voz? 🎙️", type: "select", options: [
-        { label: "🎙️ Masc. suave", value: "male_soft" }, 
-        { label: "🎙️ Masc. intensa", value: "male_strong" },
-        { label: "🎤 Fem. delicada", value: "female_soft" }, 
-        { label: "🎤 Fem. poderosa", value: "female_strong" },
-        { label: "🎵 Dueto", value: "duo" }, 
-        { label: "👥 Coral", value: "choir" }
-    ], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
+    { step: 500, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Quem você quer homenagear?", hint: "Digite o nome completo da pessoa. Pode incluir apelido se tiver.", type: "input", placeholder: "Ex: Nome da pessoa", minLength: 2, metadata: { fieldName: "recipient.name", required: true } },
+    { step: 501, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Qual sua relação com essa pessoa?", hint: "Como essa pessoa se relaciona com você? É um amigo, família, mentor, colega?", type: "input", placeholder: "Ex: Relação...", minLength: 2, metadata: { fieldName: "ai_metadata.relationship", required: true } },
+    { step: 502, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Por que quer homenagear?", hint: "Qual é o motivo principal? Uma celebração, reconhecimento, gratidão? O que faz você querer homenagear essa pessoa?", type: "textarea", placeholder: "Ex: Motivos...", minLength: 20, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
+    { step: 503, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Histórias marcantes?", hint: "Conte momentos importantes que vocês viveram juntos. Momentos que te marcaram ou que definiram a relação de vocês.", type: "textarea", placeholder: "Ex: Momentos importantes...", minLength: 15, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
+    { step: 504, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Qualidades admiráveis?", hint: "Quais são as qualidades que você mais admira nessa pessoa? O que a torna especial?", type: "textarea", placeholder: "Ex: Qualidades...", minLength: 15, metadata: { fieldName: "recipient.specialCharacteristics", required: true } },
+    { step: 505, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Legado dessa pessoa?", hint: "Qual é o impacto que essa pessoa teve ou tem na sua vida? O que ela deixa de marca?", type: "textarea", placeholder: "Ex: Impacto...", minLength: 15, metadata: { fieldName: "lyricDetails.transformation", required: true } },
+    { step: 506, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Estilo musical?", hint: "Que tipo de música representa essa pessoa ou essa homenagem?", type: "select", options: [{ label: "🎸 MPB", value: "mpb" }, { label: "🤠 Sertanejo", value: "sertanejo" }, { label: "🎤 Pop", value: "pop" }, { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" }, { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
+    { step: "506.5", section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute" && d.step_506 === "other", question: "Qual outro estilo?", hint: "Descreva o estilo desejado.", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: 507, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Impacto emocional?", hint: "Como você quer que as pessoas se sintam ouvindo essa homenagem?", type: "select", options: [{ label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" }, { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }], metadata: { fieldName: "musicStyle.mood", required: true } },
+    { step: 508, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Tipo de movimento?", hint: "Qual ritmo combina melhor?", type: "select", options: [{ label: "🌊 Calma", value: "calm" }, { label: "⚖️ Equilibrada", value: "balanced" }, { label: "📈 Intensa", value: "intense" }, { label: "🧘 Meditativa", value: "meditative" }], metadata: { fieldName: "musicStyle.tempo", required: true } },
+    { step: 509, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Idioma?", hint: "Em qual idioma?", type: "select", options: [{ label: "🇧🇷 Português", value: "pt_br" }, { label: "🇺🇸 Inglês", value: "en" }, { label: "🇪🇸 Espanhol", value: "es" }, { label: "🇮🇹 Italiano", value: "it" }, { label: "🌍 Outro", value: "other" }], metadata: { fieldName: "lyricDetails.language", required: true } },
+    { step: "509.5", section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute" && d.step_509 === "other", question: "Qual outro idioma?", hint: "Escolha o idioma.", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: 510, section: "HOMENAGEM", condition: (d) => d.step_0 === "tribute", question: "Tipo de voz?", hint: "Qual tipo de voz combina?", type: "select", options: [{ label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" }, { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" }, { label: "🎵 Dueto", value: "duo" }, { label: "👥 Coral", value: "choir" }], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
 
     // ===== TEMA 6: AMIZADE (600-610) =====
-    { step: 600, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "Quem é seu(sua) amigo(a)? 👤", type: "input", placeholder: "Nome…", minLength: 2, metadata: { fieldName: "recipient.name", required: true } },
-    { step: 601, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "Como se conheceram? 📖", type: "textarea", placeholder: "História…", minLength: 20, metadata: { fieldName: "lyricDetails.origin", required: true } },
-    { step: 602, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "Momentos especiais? 🎬", type: "textarea", placeholder: "Memórias…", minLength: 15, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
-    { step: 603, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "O que essa amizade significa? 💝", type: "textarea", placeholder: "Significado…", minLength: 15, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
-    { step: 604, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "Qualidades do(a) amigo(a)? ⭐", type: "textarea", placeholder: "Qualidades…", minLength: 15, metadata: { fieldName: "recipient.specialCharacteristics", required: true } },
-    { step: 605, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "Estilo musical? 🎸", type: "select", options: [
-        { label: "🎸 MPB", value: "mpb" }, 
-        { label: "🤠 Sertanejo", value: "sertanejo" }, 
-        { label: "🎤 Pop", value: "pop" },
-        { label: "🎺 Acústico", value: "acoustic" }, 
-        { label: "🎸 Rock", value: "rock" }, 
-        { label: "✨ Gospel", value: "gospel" },
-        { label: "🎙️ Rap", value: "rap" }, 
-        { label: "🌌 Outro", value: "other" }
-    ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "605.5", section: "AMIZADE", condition: (d) => d.step_0 === "friendship" && d.step_605 === "other", question: "Qual outro estilo? 🎸", type: "input", placeholder: "Estilo…", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
-    { step: 606, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "Impacto emocional? 💖", type: "select", options: [
-        { label: "😭 Emocionar", value: "emotional" }, 
-        { label: "☮️ Paz", value: "peace" }, 
-        { label: "✨ Arrepio", value: "goosebumps" },
-        { label: "😊 Sorriso", value: "smile" }, 
-        { label: "🌅 Esperança", value: "hope" }, 
-        { label: "💪 Força", value: "strength" }
-    ], metadata: { fieldName: "musicStyle.mood", required: true } },
-    { step: 607, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "Tipo de movimento? ⚡", type: "select", options: [
-        { label: "🌊 Calma", value: "calm" }, 
-        { label: "⚖️ Equilibrada", value: "balanced" }, 
-        { label: "📈 Intensa", value: "intense" }, 
-        { label: "🧘 Meditativa", value: "meditative" }
-    ], metadata: { fieldName: "musicStyle.tempo", required: true } },
-    { step: 608, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "Idioma? 🌍", type: "select", options: [
-        { label: "🇧🇷 Português", value: "pt_br" }, 
-        { label: "🇺🇸 Inglês", value: "en" }, 
-        { label: "🇪🇸 Espanhol", value: "es" },
-        { label: "🇮🇹 Italiano", value: "it" }, 
-        { label: "🌍 Outro", value: "other" }
-    ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "608.5", section: "AMIZADE", condition: (d) => d.step_0 === "friendship" && d.step_608 === "other", question: "Qual outro idioma? 🌍", type: "input", placeholder: "Idioma…", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
-    { step: 609, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "Tipo de voz? 🎙️", type: "select", options: [
-        { label: "🎙️ Masc. suave", value: "male_soft" }, 
-        { label: "🎙️ Masc. intensa", value: "male_strong" },
-        { label: "🎤 Fem. delicada", value: "female_soft" }, 
-        { label: "🎤 Fem. poderosa", value: "female_strong" },
-        { label: "🎵 Dueto", value: "duo" }, 
-        { label: "👥 Coral", value: "choir" }
-    ], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
-    { step: 610, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "O que evitar? 🚫", type: "textarea", placeholder: "Evitar…", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } },
+    { step: 600, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "Quem é seu(sua) amigo(a)?", hint: "Digite o nome do seu amigo(a). Pode ser primeiro nome ou apelido que vocês usam.", type: "input", placeholder: "Ex: Nome...", minLength: 2, metadata: { fieldName: "recipient.name", required: true } },
+    { step: 601, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "Como se conheceram?", hint: "Conte a história de como vocês se conheceram. O contexto, o que chamou sua atenção nessa pessoa.", type: "textarea", placeholder: "Ex: História...", minLength: 20, metadata: { fieldName: "lyricDetails.origin", required: true } },
+    { step: 602, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "Momentos especiais?", hint: "Quais são os momentos que vocês viveram juntos que mais marcaram? Aventuras, descobertas, risos?", type: "textarea", placeholder: "Ex: Memórias...", minLength: 15, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
+    { step: 603, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "O que essa amizade significa?", hint: "O que essa amizade representa para você? Como ela mudou sua vida?", type: "textarea", placeholder: "Ex: Significado...", minLength: 15, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
+    { step: 604, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "Qualidades do(a) amigo(a)?", hint: "Quais são as qualidades que você mais gosta nessa pessoa? O que a torna especial como amiga?", type: "textarea", placeholder: "Ex: Qualidades...", minLength: 15, metadata: { fieldName: "recipient.specialCharacteristics", required: true } },
+    { step: 605, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "Estilo musical?", hint: "Que tipo de música combina com essa amizade?", type: "select", options: [{ label: "🎸 MPB", value: "mpb" }, { label: "🤠 Sertanejo", value: "sertanejo" }, { label: "🎤 Pop", value: "pop" }, { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" }, { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
+    { step: "605.5", section: "AMIZADE", condition: (d) => d.step_0 === "friendship" && d.step_605 === "other", question: "Qual outro estilo?", hint: "Descreva o estilo.", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: 606, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "Impacto emocional?", hint: "Como você quer que a música faz vocês se sentirem?", type: "select", options: [{ label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" }, { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }], metadata: { fieldName: "musicStyle.mood", required: true } },
+    { step: 607, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "Tipo de movimento?", hint: "Qual ritmo combina?", type: "select", options: [{ label: "🌊 Calma", value: "calm" }, { label: "⚖️ Equilibrada", value: "balanced" }, { label: "📈 Intensa", value: "intense" }, { label: "🧘 Meditativa", value: "meditative" }], metadata: { fieldName: "musicStyle.tempo", required: true } },
+    { step: 608, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "Idioma?", hint: "Em qual idioma?", type: "select", options: [{ label: "🇧🇷 Português", value: "pt_br" }, { label: "🇺🇸 Inglês", value: "en" }, { label: "🇪🇸 Espanhol", value: "es" }, { label: "🇮🇹 Italiano", value: "it" }, { label: "🌍 Outro", value: "other" }], metadata: { fieldName: "lyricDetails.language", required: true } },
+    { step: "608.5", section: "AMIZADE", condition: (d) => d.step_0 === "friendship" && d.step_608 === "other", question: "Qual outro idioma?", hint: "Escolha o idioma.", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: 609, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "Tipo de voz?", hint: "Qual tipo de voz?", type: "select", options: [{ label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" }, { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" }, { label: "🎵 Dueto", value: "duo" }, { label: "👥 Coral", value: "choir" }], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
+    { step: 610, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "O que evitar?", hint: "Tem algo que você não quer que apareça?", type: "textarea", placeholder: "Ex: Evitar...", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } },
 
     // ===== TEMA 7: ANÚNCIO DE GRAVIDEZ (700-709) =====
-    { step: 700, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Para quem é o anúncio? 👤", type: "input", placeholder: "Nome…", minLength: 2, metadata: { fieldName: "recipient.name", required: true } },
-    { step: 701, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Como descobriu? 💫", type: "textarea", placeholder: "Momento da descoberta…", minLength: 15, metadata: { fieldName: "lyricDetails.turningPoint", required: true } },
-    { step: 702, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Como se sente? 💝", type: "textarea", placeholder: "Sentimentos…", minLength: 15, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
-    { step: 703, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Expectativas? 🌟", type: "textarea", placeholder: "Esperanças…", minLength: 15, metadata: { fieldName: "final.futureWish", required: true } },
-    { step: 704, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Mensagem especial? 💬", type: "textarea", placeholder: "Mensagem…", minLength: 15, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
-    { step: 705, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Estilo musical? 🎸", type: "select", options: [
-        { label: "🎸 MPB", value: "mpb" }, 
-        { label: "🤠 Sertanejo", value: "sertanejo" }, 
-        { label: "🎤 Pop", value: "pop" },
-        { label: "🎺 Acústico", value: "acoustic" }, 
-        { label: "🎸 Rock", value: "rock" }, 
-        { label: "✨ Gospel", value: "gospel" },
-        { label: "🎙️ Rap", value: "rap" }, 
-        { label: "🌌 Outro", value: "other" }
-    ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "705.5", section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement" && d.step_705 === "other", question: "Qual outro estilo? 🎸", type: "input", placeholder: "Estilo…", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
-    { step: 706, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Impacto emocional? 💖", type: "select", options: [
-        { label: "😭 Emocionar", value: "emotional" }, 
-        { label: "☮️ Paz", value: "peace" }, 
-        { label: "✨ Arrepio", value: "goosebumps" },
-        { label: "😊 Sorriso", value: "smile" }, 
-        { label: "🌅 Esperança", value: "hope" }, 
-        { label: "💪 Força", value: "strength" }
-    ], metadata: { fieldName: "musicStyle.mood", required: true } },
-    { step: 707, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Tipo de movimento? ⚡", type: "select", options: [
-        { label: "🌊 Calma", value: "calm" }, 
-        { label: "⚖️ Equilibrada", value: "balanced" }, 
-        { label: "📈 Intensa", value: "intense" }, 
-        { label: "🧘 Meditativa", value: "meditative" }
-    ], metadata: { fieldName: "musicStyle.tempo", required: true } },
-    { step: 708, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Idioma? 🌍", type: "select", options: [
-        { label: "🇧🇷 Português", value: "pt_br" }, 
-        { label: "🇺🇸 Inglês", value: "en" }, 
-        { label: "🇪🇸 Espanhol", value: "es" },
-        { label: "🇮🇹 Italiano", value: "it" }, 
-        { label: "🌍 Outro", value: "other" }
-    ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "708.5", section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement" && d.step_708 === "other", question: "Qual outro idioma? 🌍", type: "input", placeholder: "Idioma…", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
-    { step: 709, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Tipo de voz? 🎙️", type: "select", options: [
-        { label: "🎙️ Masc. suave", value: "male_soft" }, 
-        { label: "🎙️ Masc. intensa", value: "male_strong" },
-        { label: "🎤 Fem. delicada", value: "female_soft" }, 
-        { label: "🎤 Fem. poderosa", value: "female_strong" },
-        { label: "🎵 Dueto", value: "duo" }, 
-        { label: "👥 Coral", value: "choir" }
-    ], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
+    { step: 700, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Para quem é o anúncio?", hint: "Quem você quer anunciar a gravidez para? A família? Amigos? Uma pessoa especial?", type: "input", placeholder: "Ex: Nome...", minLength: 2, metadata: { fieldName: "recipient.name", required: true } },
+    { step: 701, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Como descobriu?", hint: "Conte o momento da descoberta. Como foi? Qual foi sua reação?", type: "textarea", placeholder: "Ex: Momento da descoberta...", minLength: 15, metadata: { fieldName: "lyricDetails.turningPoint", required: true } },
+    { step: 702, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Como se sente?", hint: "Quais são seus sentimentos? Alegria, emoção, esperança? Compartilhe sinceramente.", type: "textarea", placeholder: "Ex: Sentimentos...", minLength: 15, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
+    { step: 703, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Expectativas?", hint: "Quais são suas esperanças e expectativas para essa nova fase? O que você imagina?", type: "textarea", placeholder: "Ex: Esperanças...", minLength: 15, metadata: { fieldName: "final.futureWish", required: true } },
+    { step: 704, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Mensagem especial?", hint: "Tem uma mensagem especial que você quer passar nesse anúncio?", type: "textarea", placeholder: "Ex: Mensagem...", minLength: 15, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
+    { step: 705, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Estilo musical?", hint: "Que tipo de música combina com esse anúncio?", type: "select", options: [{ label: "🎸 MPB", value: "mpb" }, { label: "🤠 Sertanejo", value: "sertanejo" }, { label: "🎤 Pop", value: "pop" }, { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" }, { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
+    { step: "705.5", section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement" && d.step_705 === "other", question: "Qual outro estilo?", hint: "Descreva o estilo.", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: 706, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Impacto emocional?", hint: "Como você quer que as pessoas se sintam?", type: "select", options: [{ label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" }, { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }], metadata: { fieldName: "musicStyle.mood", required: true } },
+    { step: 707, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Tipo de movimento?", hint: "Qual ritmo combina?", type: "select", options: [{ label: "🌊 Calma", value: "calm" }, { label: "⚖️ Equilibrada", value: "balanced" }, { label: "📈 Intensa", value: "intense" }, { label: "🧘 Meditativa", value: "meditative" }], metadata: { fieldName: "musicStyle.tempo", required: true } },
+    { step: 708, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Idioma?", hint: "Em qual idioma?", type: "select", options: [{ label: "🇧🇷 Português", value: "pt_br" }, { label: "🇺🇸 Inglês", value: "en" }, { label: "🇪🇸 Espanhol", value: "es" }, { label: "🇮🇹 Italiano", value: "it" }, { label: "🌍 Outro", value: "other" }], metadata: { fieldName: "lyricDetails.language", required: true } },
+    { step: "708.5", section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement" && d.step_708 === "other", question: "Qual outro idioma?", hint: "Escolha o idioma.", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: 709, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Tipo de voz?", hint: "Qual tipo de voz?", type: "select", options: [{ label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" }, { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" }, { label: "🎵 Dueto", value: "duo" }, { label: "👥 Coral", value: "choir" }], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
 
     // ===== TEMA 8: PET (800-809) =====
-    { step: 800, section: "PET", condition: (d) => d.step_0 === "pet", question: "Nome do seu pet? 🐾", type: "input", placeholder: "Nome…", minLength: 1, metadata: { fieldName: "recipient.name", required: true } },
-    { step: 801, section: "PET", condition: (d) => d.step_0 === "pet", question: "Que tipo de pet? 🐶🐱", type: "input", placeholder: "Cachorro, gato, etc…", minLength: 2, metadata: { fieldName: "ai_metadata.relationship", required: true } },
-    { step: 802, section: "PET", condition: (d) => d.step_0 === "pet", question: "Características especiais? 🌟", type: "textarea", placeholder: "Personalidade…", minLength: 15, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
-    { step: 803, section: "PET", condition: (d) => d.step_0 === "pet", question: "Memórias marcantes? 📖", type: "textarea", placeholder: "Momentos…", minLength: 15, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
-    { step: 804, section: "PET", condition: (d) => d.step_0 === "pet", question: "Mensagem pro seu pet? 💬", type: "textarea", placeholder: "O que quer dizer…", minLength: 15, metadata: { fieldName: "lyricDetails.withYouI", required: true } },
-    { step: 805, section: "PET", condition: (d) => d.step_0 === "pet", question: "Estilo musical? 🎸", type: "select", options: [
-        { label: "🎸 MPB", value: "mpb" }, 
-        { label: "🤠 Sertanejo", value: "sertanejo" }, 
-        { label: "🎤 Pop", value: "pop" },
-        { label: "🎺 Acústico", value: "acoustic" }, 
-        { label: "🎸 Rock", value: "rock" }, 
-        { label: "✨ Gospel", value: "gospel" },
-        { label: "🎙️ Rap", value: "rap" }, 
-        { label: "🌌 Outro", value: "other" }
-    ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "805.5", section: "PET", condition: (d) => d.step_0 === "pet" && d.step_805 === "other", question: "Qual outro estilo? 🎸", type: "input", placeholder: "Estilo…", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
-    { step: 806, section: "PET", condition: (d) => d.step_0 === "pet", question: "Impacto emocional? 💖", type: "select", options: [
-        { label: "😭 Emocionar", value: "emotional" }, 
-        { label: "☮️ Paz", value: "peace" }, 
-        { label: "✨ Arrepio", value: "goosebumps" },
-        { label: "😊 Sorriso", value: "smile" }, 
-        { label: "🌅 Esperança", value: "hope" }, 
-        { label: "💪 Força", value: "strength" }
-    ], metadata: { fieldName: "musicStyle.mood", required: true } },
-    { step: 807, section: "PET", condition: (d) => d.step_0 === "pet", question: "Tipo de movimento? ⚡", type: "select", options: [
-        { label: "🌊 Calma", value: "calm" }, 
-        { label: "⚖️ Equilibrada", value: "balanced" }, 
-        { label: "📈 Intensa", value: "intense" }, 
-        { label: "🧘 Meditativa", value: "meditative" }
-    ], metadata: { fieldName: "musicStyle.tempo", required: true } },
-    { step: 808, section: "PET", condition: (d) => d.step_0 === "pet", question: "Idioma? 🌍", type: "select", options: [
-        { label: "🇧🇷 Português", value: "pt_br" }, 
-        { label: "🇺🇸 Inglês", value: "en" }, 
-        { label: "🇪🇸 Espanhol", value: "es" },
-        { label: "🇮🇹 Italiano", value: "it" }, 
-        { label: "🌍 Outro", value: "other" }
-    ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "808.5", section: "PET", condition: (d) => d.step_0 === "pet" && d.step_808 === "other", question: "Qual outro idioma? 🌍", type: "input", placeholder: "Idioma…", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
-    { step: 809, section: "PET", condition: (d) => d.step_0 === "pet", question: "Tipo de voz? 🎙️", type: "select", options: [
-        { label: "🎙️ Masc. suave", value: "male_soft" }, 
-        { label: "🎙️ Masc. intensa", value: "male_strong" },
-        { label: "🎤 Fem. delicada", value: "female_soft" }, 
-        { label: "🎤 Fem. poderosa", value: "female_strong" },
-        { label: "🎵 Dueto", value: "duo" }, 
-        { label: "👥 Coral", value: "choir" }
-    ], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
+    { step: 800, section: "PET", condition: (d) => d.step_0 === "pet", question: "Nome do seu pet?", hint: "Qual é o nome do seu pet? Ou o apelido que vocês usam?", type: "input", placeholder: "Ex: Nome...", minLength: 1, metadata: { fieldName: "recipient.name", required: true } },
+    { step: 801, section: "PET", condition: (d) => d.step_0 === "pet", question: "Que tipo de pet?", hint: "É um cachorro, gato, pássaro, coelho? Qual espécie e que raça/tipo é?", type: "input", placeholder: "Ex: Cachorro, gato, etc...", minLength: 2, metadata: { fieldName: "ai_metadata.relationship", required: true } },
+    { step: 802, section: "PET", condition: (d) => d.step_0 === "pet", question: "Características especiais?", hint: "Como é a personalidade do seu pet? Qual é seu jeito, suas manias, suas qualidades?", type: "textarea", placeholder: "Ex: Personalidade...", minLength: 15, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
+    { step: 803, section: "PET", condition: (d) => d.step_0 === "pet", question: "Memórias marcantes?", hint: "Quais são os momentos inesquecíveis que vocês viveram juntos?", type: "textarea", placeholder: "Ex: Momentos...", minLength: 15, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
+    { step: 804, section: "PET", condition: (d) => d.step_0 === "pet", question: "Mensagem pro seu pet?", hint: "O que você gostaria de dizer para o seu pet? Como ele te faz sentir?", type: "textarea", placeholder: "Ex: O que quer dizer...", minLength: 15, metadata: { fieldName: "lyricDetails.withYouI", required: true } },
+    { step: 805, section: "PET", condition: (d) => d.step_0 === "pet", question: "Estilo musical?", hint: "Que tipo de música combina com o seu pet?", type: "select", options: [{ label: "🎸 MPB", value: "mpb" }, { label: "🤠 Sertanejo", value: "sertanejo" }, { label: "🎤 Pop", value: "pop" }, { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" }, { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
+    { step: "805.5", section: "PET", condition: (d) => d.step_0 === "pet" && d.step_805 === "other", question: "Qual outro estilo?", hint: "Descreva o estilo.", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: 806, section: "PET", condition: (d) => d.step_0 === "pet", question: "Impacto emocional?", hint: "Como você quer que a música faz as pessoas se sentirem?", type: "select", options: [{ label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" }, { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }], metadata: { fieldName: "musicStyle.mood", required: true } },
+    { step: 807, section: "PET", condition: (d) => d.step_0 === "pet", question: "Tipo de movimento?", hint: "Qual ritmo combina?", type: "select", options: [{ label: "🌊 Calma", value: "calm" }, { label: "⚖️ Equilibrada", value: "balanced" }, { label: "📈 Intensa", value: "intense" }, { label: "🧘 Meditativa", value: "meditative" }], metadata: { fieldName: "musicStyle.tempo", required: true } },
+    { step: 808, section: "PET", condition: (d) => d.step_0 === "pet", question: "Idioma?", hint: "Em qual idioma?", type: "select", options: [{ label: "🇧🇷 Português", value: "pt_br" }, { label: "🇺🇸 Inglês", value: "en" }, { label: "🇪🇸 Espanhol", value: "es" }, { label: "🇮🇹 Italiano", value: "it" }, { label: "🌍 Outro", value: "other" }], metadata: { fieldName: "lyricDetails.language", required: true } },
+    { step: "808.5", section: "PET", condition: (d) => d.step_0 === "pet" && d.step_808 === "other", question: "Qual outro idioma?", hint: "Escolha o idioma.", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: 809, section: "PET", condition: (d) => d.step_0 === "pet", question: "Tipo de voz?", hint: "Qual tipo de voz?", type: "select", options: [{ label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" }, { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" }, { label: "🎵 Dueto", value: "duo" }, { label: "👥 Coral", value: "choir" }], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
 
     // ===== TEMA 9: NETO (900-909) =====
-    { step: 900, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Nome do(a) neto(a)? 👶", type: "input", placeholder: "Nome…", minLength: 1, metadata: { fieldName: "recipient.name", required: true } },
-    { step: 901, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Como se sente sendo avó? 💝", type: "textarea", placeholder: "Sentimentos…", minLength: 15, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
-    { step: 902, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Mudança na sua vida? 🌟", type: "textarea", placeholder: "Transformação…", minLength: 15, metadata: { fieldName: "lyricDetails.transformation", required: true } },
-    { step: 903, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Promessas pro neto(a)? 🤝", type: "textarea", placeholder: "Promessas…", minLength: 15, metadata: { fieldName: "lyricDetails.promises", required: true } },
-    { step: 904, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Legado que quer deixar? 🏆", type: "textarea", placeholder: "Legado…", minLength: 15, metadata: { fieldName: "lyricDetails.futureVision", required: true } },
-    { step: 905, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Estilo musical? 🎸", type: "select", options: [
-        { label: "🎸 MPB", value: "mpb" }, 
-        { label: "🤠 Sertanejo", value: "sertanejo" }, 
-        { label: "🎤 Pop", value: "pop" },
-        { label: "🎺 Acústico", value: "acoustic" }, 
-        { label: "🎸 Rock", value: "rock" }, 
-        { label: "✨ Gospel", value: "gospel" },
-        { label: "🎙️ Rap", value: "rap" }, 
-        { label: "🌌 Outro", value: "other" }
-    ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "905.5", section: "NETO", condition: (d) => d.step_0 === "birth_grandchild" && d.step_905 === "other", question: "Qual outro estilo? 🎸", type: "input", placeholder: "Estilo…", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
-    { step: 906, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Impacto emocional? 💖", type: "select", options: [
-        { label: "😭 Emocionar", value: "emotional" }, 
-        { label: "☮️ Paz", value: "peace" }, 
-        { label: "✨ Arrepio", value: "goosebumps" },
-        { label: "😊 Sorriso", value: "smile" }, 
-        { label: "🌅 Esperança", value: "hope" }, 
-        { label: "💪 Força", value: "strength" }
-    ], metadata: { fieldName: "musicStyle.mood", required: true } },
-    { step: 907, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Tipo de movimento? ⚡", type: "select", options: [
-        { label: "🌊 Calma", value: "calm" }, 
-        { label: "⚖️ Equilibrada", value: "balanced" }, 
-        { label: "📈 Intensa", value: "intense" }, 
-        { label: "🧘 Meditativa", value: "meditative" }
-    ], metadata: { fieldName: "musicStyle.tempo", required: true } },
-    { step: 908, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Idioma? 🌍", type: "select", options: [
-        { label: "🇧🇷 Português", value: "pt_br" }, 
-        { label: "🇺🇸 Inglês", value: "en" }, 
-        { label: "🇪🇸 Espanhol", value: "es" },
-        { label: "🇮🇹 Italiano", value: "it" }, 
-        { label: "🌍 Outro", value: "other" }
-    ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "908.5", section: "NETO", condition: (d) => d.step_0 === "birth_grandchild" && d.step_908 === "other", question: "Qual outro idioma? 🌍", type: "input", placeholder: "Idioma…", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
-    { step: 909, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Tipo de voz? 🎙️", type: "select", options: [
-        { label: "🎙️ Masc. suave", value: "male_soft" }, 
-        { label: "🎙️ Masc. intensa", value: "male_strong" },
-        { label: "🎤 Fem. delicada", value: "female_soft" }, 
-        { label: "🎤 Fem. poderosa", value: "female_strong" },
-        { label: "🎵 Dueto", value: "duo" }, 
-        { label: "👥 Coral", value: "choir" }
-    ], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
+    { step: 900, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Nome do(a) neto(a)?", hint: "Qual é o nome do neto ou neta? Ou o apelido que vocês usam?", type: "input", placeholder: "Ex: Nome...", minLength: 1, metadata: { fieldName: "recipient.name", required: true } },
+    { step: 901, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Como se sente sendo avó?", hint: "Como é essa experiência? Qual é a emoção de ser avó/avô? Como muda sua vida?", type: "textarea", placeholder: "Ex: Sentimentos...", minLength: 15, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
+    { step: 902, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Mudança na sua vida?", hint: "Como o neto/a mudou sua vida? Qual é a transformação?", type: "textarea", placeholder: "Ex: Transformação...", minLength: 15, metadata: { fieldName: "lyricDetails.transformation", required: true } },
+    { step: 903, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Promessas pro neto(a)?", hint: "Quais são as promessas que você faz para seu neto/a? Como você quer estar presente?", type: "textarea", placeholder: "Ex: Promessas...", minLength: 15, metadata: { fieldName: "lyricDetails.promises", required: true } },
+    { step: 904, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Legado que quer deixar?", hint: "Qual é o legado que você quer deixar para seu neto/a? Que valores, histórias, ensinamentos?", type: "textarea", placeholder: "Ex: Legado...", minLength: 15, metadata: { fieldName: "lyricDetails.futureVision", required: true } },
+    { step: 905, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Estilo musical?", hint: "Que tipo de música combina?", type: "select", options: [{ label: "🎸 MPB", value: "mpb" }, { label: "🤠 Sertanejo", value: "sertanejo" }, { label: "🎤 Pop", value: "pop" }, { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" }, { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
+    { step: "905.5", section: "NETO", condition: (d) => d.step_0 === "birth_grandchild" && d.step_905 === "other", question: "Qual outro estilo?", hint: "Descreva o estilo.", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: 906, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Impacto emocional?", hint: "Como você quer que as pessoas se sintam?", type: "select", options: [{ label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" }, { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }], metadata: { fieldName: "musicStyle.mood", required: true } },
+    { step: 907, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Tipo de movimento?", hint: "Qual ritmo combina?", type: "select", options: [{ label: "🌊 Calma", value: "calm" }, { label: "⚖️ Equilibrada", value: "balanced" }, { label: "📈 Intensa", value: "intense" }, { label: "🧘 Meditativa", value: "meditative" }], metadata: { fieldName: "musicStyle.tempo", required: true } },
+    { step: 908, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Idioma?", hint: "Em qual idioma?", type: "select", options: [{ label: "🇧🇷 Português", value: "pt_br" }, { label: "🇺🇸 Inglês", value: "en" }, { label: "🇪🇸 Espanhol", value: "es" }, { label: "🇮🇹 Italiano", value: "it" }, { label: "🌍 Outro", value: "other" }], metadata: { fieldName: "lyricDetails.language", required: true } },
+    { step: "908.5", section: "NETO", condition: (d) => d.step_0 === "birth_grandchild" && d.step_908 === "other", question: "Qual outro idioma?", hint: "Escolha o idioma.", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: 909, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Tipo de voz?", hint: "Qual tipo de voz?", type: "select", options: [{ label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" }, { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" }, { label: "🎵 Dueto", value: "duo" }, { label: "👥 Coral", value: "choir" }], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
 
     // ===== TEMA 10: ORAÇÃO (1000-1008) =====
-    { step: 1000, section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer", question: "Qual tipo de oração? 🙏", type: "input", placeholder: "Tipo…", minLength: 2, metadata: { fieldName: "recipient.name", required: true } },
-    { step: 1001, section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer", question: "Intenção da oração? 💫", type: "textarea", placeholder: "Intenção…", minLength: 15, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
-    { step: 1002, section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer", question: "Por quem é? 👤", type: "input", placeholder: "Pessoa ou causa…", minLength: 2, metadata: { fieldName: "ai_metadata.relationship", required: true } },
-    { step: 1003, section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer", question: "Mensagem espiritual? ✨", type: "textarea", placeholder: "Mensagem…", minLength: 15, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
-    { step: 1004, section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer", question: "Estilo musical? 🎸", type: "select", options: [
-        { label: "🎸 MPB", value: "mpb" }, 
-        { label: "🤠 Sertanejo", value: "sertanejo" }, 
-        { label: "🎤 Pop", value: "pop" },
-        { label: "🎺 Acústico", value: "acoustic" }, 
-        { label: "🎸 Rock", value: "rock" }, 
-        { label: "✨ Gospel", value: "gospel" },
-        { label: "🎙️ Rap", value: "rap" }, 
-        { label: "🌌 Outro", value: "other" }
-    ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "1004.5", section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer" && d.step_1004 === "other", question: "Qual outro estilo? 🎸", type: "input", placeholder: "Estilo…", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
-    { step: 1005, section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer", question: "Impacto emocional? 💖", type: "select", options: [
-        { label: "😭 Emocionar", value: "emotional" }, 
-        { label: "☮️ Paz", value: "peace" }, 
-        { label: "✨ Arrepio", value: "goosebumps" },
-        { label: "😊 Sorriso", value: "smile" }, 
-        { label: "🌅 Esperança", value: "hope" }, 
-        { label: "💪 Força", value: "strength" }
-    ], metadata: { fieldName: "musicStyle.mood", required: true } },
-    { step: 1006, section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer", question: "Tipo de movimento? ⚡", type: "select", options: [
-        { label: "🌊 Calma", value: "calm" }, 
-        { label: "⚖️ Equilibrada", value: "balanced" }, 
-        { label: "📈 Intensa", value: "intense" }, 
-        { label: "🧘 Meditativa", value: "meditative" }
-    ], metadata: { fieldName: "musicStyle.tempo", required: true } },
-    { step: 1007, section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer", question: "Idioma? 🌍", type: "select", options: [
-        { label: "🇧🇷 Português", value: "pt_br" }, 
-        { label: "🇺🇸 Inglês", value: "en" }, 
-        { label: "🇪🇸 Espanhol", value: "es" },
-        { label: "🇮🇹 Italiano", value: "it" }, 
-        { label: "🌍 Outro", value: "other" }
-    ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "1007.5", section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer" && d.step_1007 === "other", question: "Qual outro idioma? 🌍", type: "input", placeholder: "Idioma…", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
-    { step: 1008, section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer", question: "Tipo de voz? 🎙️", type: "select", options: [
-        { label: "🎙️ Masc. suave", value: "male_soft" }, 
-        { label: "🎙️ Masc. intensa", value: "male_strong" },
-        { label: "🎤 Fem. delicada", value: "female_soft" }, 
-        { label: "🎤 Fem. poderosa", value: "female_strong" },
-        { label: "🎵 Dueto", value: "duo" }, 
-        { label: "👥 Coral", value: "choir" }
-    ], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
+    { step: 1000, section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer", question: "Qual tipo de oração?", hint: "Qual é o tipo de oração? De gratidão, de pedido, de intercessão, de louvor?", type: "input", placeholder: "Ex: Tipo...", minLength: 2, metadata: { fieldName: "recipient.name", required: true } },
+    { step: 1001, section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer", question: "Intenção da oração?", hint: "Qual é a intenção principal dessa oração? Por quem ou o quê vocês está orando?", type: "textarea", placeholder: "Ex: Intenção...", minLength: 15, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
+    { step: 1002, section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer", question: "Por quem é?", hint: "Por quem essa oração é dirigida? Uma pessoa, uma causa, uma comunidade?", type: "input", placeholder: "Ex: Pessoa ou causa...", minLength: 2, metadata: { fieldName: "ai_metadata.relationship", required: true } },
+    { step: 1003, section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer", question: "Mensagem espiritual?", hint: "Qual é a mensagem espiritual que você quer passar? Qual é a sua fé, sua esperança?", type: "textarea", placeholder: "Ex: Mensagem...", minLength: 15, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
+    { step: 1004, section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer", question: "Estilo musical?", hint: "Que tipo de música combina com essa oração?", type: "select", options: [{ label: "🎸 MPB", value: "mpb" }, { label: "🤠 Sertanejo", value: "sertanejo" }, { label: "🎤 Pop", value: "pop" }, { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" }, { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
+    { step: "1004.5", section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer" && d.step_1004 === "other", question: "Qual outro estilo?", hint: "Descreva o estilo.", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: 1005, section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer", question: "Impacto emocional?", hint: "Como você quer que as pessoas se sintam?", type: "select", options: [{ label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" }, { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }], metadata: { fieldName: "musicStyle.mood", required: true } },
+    { step: 1006, section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer", question: "Tipo de movimento?", hint: "Qual ritmo combina?", type: "select", options: [{ label: "🌊 Calma", value: "calm" }, { label: "⚖️ Equilibrada", value: "balanced" }, { label: "📈 Intensa", value: "intense" }, { label: "🧘 Meditativa", value: "meditative" }], metadata: { fieldName: "musicStyle.tempo", required: true } },
+    { step: 1007, section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer", question: "Idioma?", hint: "Em qual idioma?", type: "select", options: [{ label: "🇧🇷 Português", value: "pt_br" }, { label: "🇺🇸 Inglês", value: "en" }, { label: "🇪🇸 Espanhol", value: "es" }, { label: "🇮🇹 Italiano", value: "it" }, { label: "🌍 Outro", value: "other" }], metadata: { fieldName: "lyricDetails.language", required: true } },
+    { step: "1007.5", section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer" && d.step_1007 === "other", question: "Qual outro idioma?", hint: "Escolha o idioma.", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: 1008, section: "ORAÇÃO", condition: (d) => d.step_0 === "prayer", question: "Tipo de voz?", hint: "Qual tipo de voz?", type: "select", options: [{ label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" }, { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" }, { label: "🎵 Dueto", value: "duo" }, { label: "👥 Coral", value: "choir" }], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
 
     // ===== TEMA 11: CORPORATIVO (1100-1108) =====
-    { step: 1100, section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate", question: "Nome da empresa? 🏢", type: "input", placeholder: "Empresa…", minLength: 2, metadata: { fieldName: "recipient.name", required: true } },
-    { step: 1101, section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate", question: "Segmento / Ramo? 🎯", type: "input", placeholder: "Ramo…", minLength: 2, metadata: { fieldName: "ai_metadata.relationship", required: true } },
-    { step: 1102, section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate", question: "Missão / Visão? 🌟", type: "textarea", placeholder: "Missão…", minLength: 15, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
-    { step: 1103, section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate", question: "Valores da empresa? 💎", type: "textarea", placeholder: "Valores…", minLength: 15, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
-    { step: 1104, section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate", question: "Mensagem para o público? 📢", type: "textarea", placeholder: "Mensagem…", minLength: 15, metadata: { fieldName: "lyricDetails.transformation", required: true } },
-    { step: 1105, section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate", question: "Estilo musical? 🎸", type: "select", options: [
-        { label: "🎸 MPB", value: "mpb" }, 
-        { label: "🤠 Sertanejo", value: "sertanejo" }, 
-        { label: "🎤 Pop", value: "pop" },
-        { label: "🎺 Acústico", value: "acoustic" }, 
-        { label: "🎸 Rock", value: "rock" }, 
-        { label: "✨ Gospel", value: "gospel" },
-        { label: "🎙️ Rap", value: "rap" }, 
-        { label: "🌌 Outro", value: "other" }
-    ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "1105.5", section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate" && d.step_1105 === "other", question: "Qual outro estilo? 🎸", type: "input", placeholder: "Estilo…", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
-    { step: 1106, section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate", question: "Impacto emocional? 💖", type: "select", options: [
-        { label: "😭 Emocionar", value: "emotional" }, 
-        { label: "☮️ Paz", value: "peace" }, 
-        { label: "✨ Arrepio", value: "goosebumps" },
-        { label: "😊 Sorriso", value: "smile" }, 
-        { label: "🌅 Esperança", value: "hope" }, 
-        { label: "💪 Força", value: "strength" }
-    ], metadata: { fieldName: "musicStyle.mood", required: true } },
-    { step: 1107, section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate", question: "Tipo de movimento? ⚡", type: "select", options: [
-        { label: "🌊 Calma", value: "calm" }, 
-        { label: "⚖️ Equilibrada", value: "balanced" }, 
-        { label: "📈 Intensa", value: "intense" }, 
-        { label: "🧘 Meditativa", value: "meditative" }
-    ], metadata: { fieldName: "musicStyle.tempo", required: true } },
-    { step: 1108, section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate", question: "Tipo de voz? 🎙️", type: "select", options: [
-        { label: "🎙️ Masc. suave", value: "male_soft" }, 
-        { label: "🎙️ Masc. intensa", value: "male_strong" },
-        { label: "🎤 Fem. delicada", value: "female_soft" }, 
-        { label: "🎤 Fem. poderosa", value: "female_strong" },
-        { label: "🎵 Dueto", value: "duo" }, 
-        { label: "👥 Coral", value: "choir" }
-    ], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
+    { step: 1100, section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate", question: "Nome da empresa?", hint: "Qual é o nome da sua empresa?", type: "input", placeholder: "Ex: Empresa...", minLength: 2, metadata: { fieldName: "recipient.name", required: true } },
+    { step: 1101, section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate", question: "Segmento / Ramo?", hint: "Em qual ramo a empresa atua? Tech, varejo, saúde, educação, etc?", type: "input", placeholder: "Ex: Ramo...", minLength: 2, metadata: { fieldName: "ai_metadata.relationship", required: true } },
+    { step: 1102, section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate", question: "Missão / Visão?", hint: "Qual é a missão e visão da empresa? O que vocês fazem? Qual é o objetivo?", type: "textarea", placeholder: "Ex: Missão...", minLength: 15, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
+    { step: 1103, section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate", question: "Valores da empresa?", hint: "Quais são os valores principais que a empresa representa? Inovação, integridade, excelência?", type: "textarea", placeholder: "Ex: Valores...", minLength: 15, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
+    { step: 1104, section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate", question: "Mensagem para o público?", hint: "Qual é a mensagem que a empresa quer passar para seus clientes ou colaboradores?", type: "textarea", placeholder: "Ex: Mensagem...", minLength: 15, metadata: { fieldName: "lyricDetails.transformation", required: true } },
+    { step: 1105, section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate", question: "Estilo musical?", hint: "Que tipo de música combina com a imagem da empresa?", type: "select", options: [{ label: "🎸 MPB", value: "mpb" }, { label: "🤠 Sertanejo", value: "sertanejo" }, { label: "🎤 Pop", value: "pop" }, { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" }, { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
+    { step: "1105.5", section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate" && d.step_1105 === "other", question: "Qual outro estilo?", hint: "Descreva o estilo.", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: 1106, section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate", question: "Impacto emocional?", hint: "Como você quer que as pessoas se sintam?", type: "select", options: [{ label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" }, { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }], metadata: { fieldName: "musicStyle.mood", required: true } },
+    { step: 1107, section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate", question: "Tipo de movimento?", hint: "Qual ritmo combina?", type: "select", options: [{ label: "🌊 Calma", value: "calm" }, { label: "⚖️ Equilibrada", value: "balanced" }, { label: "📈 Intensa", value: "intense" }, { label: "🧘 Meditativa", value: "meditative" }], metadata: { fieldName: "musicStyle.tempo", required: true } },
+    { step: 1108, section: "CORPORATIVO", condition: (d) => d.step_0 === "corporate", question: "Tipo de voz?", hint: "Qual tipo de voz?", type: "select", options: [{ label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" }, { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" }, { label: "🎵 Dueto", value: "duo" }, { label: "👥 Coral", value: "choir" }], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
 
     // ===== TEMA 12: OUTRO (1200-1208) =====
-    { step: 1200, section: "OUTRO", condition: (d) => d.step_0 === "other", question: "Descreva seu tema custom? 🎭", type: "textarea", placeholder: "Qual é a ideia…", minLength: 20, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
-    { step: 1201, section: "OUTRO", condition: (d) => d.step_0 === "other", question: "Para quem é a música? 👤", type: "input", placeholder: "Pessoa ou grupo…", minLength: 2, metadata: { fieldName: "recipient.name", required: true } },
-    { step: 1202, section: "OUTRO", condition: (d) => d.step_0 === "other", question: "Detalhes importantes? 📝", type: "textarea", placeholder: "Detalhes…", minLength: 15, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
-    { step: 1203, section: "OUTRO", condition: (d) => d.step_0 === "other", question: "Estilo musical? 🎸", type: "select", options: [
-        { label: "🎸 MPB", value: "mpb" }, 
-        { label: "🤠 Sertanejo", value: "sertanejo" }, 
-        { label: "🎤 Pop", value: "pop" },
-        { label: "🎺 Acústico", value: "acoustic" }, 
-        { label: "🎸 Rock", value: "rock" }, 
-        { label: "✨ Gospel", value: "gospel" },
-        { label: "🎙️ Rap", value: "rap" }, 
-        { label: "🌌 Outro", value: "other" }
-    ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "1203.5", section: "OUTRO", condition: (d) => d.step_0 === "other" && d.step_1203 === "other", question: "Qual outro estilo? 🎸", type: "input", placeholder: "Estilo…", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
-    { step: 1204, section: "OUTRO", condition: (d) => d.step_0 === "other", question: "Impacto emocional? 💖", type: "select", options: [
-        { label: "😭 Emocionar", value: "emotional" }, 
-        { label: "☮️ Paz", value: "peace" }, 
-        { label: "✨ Arrepio", value: "goosebumps" },
-        { label: "😊 Sorriso", value: "smile" }, 
-        { label: "🌅 Esperança", value: "hope" }, 
-        { label: "💪 Força", value: "strength" }
-    ], metadata: { fieldName: "musicStyle.mood", required: true } },
-    { step: 1205, section: "OUTRO", condition: (d) => d.step_0 === "other", question: "Tipo de movimento? ⚡", type: "select", options: [
-        { label: "🌊 Calma", value: "calm" }, 
-        { label: "⚖️ Equilibrada", value: "balanced" }, 
-        { label: "📈 Intensa", value: "intense" }, 
-        { label: "🧘 Meditativa", value: "meditative" }
-    ], metadata: { fieldName: "musicStyle.tempo", required: true } },
-    { step: 1206, section: "OUTRO", condition: (d) => d.step_0 === "other", question: "Idioma? 🌍", type: "select", options: [
-        { label: "🇧🇷 Português", value: "pt_br" }, 
-        { label: "🇺🇸 Inglês", value: "en" }, 
-        { label: "🇪🇸 Espanhol", value: "es" },
-        { label: "🇮🇹 Italiano", value: "it" }, 
-        { label: "🌍 Outro", value: "other" }
-    ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "1206.5", section: "OUTRO", condition: (d) => d.step_0 === "other" && d.step_1206 === "other", question: "Qual outro idioma? 🌍", type: "input", placeholder: "Idioma…", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
-    { step: 1207, section: "OUTRO", condition: (d) => d.step_0 === "other", question: "Tipo de voz? 🎙️", type: "select", options: [
-        { label: "🎙️ Masc. suave", value: "male_soft" }, 
-        { label: "🎙️ Masc. intensa", value: "male_strong" },
-        { label: "🎤 Fem. delicada", value: "female_soft" }, 
-        { label: "🎤 Fem. poderosa", value: "female_strong" },
-        { label: "🎵 Dueto", value: "duo" }, 
-        { label: "👥 Coral", value: "choir" }
-    ], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
-    { step: 1208, section: "OUTRO", condition: (d) => d.step_0 === "other", question: "O que evitar? 🚫", type: "textarea", placeholder: "Evitar…", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } }
+    { step: 1200, section: "OUTRO", condition: (d) => d.step_0 === "other", question: "Descreva seu tema custom?", hint: "Qual é a sua ideia? Descreva o tema que você tem em mente e que não está nas opções.", type: "textarea", placeholder: "Ex: Qual é a ideia...", minLength: 20, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
+    { step: 1201, section: "OUTRO", condition: (d) => d.step_0 === "other", question: "Para quem é a música?", hint: "A música é para uma pessoa, grupo, ou ocasião específica?", type: "input", placeholder: "Ex: Pessoa ou grupo...", minLength: 2, metadata: { fieldName: "recipient.name", required: true } },
+    { step: 1202, section: "OUTRO", condition: (d) => d.step_0 === "other", question: "Detalhes importantes?", hint: "Tem algo específico que você quer que apareça na música? Contexto, histórias, mensagens?", type: "textarea", placeholder: "Ex: Detalhes...", minLength: 15, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
+    { step: 1203, section: "OUTRO", condition: (d) => d.step_0 === "other", question: "Estilo musical?", hint: "Que tipo de música combina?", type: "select", options: [{ label: "🎸 MPB", value: "mpb" }, { label: "🤠 Sertanejo", value: "sertanejo" }, { label: "🎤 Pop", value: "pop" }, { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" }, { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
+    { step: "1203.5", section: "OUTRO", condition: (d) => d.step_0 === "other" && d.step_1203 === "other", question: "Qual outro estilo?", hint: "Descreva o estilo.", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: 1204, section: "OUTRO", condition: (d) => d.step_0 === "other", question: "Impacto emocional?", hint: "Como você quer que as pessoas se sintam?", type: "select", options: [{ label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" }, { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }], metadata: { fieldName: "musicStyle.mood", required: true } },
+    { step: 1205, section: "OUTRO", condition: (d) => d.step_0 === "other", question: "Tipo de movimento?", hint: "Qual ritmo combina?", type: "select", options: [{ label: "🌊 Calma", value: "calm" }, { label: "⚖️ Equilibrada", value: "balanced" }, { label: "📈 Intensa", value: "intense" }, { label: "🧘 Meditativa", value: "meditative" }], metadata: { fieldName: "musicStyle.tempo", required: true } },
+    { step: 1206, section: "OUTRO", condition: (d) => d.step_0 === "other", question: "Idioma?", hint: "Em qual idioma?", type: "select", options: [{ label: "🇧🇷 Português", value: "pt_br" }, { label: "🇺🇸 Inglês", value: "en" }, { label: "🇪🇸 Espanhol", value: "es" }, { label: "🇮🇹 Italiano", value: "it" }, { label: "🌍 Outro", value: "other" }], metadata: { fieldName: "lyricDetails.language", required: true } },
+    { step: "1206.5", section: "OUTRO", condition: (d) => d.step_0 === "other" && d.step_1206 === "other", question: "Qual outro idioma?", hint: "Escolha o idioma.", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: 1207, section: "OUTRO", condition: (d) => d.step_0 === "other", question: "Tipo de voz?", hint: "Qual tipo de voz?", type: "select", options: [{ label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" }, { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" }, { label: "🎵 Dueto", value: "duo" }, { label: "👥 Coral", value: "choir" }], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
+    { step: 1208, section: "OUTRO", condition: (d) => d.step_0 === "other", question: "O que evitar?", hint: "Tem algo que você não quer que apareça?", type: "textarea", placeholder: "Ex: Evitar...", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } }
 ];
 
-console.log('✅ chat_themes_completo.js carregado!');
+console.log('✅ CHAT_THEMES_12_TEMAS_COMPLETO.js carregado!');
 console.log('✅ Total de steps:', elaboratedChatFlow.length);
-console.log('✅ Temas disponíveis: 12 completos');
-console.log('✅ Funcionando em seu login.html agora!');
+console.log('✅ 12 temas completos com hints (adendo contextual)');
+console.log('✅ Pronto para uso no seu projeto!');
