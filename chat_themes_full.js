@@ -576,8 +576,4 @@ elaboratedChatFlow = [
 ];
 
 
-// ============================================
-// EXPORT
-// ============================================
-
-export { elaboratedChatFlow, StepHierarchy };
+console.log('✅ elaboratedChatFlow carregado com sucesso!');
