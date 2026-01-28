@@ -1017,31 +1017,24 @@
           if (order.status === "draft") {
             hasDrafts = true;
             const summary = extractSummaryFromPayload(order.payload);
-
-            draftsContainer.innerHTML += `
-              <div class="card draft-card">
-                <div class="card-header">
-                  <h3>🎵 Música para: ${summary.recipient}</h3>
-                  <span class="status-badge status-draft">Rascunho</span>
-                </div>
-
-                <div class="draft-summary">
-                  <p><strong>Para:</strong> ${summary.recipient} (${summary.ageGroup})</p>
-                  <p><strong>Ocasião:</strong> ${summary.occasion}</p>
-                  <p><strong>Gênero:</strong> ${summary.genre}</p>
-                  <p><strong>Mensagem:</strong> "${summary.message}"</p>
-                </div>
-
-                <div class="action-row">
-                  <button class="btn btn-revise" onclick="editarDraft('${order.id}')">
-                    ✏️ Editar Formulário
-                  </button>
-                  <button class="btn btn-approve" onclick="irParaCheckout('${order.id}')">
-                    💳 Pagar e Gerar Letra (R$ 49,90)
-                  </button>
-                </div>
-              </div>
-            `;
+draftsContainer.innerHTML += `
+    <div class="card draft-card">
+        <div class="card-header">
+            <h3>🎵 ${summary.recipient}</h3>
+            <span class="status-badge status-draft">Rascunho</span>
+        </div>
+        <div class="draft-summary">
+            <p><strong>Tema:</strong> ${summary.recipient}</p>
+            <p><strong>Gênero:</strong> ${summary.genre}</p>
+            <p><strong>Perguntas:</strong> ${summary.asked_count} respondidas</p>
+            <p><strong>Descrição:</strong> "${summary.message}"</p>
+        </div>
+        <div class="action-row">
+            <button class="btn btn-revise" onclick="editarDraft(${order.id})">✏️ Editar Formulário</button>
+            <button class="btn btn-approve" onclick="irParaCheckout(${order.id})">💰 Pagar e Gerar Letra (R$ 49,90)</button>
+        </div>
+    </div>
+`;
           }
           else if (order.status === "pending_approval" && !order.versao_modificada) {
             hasPending = true;
@@ -1887,6 +1880,7 @@ async function saveEditDraftNew() {
 
 </body>
 </html>
+
 
 
 
