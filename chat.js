@@ -100,21 +100,39 @@ function renderQuestion() {
     const inputContainer = document.getElementById("inputSection");
     inputContainer.innerHTML = "";
 
+    // 🔍 DEBUG: Ver estado atual
+    console.log("🔍 DEBUG renderQuestion:");
+    console.log("   formData.step_0 =", formData.step_0);
+    console.log("   formData.step_100 =", formData.step_100);
+    console.log("   formData =", formData);
+
+    // Filtrar apenas steps válidos para este tema
     const validSteps = elaboratedChatFlow.filter((step) => {
         if (step.condition) return step.condition(formData);
         return true;
     });
 
     console.log("📋 Steps válidos para este tema:", validSteps.length);
-    console.log("📍 Current step:", currentStep);
+    console.log("📍 Current step (index):", currentStep);
 
+    // Se passou do limite
     if (currentStep >= validSteps.length) {
+        console.log("✅ Fim do formulário! Mostrando botão Salvar");
         renderSaveButton(inputContainer);
         scrollToBottom();
         return;
     }
 
     currentQuestion = validSteps[currentStep];
+
+    if (!currentQuestion) {
+        console.error("❌ Erro: currentQuestion é null");
+        console.log("   validSteps.length =", validSteps.length);
+        console.log("   currentStep =", currentStep);
+        return;
+    }
+
+    console.log("📌 Pergunta atual:", currentQuestion.step, "-", currentQuestion.question);
 
     const progress = ((currentStep + 1) / (validSteps.length + 1)) * 100;
     const pf = document.getElementById("progressFill");
@@ -187,13 +205,11 @@ function renderInput(question, container) {
 function handleOption(val, label) {
     addMessage("user", label);
     
-    // Salvar no objeto answers (estruturado)
+    // ✅ PASSO 1: Salvar a resposta IMEDIATAMENTE
     setNestedValue(formData.answers, currentQuestion.metadata.fieldName, val);
+    formData[`step_${currentQuestion.step}`] = val;  // ← SUPER IMPORTANTE!
     
-    // Salvar step0, step1, step2, etc para conditions dinâmicas
-    formData[`step${currentQuestion.step}`] = val;
-    
-    // Registrar pergunta + resposta no array asked
+    // ✅ PASSO 2: Registrar no array asked
     formData.asked = formData.asked || [];
     formData.asked.push({
         id: currentQuestion.metadata.fieldName,
@@ -205,9 +221,13 @@ function handleOption(val, label) {
         timestamp: new Date().toISOString()
     });
     
-    console.log("✅ Opção selecionada:", val, "Form agora tem:", formData);
+    console.log("✅ Resposta salva:", currentQuestion.step, "=", val);
+    console.log("📊 formData agora:", formData);
     
+    // ✅ PASSO 3: DEPOIS incrementar
     currentStep++;
+    
+    // ✅ PASSO 4: DEPOIS renderizar (com dados ATUALIZADOS)
     setTimeout(renderQuestion, 600);
 }
 
@@ -222,12 +242,11 @@ function handleInput() {
 
     addMessage("user", val);
     
+    // ✅ PASSO 1: Salvar IMEDIATAMENTE
     setNestedValue(formData.answers, currentQuestion.metadata.fieldName, val);
+    formData[`step_${currentQuestion.step}`] = val;  // ← SUPER IMPORTANTE!
     
-    // Salvar step0, step1, step2, etc para conditions
-    formData[`step${currentQuestion.step}`] = val;
-    
-    // Registrar pergunta + resposta
+    // ✅ PASSO 2: Registrar
     formData.asked = formData.asked || [];
     formData.asked.push({
         id: currentQuestion.metadata.fieldName,
@@ -239,9 +258,13 @@ function handleInput() {
         timestamp: new Date().toISOString()
     });
     
-    console.log("✅ Input registrado:", val, "Form agora tem:", formData);
+    console.log("✅ Resposta salva:", currentQuestion.step, "=", val);
+    console.log("📊 formData agora:", formData);
     
+    // ✅ PASSO 3: DEPOIS incrementar
     currentStep++;
+    
+    // ✅ PASSO 4: DEPOIS renderizar
     setTimeout(renderQuestion, 600);
 }
 
