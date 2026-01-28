@@ -31,678 +31,261 @@
       overflow-x:hidden;
     }
 
-    .container{ max-width: 1120px; margin: 0 auto; padding: 0 20px; }
-    .section{ padding: 68px 0; border-top: 1px solid rgba(255,255,255,.06); }
-    .h2{
-      font-size: 2rem; letter-spacing: -.5px; font-weight: 1000;
-      text-align:center; margin-bottom: 10px;
-    }
-    .desc{
-      text-align:center; color: var(--tm);
-      max-width: 860px; margin: 0 auto 28px auto;
-      font-size: 1.02rem;
-    }
+    .container{ max-width:1120px; margin:0 auto; padding:0 16px; }
+    .section{ padding:64px 0; border-top:1px solid rgba(255,255,255,.06); }
 
-    /* Buttons */
     .btn{
-      appearance:none; border:none; cursor:pointer;
-      border-radius: 12px; padding: 13px 18px;
-      font-weight: 1000; font-size: .98rem;
-      display:inline-flex; align-items:center; justify-content:center; gap:10px;
-      text-decoration:none; user-select:none; white-space:nowrap;
-      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+      border:none; cursor:pointer;
+      border-radius:12px; padding:14px 18px;
+      font-weight:1000; font-size:1rem;
+      display:inline-flex; align-items:center; justify-content:center;
+      transition:.2s;
     }
     .btn-primary{
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: #fff; box-shadow: 0 14px 40px rgba(0,217,255,.18);
+      background:linear-gradient(135deg,var(--primary),var(--secondary));
+      color:#fff;
+      box-shadow:0 14px 40px rgba(0,217,255,.2);
     }
-    .btn-primary:hover{ transform: translateY(-2px); box-shadow: 0 18px 55px rgba(0,217,255,.28); }
-    .btn-ghost{
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.10);
-      color: var(--t);
-      box-shadow: none;
-    }
-    .btn-ghost:hover{ transform: translateY(-2px); border-color: rgba(0,217,255,.45); }
+    .btn-primary:hover{ transform:translateY(-2px); }
 
     /* HERO */
-    header.hero{
-      position: relative;
-      padding: 44px 0 28px 0;
-      border-bottom: 1px solid rgba(255,255,255,.06);
-      overflow:hidden;
+    header{
+      padding:44px 0 32px;
       background:
-        radial-gradient(1200px 520px at 25% 20%, rgba(0,217,255,.12), transparent 55%),
-        radial-gradient(900px 520px at 80% 55%, rgba(99,102,241,.12), transparent 55%),
-        linear-gradient(135deg, var(--dark) 0%, var(--dark2) 100%);
+        radial-gradient(1000px 520px at 30% 20%, rgba(0,217,255,.12), transparent 55%),
+        linear-gradient(135deg,var(--dark),var(--dark2));
+      border-bottom:1px solid rgba(255,255,255,.06);
     }
-    header.hero::before{
-      content:""; position:absolute; inset:-2px;
-      background:
-        radial-gradient(circle at 30% 30%, rgba(0,217,255,.08), transparent 55%),
-        radial-gradient(circle at 70% 70%, rgba(99,102,241,.08), transparent 55%);
-      pointer-events:none;
-    }
-    header.hero .container{ position:relative; z-index:1; }
 
-    .brand{ display:flex; align-items:center; justify-content:center; gap:10px; }
-    .brand img{ height:56px; filter: drop-shadow(0 10px 20px rgba(0,217,255,.16)); }
+    .brand{ display:flex; justify-content:center; }
+    .brand img{ height:54px; }
 
     .pill{
-      display:inline-flex; align-items:center; gap:8px;
-      margin: 14px auto 0 auto;
-      padding: 7px 12px;
+      margin:14px auto 0;
+      padding:7px 14px;
       border-radius:999px;
       border:1px solid rgba(0,217,255,.25);
-      background: rgba(0,217,255,.06);
-      color: var(--tl);
-      font-size:.86rem;
+      background:rgba(0,217,255,.06);
+      color:var(--tl);
+      font-size:.85rem;
+      width:fit-content;
     }
 
     .hero-grid{
       display:grid;
-      grid-template-columns: 1.05fr .95fr;
-      gap: 22px;
+      grid-template-columns:1fr 1fr;
+      gap:24px;
+      margin-top:24px;
       align-items:center;
-      margin-top: 22px;
     }
 
-    .hero h1{
-      font-size: 2.55rem;
-      letter-spacing:-.7px;
-      line-height:1.08;
+    h1{
+      font-size:2.4rem;
+      line-height:1.1;
       font-weight:1100;
-      margin-bottom: 12px;
+      margin-bottom:12px;
     }
-    .hero .lead{
-      font-size: 1.06rem;
-      color: var(--tl);
-      margin-bottom: 12px;
-      max-width: 58ch;
+
+    .lead{
+      color:var(--tl);
+      font-size:1.05rem;
+      margin-bottom:14px;
+      max-width:55ch;
     }
 
     .promise{
-      display:inline-block;
-      margin: 6px 0 14px 0;
-      padding: 12px 14px;
-      border-radius: 14px;
-      border: 1px solid rgba(16,185,129,.22);
-      background: rgba(16,185,129,.14);
-      color: rgba(183,255,227,.98);
-      font-weight: 900;
-    }
-
-    .hero-actions{
-      display:flex; gap:10px; flex-wrap:wrap; margin-top: 6px;
+      background:rgba(16,185,129,.14);
+      border:1px solid rgba(16,185,129,.25);
+      padding:12px 14px;
+      border-radius:14px;
+      font-weight:900;
+      color:#b7ffe3;
+      margin-bottom:16px;
     }
 
     .chips{
-      margin-top: 14px;
-      display:flex; gap:10px; flex-wrap:wrap;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:16px;
     }
     .chip{
-      padding: 9px 12px;
+      padding:8px 12px;
       border-radius:999px;
       border:1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.03);
-      color: var(--tl);
-      font-size: .9rem;
-      backdrop-filter: blur(10px);
+      background:rgba(255,255,255,.03);
+      font-size:.9rem;
+      color:var(--tl);
     }
 
-    /* Demo Card */
     .card{
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 18px;
-      padding: 18px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(12px);
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:18px;
+      padding:18px;
+      box-shadow:var(--shadow);
     }
-    .card .badge{
-      display:inline-flex; align-items:center; gap:8px;
-      padding: 6px 10px;
-      border-radius:999px;
-      font-size:.82rem;
-      font-weight:1000;
-      color: rgba(183,255,227,.98);
-      border:1px solid rgba(16,185,129,.25);
-      background: rgba(16,185,129,.12);
-      margin-bottom: 12px;
-    }
-    .card h3{ font-size:1.08rem; font-weight:1100; letter-spacing:-.2px; margin-bottom: 10px; }
-    .demo{
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.22);
-      padding: 14px;
-    }
-    .demo-top{
-      display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom: 10px;
-    }
-    .demo-title{ font-weight:1000; color: var(--tl); font-size:.95rem; }
-    .demo-tag{
-      font-size:.78rem; color: var(--tm);
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.03);
-      padding:6px 10px; border-radius:999px; white-space:nowrap;
-    }
-    .demo audio{ width: 100%; display:block; }
-    .mini-proof{
-      margin-top: 12px;
-      border-top: 1px solid rgba(255,255,255,.08);
-      padding-top: 12px;
-      display:grid; gap:10px;
-    }
-    .mini-proof p{
-      color: var(--tm);
-      font-size:.92rem;
-      line-height:1.55;
-    }
-    .mini-proof b{ color: var(--tl); }
 
-    /* Proof */
-    .proof-row{
-      margin-top: 18px;
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-    .proof{
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.03);
-      padding: 14px;
-      text-align:left;
-    }
-    .proof .k{ font-weight:1100; font-size:1.15rem; letter-spacing:-.3px; margin-bottom: 4px; }
-    .proof .v{ color: var(--tm); font-size:.92rem; }
+    audio{ width:100%; margin-top:10px; }
 
-    /* Steps */
-    .steps{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin-top: 18px;
-    }
-    .step{
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.03);
-      padding: 18px;
-    }
-    .step .n{
-      width: 34px; height: 34px;
-      border-radius: 10px;
-      display:inline-flex; align-items:center; justify-content:center;
-      background: rgba(0,217,255,.12);
-      border: 1px solid rgba(0,217,255,.18);
-      font-weight:1100;
-      margin-bottom: 10px;
-    }
-    .step h3{ font-size: 1.06rem; font-weight:1100; letter-spacing:-.2px; margin-bottom: 8px; }
-    .step p{ color: var(--tm); font-size: .95rem; line-height: 1.6; }
-
-    /* Pricing */
-    .pricing-wrap{
-      display:grid;
-      grid-template-columns: 1.05fr .95fr;
-      gap: 16px;
-      align-items: start;
-      margin-top: 18px;
-    }
+    /* PREÇO */
     .pricing{
-      border-radius: 20px;
-      border: 1px solid rgba(0,217,255,.35);
-      background: linear-gradient(135deg, rgba(0,217,255,.10) 0%, rgba(99,102,241,.07) 100%);
-      padding: 20px;
-      box-shadow: 0 26px 80px rgba(0,217,255,.10);
-    }
-    .pricing .top{
-      display:flex; justify-content:space-between; align-items:center; gap:10px;
-      margin-bottom: 10px;
-    }
-    .pricing .label{
-      padding: 6px 10px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      color: var(--tm);
-      font-size:.82rem;
-      font-weight:1000;
-    }
-    .pricing h3{
-      font-size: 1.35rem;
-      font-weight:1100;
-      letter-spacing:-.3px;
-      margin: 0;
-    }
-    .price-row{ margin-top: 10px; display:flex; gap:12px; align-items:baseline; flex-wrap:wrap; }
-    .old{ text-decoration:line-through; color: rgba(239,68,68,.95); font-weight: 900; font-size: 1.05rem; }
-    .now{ font-size: 2.05rem; font-weight: 1100; letter-spacing:-.6px; color: rgba(183,255,227,.98); text-shadow: 0 0 18px rgba(16,185,129,.20); }
-    .off{ color:#f59e0b; font-weight:1100; font-size:.95rem; }
-
-    .callout{
-      margin-top: 12px;
-      padding: 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(16,185,129,.22);
-      background: rgba(16,185,129,.12);
-      color: rgba(183,255,227,.98);
-      font-weight: 1000;
-      line-height:1.4;
+      border:1px solid rgba(0,217,255,.35);
+      background:linear-gradient(135deg,rgba(0,217,255,.1),rgba(99,102,241,.07));
+      border-radius:20px;
+      padding:22px;
+      max-width:520px;
+      margin:0 auto;
+      text-align:center;
+      box-shadow:0 30px 90px rgba(0,217,255,.12);
     }
 
-    .feat{
-      list-style:none; margin-top: 14px; padding-left: 0;
-    }
-    .feat li{
-      padding: 9px 0;
-      border-bottom: 1px solid rgba(255,255,255,.06);
-      color: var(--tl);
-      display:flex; gap:10px; align-items:flex-start;
-      font-size:.96rem; line-height:1.45;
-    }
-    .feat li:last-child{ border-bottom:none; }
-    .feat li::before{ content:"✓"; color: var(--success); font-weight: 1100; }
+    .old{ text-decoration:line-through; color:#ef4444; font-weight:900; }
+    .now{ font-size:2.1rem; font-weight:1100; color:#b7ffe3; }
+    .off{ color:#f59e0b; font-weight:900; }
 
-    .cta-big{
-      margin-top: 14px;
-      width: 100%;
-      justify-content:center;
-      padding: 14px 16px;
-      background: linear-gradient(45deg, #10b981, #f59e0b);
-      box-shadow: 0 18px 55px rgba(16,185,129,.18);
-      font-weight:1100;
-    }
-    .cta-big:hover{ transform: translateY(-2px); box-shadow: 0 22px 70px rgba(16,185,129,.26); }
-
-    .side{ display:grid; gap: 12px; }
-    .quote{ color: var(--tl); font-style:italic; font-size:.94rem; line-height:1.55; }
-    .who{ margin-top: 10px; color: var(--primary); font-weight:1100; font-size:.85rem; }
+    ul{ list-style:none; margin-top:14px; text-align:left; }
+    li{ margin-bottom:8px; color:var(--tl); }
+    li::before{ content:"✓ "; color:var(--success); font-weight:900; }
 
     /* FAQ */
-    .faq{
-      max-width: 920px;
-      margin: 0 auto;
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 18px;
-    }
     details{
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.03);
-      padding: 14px;
-      backdrop-filter: blur(10px);
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:14px;
+      padding:14px;
     }
-    summary{
-      cursor:pointer;
-      list-style:none;
-      font-weight:1100;
-      color: var(--tl);
-      font-size:.98rem;
-    }
-    summary::-webkit-details-marker{ display:none; }
-    details p{ margin-top: 10px; color: var(--tm); font-size:.94rem; line-height:1.65; }
+    summary{ cursor:pointer; font-weight:900; }
+    details p{ margin-top:8px; color:var(--tm); }
 
-    /* Footer */
-    footer{
-      padding: 44px 0;
-      border-top: 1px solid rgba(255,255,255,.06);
-      color: var(--tm);
-      text-align:center;
-      background: rgba(255,255,255,.01);
-    }
-    footer img{ height: 30px; filter: drop-shadow(0 3px 8px rgba(0,217,255,.12)); }
-
-    /* Sticky bar (always show value) */
-    .page-pad{ padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
-    .sticky-bar{
-      position: fixed; left: 0; right: 0; bottom: 0;
-      z-index: 9999;
-      background: rgba(10,14,39,.88);
-      border-top: 1px solid rgba(255,255,255,.10);
-      backdrop-filter: blur(12px);
-      padding: 10px 12px calc(10px + env(safe-area-inset-bottom)) 12px;
-    }
-    .sticky-inner{
-      max-width: 1120px;
-      margin: 0 auto;
+    /* STICKY */
+    .sticky{
+      position:fixed;
+      bottom:0; left:0; right:0;
+      background:rgba(10,14,39,.9);
+      backdrop-filter:blur(12px);
+      border-top:1px solid rgba(255,255,255,.1);
+      padding:12px;
       display:flex;
-      align-items:center;
       justify-content:space-between;
-      gap:10px;
+      align-items:center;
+      z-index:999;
     }
-    .sticky-left{ display:flex; flex-direction:column; gap:2px; min-width:0; }
-    .sticky-title{
-      font-weight:1100; letter-spacing:-.2px;
-      color: var(--tl);
-      font-size:.92rem;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      max-width: 56vw;
-    }
-    .sticky-price{ display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; }
-    .sticky-old{ text-decoration:line-through; color: rgba(239,68,68,.95); font-weight:1100; font-size:.9rem; }
-    .sticky-now{ color: rgba(183,255,227,.98); font-weight:1100; font-size:1.2rem; }
-    .sticky-cta{
-      padding: 12px 14px;
-      border-radius: 12px;
-      font-weight:1100;
-      background: linear-gradient(45deg, #10b981, #f59e0b);
-      color: #08101f;
-      border:none;
-      cursor:pointer;
-      white-space:nowrap;
-      box-shadow: 0 12px 40px rgba(16,185,129,.16);
-      transition: transform .2s ease, box-shadow .2s ease;
-    }
-    .sticky-cta:hover{ transform: translateY(-1px); box-shadow: 0 16px 55px rgba(16,185,129,.24); }
 
-    /* Responsive */
-    @media (max-width: 980px){
-      .hero-grid{ grid-template-columns: 1fr; }
-      .proof-row{ grid-template-columns: 1fr; }
-      .steps{ grid-template-columns: 1fr; }
-      .pricing-wrap{ grid-template-columns: 1fr; }
-      .faq{ grid-template-columns: 1fr; }
-      .hero h1{ font-size: 2.2rem; }
-    }
-    @media (max-width: 520px){
-      .container{ padding: 0 16px; }
-      .section{ padding: 54px 0; }
-      .h2{ font-size: 1.65rem; }
-      .desc{ font-size: .98rem; margin-bottom: 22px; }
-
-      header.hero{ padding: 36px 0 22px 0; }
-      .brand img{ height: 52px; }
-
-      .hero h1{ font-size: 1.78rem; line-height: 1.1; }
-      .hero .lead{ font-size: 1rem; }
-      .promise{ width: 100%; text-align: center; }
-
-      .hero-actions{ width: 100%; }
-      .hero-actions .btn{ width: 100%; }
-
-      .chips .chip{ width: 100%; justify-content:center; }
-
-      .demo-top{ flex-direction: column; align-items:flex-start; }
-      .demo-tag{ align-self:flex-start; }
-      .sticky-title{ max-width: 54vw; }
-    }
-    @media (max-width: 380px){
-      .sticky-title{ max-width: 48vw; }
-      .sticky-cta{ padding: 12px 12px; }
+    @media(max-width:900px){
+      .hero-grid{ grid-template-columns:1fr; }
+      h1{ font-size:1.8rem; }
+      .btn-primary{ width:100%; }
     }
   </style>
 </head>
 
 <body>
-  <div class="page-pad">
 
-    <!-- Chat modal (mantido) -->
-    <div class="chat-modal" id="chatModal">
-      <div class="chat-container">
-        <div class="chat-header">
-          <h2>🎂 Música de Aniversário</h2>
-          <button class="close-chat" onclick="closeChat()">×</button>
-          <div class="progress-bar">
-            <div class="progress-fill" id="progressFill"></div>
-          </div>
-        </div>
-
-        <div class="chat-messages" id="chatMessages"></div>
-        <div class="chat-input-section" id="inputSection"></div>
-      </div>
+<header>
+  <div class="container">
+    <div class="brand">
+      <img src="https://i.ibb.co/wFFzDMy9/tunecraft-logo-transparente.png">
     </div>
 
-    <!-- HERO -->
-    <header class="hero" id="topo">
-      <div class="container">
-        <div class="brand">
-          <img src="https://i.ibb.co/wFFzDMy9/tunecraft-logo-transparente.png" alt="TuneCraft" />
+    <div class="pill">🎂 Música de Aniversário</div>
+
+    <div class="hero-grid">
+      <div>
+        <h1>Um presente diferente, sem risco de errar</h1>
+        <p class="lead">
+          Você conta histórias reais. A TuneCraft transforma isso em uma música
+          personalizada, com voz e arranjo profissional.
+        </p>
+
+        <div class="promise">
+          ⚡ Música em até <b>10 minutos</b> após aprovação da letra
         </div>
 
-        <div style="display:flex; justify-content:center;">
-          <div class="pill">Tema: 🎂 Aniversário</div>
-        </div>
+        <button class="btn btn-primary" onclick="goToCheckoutWithTheme()">
+          Criar minha música por R$ 49,90
+        </button>
 
-        <div class="hero-grid">
-          <!-- Left -->
-          <div>
-            <h1>Um presente que acerta sem você “inventar moda”.</h1>
-            <p class="lead">
-              Você conta histórias reais (cenas, apelidos, piadas internas). A TuneCraft transforma isso em uma música
-              com voz e arranjo — com a cara da pessoa.
-            </p>
-
-            <div class="promise">⚡ Música em até <b>10 minutos</b> após aprovação da letra.</div>
-
-            <div class="hero-actions">
-              <button class="btn btn-primary" onclick="goToCheckoutWithTheme()">
-                Criar minha música por R$ 49,90
-              </button>
-              <button class="btn btn-ghost" onclick="document.getElementById('preco').scrollIntoView({behavior:'smooth'})">
-                Ver detalhes e preço
-              </button>
-            </div>
-
-            <div class="chips">
-              <div class="chip">✅ Você aprova a letra antes</div>
-              <div class="chip">✍️ Pode pedir alterações específicas após gerar a letra</div>
-              <div class="chip">🎧 No final, você recebe <b>2 versões</b> da música com a mesma letra</div>
-            </div>
-
-            <div class="proof-row">
-              <div class="proof">
-                <div class="k">Sem “template”</div>
-                <div class="v">Detalhes reais → letra com a identidade da pessoa.</div>
-              </div>
-              <div class="proof">
-                <div class="k">Sob controle</div>
-                <div class="v">Você ajusta a letra e aprova antes do áudio final.</div>
-              </div>
-              <div class="proof">
-                <div class="k">Mais opções</div>
-                <div class="v">Geramos 2 versões com a mesma letra (pra você escolher a melhor).</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Right -->
-          <div class="card">
-            <div class="badge">▶ Ouça um trecho (exemplo curto)</div>
-            <h3>Entenda o “clima” em 20 segundos</h3>
-
-            <div class="demo">
-              <div class="demo-top">
-                <div class="demo-title">Exemplo: “Aniversário (Pop leve)”</div>
-                <div class="demo-tag">~20s</div>
-              </div>
-
-              <audio controls preload="none">
-                <source src="demo-exemplo.mp3" type="audio/mpeg" />
-                Seu navegador não suporta áudio.
-              </audio>
-
-              <div class="mini-proof">
-                <p><b>Você não precisa escrever bem.</b> O chat te guia com perguntas simples.</p>
-                <p><b>Você tem controle.</b> Pode pedir alterações específicas na letra antes do áudio final.</p>
-                <p><b>Você escolhe.</b> No fim, entregamos <b>2 versões</b> da música com a mesma letra.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </header>
-
-    <!-- COMO FUNCIONA -->
-    <section class="section" id="como-funciona">
-      <div class="container">
-        <div class="h2">Como funciona</div>
-        <div class="desc">Fluxo curto. Ajustável. Você aprova — e recebe duas versões finais.</div>
-
-        <div class="steps">
-          <div class="step">
-            <div class="n">1</div>
-            <h3>Você inicia o pedido</h3>
-            <p>Pagamento e cadastro rápidos liberam o chat.</p>
-          </div>
-          <div class="step">
-            <div class="n">2</div>
-            <h3>Geramos a letra</h3>
-            <p>Com base nas suas histórias, apelidos e estilo.</p>
-          </div>
-          <div class="step">
-            <div class="n">3</div>
-            <h3>Você ajusta e aprova</h3>
-            <p>Você pode pedir <b style="color:var(--tl);">alterações específicas</b>. Aprovou? Em até 10 minutos geramos o áudio.</p>
-          </div>
-        </div>
-
-        <div style="margin-top: 18px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
-          <button class="btn btn-primary" onclick="goToCheckoutWithTheme()">Criar por R$ 49,90</button>
-          <button class="btn btn-ghost" onclick="document.getElementById('preco').scrollIntoView({behavior:'smooth'})">Ver preço</button>
+        <div class="chips">
+          <div class="chip">✍️ Você pode pedir ajustes específicos na letra</div>
+          <div class="chip">🎧 Recebe 2 versões da música</div>
+          <div class="chip">🛡️ Garantia 30 dias</div>
         </div>
       </div>
-    </section>
 
-    <!-- PREÇO -->
-    <section class="section" id="preco" style="background: rgba(255,255,255,.01);">
-      <div class="container">
-        <div class="h2">Preço e entrega</div>
-        <div class="desc">Você recebe 2 versões finais com a mesma letra — e escolhe a melhor.</div>
-
-        <div class="pricing-wrap">
-          <div class="pricing">
-            <div class="top">
-              <h3>Single de Aniversário</h3>
-              <div class="label">Condição atual</div>
-            </div>
-
-            <div class="price-row">
-              <span class="old">R$ 99,90</span>
-              <span class="now">R$ 49,90</span>
-              <span class="off">50% OFF</span>
-            </div>
-
-            <div class="callout">⚡ Música em até 10 minutos após aprovação da letra.</div>
-
-            <ul class="feat">
-              <li>Letra sob medida (com ajustes específicos antes do áudio)</li>
-              <li>Entrega de <b>2 versões</b> com a mesma letra</li>
-              <li>Voz e estilo escolhidos</li>
-              <li>MP3 + WAV (qualidade de estúdio)</li>
-            </ul>
-
-            <button class="btn cta-big" onclick="goToCheckoutWithTheme()">Criar minha música por R$ 49,90</button>
-            <div style="margin-top:10px; color: rgba(183,255,227,.95); font-weight: 1000; font-size:.92rem;">
-              ✓ Garantia 30 dias
-            </div>
-          </div>
-
-          <div class="side">
-            <div class="card">
-              <div class="quote">“A gente ajustou um trecho específico e ficou perfeito. E ainda vieram duas versões pra escolher.”</div>
-              <div class="who">Cliente TuneCraft — Aniversário</div>
-            </div>
-
-            <div class="card">
-              <div class="quote">“A versão 1 ficou mais suave, a 2 mais animada. Usei a 2 na festa.”</div>
-              <div class="who">Cliente TuneCraft — Festa de aniversário</div>
-            </div>
-
-            <div class="card">
-              <div class="quote">“Aprovou a letra, em minutos já tava tocando no meu celular.”</div>
-              <div class="who">Cliente TuneCraft — Presente de última hora</div>
-            </div>
-          </div>
-        </div>
+      <div class="card">
+        <b>Ouça um trecho de exemplo</b>
+        <audio controls>
+          <source src="demo-exemplo.mp3" type="audio/mpeg">
+        </audio>
+        <p style="margin-top:10px;color:var(--tm)">
+          Mesmo clima, mesma letra — no final você escolhe a versão que mais gostar.
+        </p>
       </div>
-    </section>
-
-    <!-- FAQ -->
-    <section class="section" id="faq">
-      <div class="container">
-        <div class="h2">Perguntas rápidas</div>
-        <div class="desc">Poucas, mas as que importam.</div>
-
-        <div class="faq">
-          <details>
-            <summary>O que são “alterações específicas” na letra?</summary>
-            <p>Você pode pedir mudanças pontuais (frases, nomes, tom, um verso, uma referência) antes de aprovar a letra final.</p>
-          </details>
-
-          <details>
-            <summary>Como funcionam as 2 versões finais?</summary>
-            <p>Após a letra aprovada, geramos <b>duas versões de música</b> usando a mesma letra (variação de interpretação/arranjo) para você escolher a que preferir.</p>
-          </details>
-
-          <details>
-            <summary>“10 minutos” é garantido?</summary>
-            <p>Após você aprovar a letra, a geração do áudio é rápida — em até 10 minutos.</p>
-          </details>
-
-          <details>
-            <summary>O que eu recebo?</summary>
-            <p>Você recebe o áudio final em MP3 + WAV (qualidade de estúdio).</p>
-          </details>
-        </div>
-
-        <div style="margin-top: 18px; display:flex; justify-content:center;">
-          <button class="btn btn-primary" onclick="goToCheckoutWithTheme()">Criar por R$ 49,90</button>
-        </div>
-      </div>
-    </section>
-
-    <footer>
-      <div class="container">
-        <div style="margin-bottom: 14px;">
-          <img src="https://i.ibb.co/wFFzDMy9/tunecraft-logo-transparente.png" alt="TuneCraft" />
-        </div>
-        <div>Dados seguros • Garantia 30 dias</div>
-        <div style="margin-top: 10px; opacity: .85;">© 2026 TuneCraft. Todos os direitos reservados.</div>
-      </div>
-    </footer>
-
-  </div>
-
-  <!-- Sticky price/value (always visible) -->
-  <div class="sticky-bar" role="region" aria-label="Preço e CTA fixos">
-    <div class="sticky-inner">
-      <div class="sticky-left">
-        <div class="sticky-title">Música de Aniversário • 2 versões finais • até 10 min</div>
-        <div class="sticky-price">
-          <span class="sticky-old">R$ 99,90</span>
-          <span class="sticky-now">R$ 49,90</span>
-        </div>
-      </div>
-      <button class="sticky-cta" onclick="goToCheckoutWithTheme()">Criar por R$ 49,90</button>
     </div>
   </div>
+</header>
 
-  <script>
-    const LANDING_THEME_ID = "birthday";
-    const LANDING_THEME_LABEL = "Aniversário";
+<section class="section" id="preco">
+  <div class="container">
+    <div class="pricing">
+      <h2>Single de Aniversário</h2>
 
-    function persistLandingAttribution() {
-      localStorage.setItem("tunecraft_landing_themeId", LANDING_THEME_ID);
-      localStorage.setItem("tunecraft_landing_themeLabel", LANDING_THEME_LABEL);
-      localStorage.setItem("tunecraft_landing_path", location.pathname);
-      localStorage.setItem("tunecraft_landing_ts", new Date().toISOString());
-    }
+      <p>
+        <span class="old">R$ 99,90</span><br>
+        <span class="now">R$ 49,90</span><br>
+        <span class="off">50% OFF</span>
+      </p>
 
-    function goToCheckoutWithTheme() {
-      persistLandingAttribution();
-      window.location.href = "login.html?theme=" + encodeURIComponent(LANDING_THEME_ID);
-    }
-  </script>
+      <ul>
+        <li>Letra personalizada (com ajustes antes do áudio)</li>
+        <li>2 versões finais da música</li>
+        <li>Voz e estilo escolhidos</li>
+        <li>Entrega rápida (até 10 minutos)</li>
+      </ul>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="chat.js?v=2026-01-25T17:24"></script>
+      <button class="btn btn-primary" onclick="goToCheckoutWithTheme()">
+        Criar minha música agora
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 style="text-align:center;margin-bottom:20px">Perguntas frequentes</h2>
+
+    <details>
+      <summary>Posso pedir mudanças na letra?</summary>
+      <p>Sim. Você pode pedir ajustes específicos antes de aprovar a versão final.</p>
+    </details>
+
+    <details>
+      <summary>Como funcionam as 2 versões?</summary>
+      <p>A letra é a mesma. O que muda é interpretação/arranjo para você escolher.</p>
+    </details>
+
+    <details>
+      <summary>Quanto tempo demora?</summary>
+      <p>Após aprovação da letra, o áudio é gerado em até 10 minutos.</p>
+    </details>
+  </div>
+</section>
+
+<div class="sticky">
+  <div>
+    <b>R$ 49,90</b><br>
+    <small style="color:var(--tm)">2 versões • até 10 min</small>
+  </div>
+  <button class="btn btn-primary" onclick="goToCheckoutWithTheme()">Criar agora</button>
+</div>
+
+<script>
+  function goToCheckoutWithTheme(){
+    localStorage.setItem("tunecraft_theme","birthday");
+    window.location.href = "login.html?theme=birthday";
+  }
+</script>
+
 </body>
 </html>
