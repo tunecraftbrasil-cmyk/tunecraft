@@ -73,7 +73,7 @@ class StepHierarchy {
 // ===== MAIN DATA STRUCTURE =====
 
 
-const elaboratedChatFlow = [
+elaboratedChatFlow = [
     // ===== BLOCO UNIVERSAL =====
     { step: "0", section: "TEMA", question: "Qual é o tema da música que você quer criar? 🎵", type: "select", options: [
         { label: "🎂 Aniversário", value: "birthday" },
