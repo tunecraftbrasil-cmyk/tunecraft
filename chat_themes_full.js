@@ -1,16 +1,19 @@
 // ============================================
-// CHAT_THEMES_FULL.JS v7 - DECIMAL HIERÁRQUICO
-// Arquivo COMPLETO - Pronto para usar
-// Copie e cole este arquivo no seu projeto
+// CHAT_THEMES.JS v7 - DECIMAL HIERÁRQUICO
+// Versão corrigida com nomenclatura 1.9 → 1.9.1 → 1.10
 // ============================================
 
-// ===== HELPER CLASS =====
+// ===== HELPER CLASSES =====
 
 class StepHierarchy {
+  // Parse "1.9.1" para [1, 9, 1]
   parseStep = (stepId) => {
-    return String(stepId).split('.').map(n => parseInt(n));
+    return String(stepId)
+      .split('.')
+      .map(n => parseInt(n));
   }
 
+  // Parent de "1.9.1" é "1.9"
   getParentStep = (stepId) => {
     const parts = this.parseStep(stepId);
     if (parts.length > 1) {
@@ -19,27 +22,37 @@ class StepHierarchy {
     return null;
   }
 
+  // Profundidade: "1.9.1" = 3, "1.9" = 2, "1" = 1
   getDepth = (stepId) => {
     return this.parseStep(stepId).length;
   }
 
+  // É sub-step condicional? "1.9.1" = true, "1.9" = false
   isConditionalChild = (stepId) => {
     return this.getDepth(stepId) > 2;
   }
 
+  // Próximo step lógico
   getNextStep = (currentStep, data) => {
     const depth = this.getDepth(currentStep);
+    
+    // Se é sub-step (profundidade 3+), volta para parent + 1
     if (depth > 2) {
       const parent = this.getParentStep(currentStep);
       return this.getNextMainStep(parent);
     }
+    
+    // Se é step normal com "outro", vai para sub-step
     const dataKey = `step_${currentStep}`;
     if (data[dataKey] === "other") {
       return `${currentStep}.1`;
     }
+    
+    // Se é step normal sem "outro", vai para próximo
     return this.getNextMainStep(currentStep);
   }
 
+  // Próximo step no nível 1 ou 2
   getNextMainStep = (stepId) => {
     const parts = this.parseStep(stepId);
     const lastPart = parts[parts.length - 1];
@@ -50,7 +63,7 @@ class StepHierarchy {
 
 // ===== MAIN DATA STRUCTURE =====
 
-const elaboratedChatFlow = [
+elaboratedChatFlow = [
     // ===== BLOCO UNIVERSAL =====
     { step: 0, section: "TEMA", question: "Qual é o tema da música que você quer criar? 🎵", type: "select", options: [
         { label: "🎂 Aniversário", value: "birthday" },
@@ -209,10 +222,25 @@ const elaboratedChatFlow = [
 ];
 
 // ============================================
-// VERIFICAÇÃO
+// PADRÃO PARA OUTROS TEMAS
 // ============================================
 
-console.log('✅ elaboratedChatFlow carregado com sucesso!');
-console.log('✅ Total de steps:', elaboratedChatFlow.length);
-console.log('✅ Temas: Aniversário, Declaração de Amor, Casamento');
-console.log('✅ Nomenclatura: 1.9 → 1.9.1 → 1.10 (decimal hierárquico)');
+/*
+APLIQUE O MESMO PADRÃO PARA OS OUTROS TEMAS:
+
+Quando tiver um step com opção "Outro":
+- Step principal: { step: X.Y, condition: ..., type: "select", options: [..., "Outro"] }
+- Step condicional: { step: X.Y.1, condition: (d) => d["step_X.Y"] === "other", ... }
+- Próximo step: { step: X.Z (não X.Y.2!), condition: ... }
+
+EXEMPLO:
+{ step: 2.8, options: ["MPB", "Outro"] }        ← Principal
+{ step: 2.8.1, condition: d["step_2.8"] === "other" }  ← Condicional
+{ step: 2.9, ... }                               ← Próximo (não 2.8.2!)
+*/
+
+// ============================================
+// EXPORT
+// ============================================
+
+export { elaboratedChatFlow, StepHierarchy };
