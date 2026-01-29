@@ -162,29 +162,26 @@
     .bullets li::before{ content:"✓ "; color:var(--success); font-weight:1000; }
 
     .howbox-compact { padding: 18px !important; gap: 12px !important; }
-  .howbox-compact h3 { font-size: 1.15rem !important; margin-bottom: 2px; }
+    .howbox-compact h3 { font-size: 1.15rem !important; margin-bottom: 2px; }
+    .howbox-compact .how-steps { gap: 8px !important; }
+    .howbox-compact .hs { padding: 10px !important; border-radius: 14px !important; gap: 10px !important; }
+    .howbox-compact .hs .n{
+      width: 28px !important;
+      height: 28px !important;
+      border-radius: 10px !important;
+      font-size: .92rem !important;
+    }
+    .howbox-compact .hs b { font-size: .98rem !important; }
+    .howbox-compact .hs p { font-size: .92rem !important; line-height: 1.45 !important; margin-top: 2px !important; }
 
-  .howbox-compact .how-steps { gap: 8px !important; }
-  .howbox-compact .hs { padding: 10px !important; border-radius: 14px !important; gap: 10px !important; }
+    .micro-compact { padding-top: 10px !important; gap: 6px !important; font-size: .92rem !important; }
+    .micro-compact strong { font-weight: 1100 !important; }
 
-  .howbox-compact .hs .n{
-    width: 28px !important;
-    height: 28px !important;
-    border-radius: 10px !important;
-    font-size: .92rem !important;
-  }
-
-  .howbox-compact .hs b { font-size: .98rem !important; }
-  .howbox-compact .hs p { font-size: .92rem !important; line-height: 1.45 !important; margin-top: 2px !important; }
-
-  .micro-compact { padding-top: 10px !important; gap: 6px !important; font-size: .92rem !important; }
-  .micro-compact strong { font-weight: 1100 !important; }
-
-  /* Em telas menores, mantém compacto e legível */
-  @media (max-width: 980px){
-    .howbox-compact { padding: 16px !important; }
-    .howbox-compact .hs { padding: 10px !important; }
-  }
+    /* Em telas menores, mantém compacto e legível */
+    @media (max-width: 980px){
+      .howbox-compact { padding: 16px !important; }
+      .howbox-compact .hs { padding: 10px !important; }
+    }
 
     .how-steps{
       display:grid;
@@ -299,7 +296,7 @@
         </button>
 
         <div class="chips">
-          <div class="chip">✍️ Ajustes específicos na letra antes do áudio</div>
+          <div class="chip">✍️ Ajustes pontuais na letra antes do áudio</div>
           <div class="chip">🎧 2 versões finais com a mesma letra</div>
           <div class="chip">🛡️ Garantia 30 dias</div>
         </div>
@@ -333,7 +330,7 @@
           </p>
 
           <div style="margin-top:12px; color:#b7ffe3; font-weight:1000;">
-            ✓ Entrega rápida • 2 versões • Ajustes na letra
+            ✓ Entrega rápida • 2 versões • Ajustes na letra antes do áudio
           </div>
         </div>
 
@@ -350,48 +347,49 @@
       </div>
 
       <div class="howbox howbox-compact">
-  <h3>Como a música ganha a sua cara</h3>
+        <h3>Como a música ganha a sua cara</h3>
 
-  <div class="how-steps">
-    <div class="hs">
-      <div class="n">1</div>
-      <div>
-        <b>Você compartilha o contexto</b>
-        <p>A conversa te conduz pelos pontos certos — sem você precisar “saber o que falar”.</p>
+        <div class="how-steps">
+          <div class="hs">
+            <div class="n">1</div>
+            <div>
+              <b>Você compartilha o contexto</b>
+              <p>A conversa te conduz pelos pontos certos — sem você precisar “saber o que falar”.</p>
+            </div>
+          </div>
+
+          <div class="hs">
+            <div class="n">2</div>
+            <div>
+              <b>A letra é construída para soar como música</b>
+              <p>Estrutura, ritmo e refrão para funcionar bem na hora do parabéns.</p>
+            </div>
+          </div>
+
+          <div class="hs">
+            <div class="n">3</div>
+            <div>
+              <b>Você refina a letra antes do áudio</b>
+              <p>Após a criação da letra, você pode sugerir ajustes para alinharmos o tom e os trechos antes de gerar a música.</p>
+            </div>
+          </div>
+
+          <div class="hs">
+            <div class="n">4</div>
+            <div>
+              <b>Você recebe duas versões finais</b>
+              <p>A mesma letra, duas interpretações. Você escolhe a melhor.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="micro micro-compact">
+          <div><strong>Objetivo:</strong> letra única, com identidade e estrutura musical sólida.</div>
+          <div><strong>Resultado:</strong> pronta pra tocar no momento certo — e boa de ouvir depois.</div>
+        </div>
       </div>
+
     </div>
-
-    <div class="hs">
-      <div class="n">2</div>
-      <div>
-        <b>A letra é construída para soar como música</b>
-        <p>Estrutura, ritmo e refrão para funcionar bem na hora do parabéns.</p>
-      </div>
-    </div>
-
-    <div class="hs">
-      <div class="n">3</div>
-      <div>
-        <b>Você ajusta até ficar do jeito certo</b>
-        <p>Refine trechos e tom. Só segue adiante quando você aprova.</p>
-      </div>
-    </div>
-
-    <div class="hs">
-      <div class="n">4</div>
-      <div>
-        <b>Você recebe duas versões finais</b>
-        <p>A mesma letra, duas interpretações. Você escolhe a melhor.</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="micro micro-compact">
-    <div><strong>Objetivo:</strong> letra única, com identidade e estrutura musical sólida.</div>
-    <div><strong>Resultado:</strong> pronta pra tocar no momento certo — e boa de ouvir depois.</div>
-  </div>
-</div>
-
   </div>
 </section>
 
@@ -447,14 +445,14 @@
     <details>
       <summary>O que eu recebo no final?</summary>
       <p>
-        Você recebe a música pronta em <b>MP3 + WAV</b> e com <b>2 versões</b> (mesma letra).
+        Você recebe a música pronta em <b>MP3</b> e com <b>2 versões</b> (mesma letra).
       </p>
     </details>
 
     <details>
       <summary>E se eu não gostar?</summary>
       <p>
-        Você tem <b>30 dias de garantia</b>. E antes do áudio final, você ainda pode ajustar a letra até ficar do jeito certo.
+        Você tem <b>30 dias de garantia</b>. E antes do áudio final, você pode sugerir ajustes na letra para alinharmos o resultado.
       </p>
     </details>
 
