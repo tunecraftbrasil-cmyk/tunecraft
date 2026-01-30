@@ -1693,39 +1693,7 @@ ${
   `;
 }
 
-          else if (order.status === "completed") {
-            hasReceived = true;
-            const urls = Array.isArray(order.audio_urls) ? order.audio_urls : [];
-
-            receivedContainer.innerHTML += `
-              <div class="card">
-                <div class="card-header">
-                  <h3>${title}</h3>
-                  <span class="status-badge status-completed">Pronta</span>
-                </div>
-
-                ${
-                  urls.length >= 2
-                    ? `
-                      <strong>🎧 Versão A</strong>
-                      <audio controls src="${urls[0].audio_url || urls[0]}" style="width:100%; margin:10px 0;"></audio>
-
-                      <strong>🎧 Versão B</strong>
-                      <audio controls src="${urls[1].audio_url || urls[1]}" style="width:100%; margin:10px 0;"></audio>
-
-                      
-                    `
-                    : urls.length === 1
-                    ? `
-                      <strong>🎧 Áudio</strong>
-                      <audio controls src="${urls[0].audio_url || urls[0]}" style="width:100%; margin:10px 0;"></audio>
-                      <a class="btn btn-download" href="${urls[0].audio_url || urls[0]}" download>⬇️ Baixar</a>
-                    `
-                    : `<p>Sua música foi finalizada e está sendo preparada para audição.</p>`
-                }
-              </div>
-            `;
-          }
+         
         });
       }
 
@@ -1751,13 +1719,7 @@ ${
         `;
       }
 
-      if (!hasApproved) {
-        approvedContainer.innerHTML = `
-          <div class="empty-state" style="padding:20px;">
-            <p>Sem músicas em produção no momento.</p>
-          </div>
-        `;
-      }
+     
 
       if (!hasReceived) {
         receivedContainer.innerHTML = `
@@ -2705,6 +2667,7 @@ async function saveEditDraftNew() {
 
 </body>
 </html>
+
 
 
 
