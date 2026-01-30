@@ -131,81 +131,81 @@ elaboratedChatFlow = [
     { step: 400, section: "FILHO", condition: (d) => d.step_0 === "birth_child", question: "Que tipo de música você quer criar? 🎵", type: "select", options: [
         { label: "🎶 Música para a vida", value: "life_song" }, { label: "🌙 Canção de ninar", value: "lullaby" }
     ], metadata: { fieldName: "ai_metadata.subThemeId", required: true } },
-    { step: 401, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "life_song", question: "Quem está falando? 👥", type: "select", options: [
+    { step: 401, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "life_song", question: "Quem está falando? 👥", type: "select", options: [
         { label: "👨 Pai", value: "father" }, { label: "👩 Mãe", value: "mother" }, { label: "👨‍👩‍👧 Ambos", value: "both" }, { label: "🎭 Outro", value: "other" }
     ], metadata: { fieldName: "ai_metadata.creatorRole", required: true } },
-    { step: 402, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "life_song", question: "O bebê já nasceu? 👶", type: "select", options: [
+    { step: 402, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "life_song", question: "O bebê já nasceu? 👶", type: "select", options: [
         { label: "✅ Já nasceu", value: "born" }, { label: "⏳ Ainda não", value: "not_born" }
     ], metadata: { fieldName: "ai_metadata.birthStatus", required: true } },
-    { step: 403, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "life_song", question: "Qual o nome ou apelido? 🎤", type: "input", placeholder: "Como chamam?", minLength: 1, metadata: { fieldName: "recipient.babyName", required: true } },
-    { step: 404, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "life_song", question: "O que você sentiu ao descobrir? 💭", type: "textarea", placeholder: "Emoções naquele momento…", minLength: 15, metadata: { fieldName: "lyricDetails.firstFeeling", required: true } },
-    { step: 405, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "life_song", question: "Conte uma cena marcante dessa fase (teste, ultrassom, abraço, etc.). 🎬", type: "textarea", placeholder: "Teste, ultrassom, abraço…", minLength: 15, metadata: { fieldName: "lyricDetails.markantScene", required: true } },
-    { step: 406, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "life_song", question: "Se fosse uma carta para o futuro dessa criança, o que precisaria dizer? 📜", type: "textarea", placeholder: "O que essa criança deve saber aos 15…", minLength: 20, metadata: { fieldName: "lyricDetails.letterToFuture", required: true } },
-    { step: 407, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "life_song", question: "Qual é o valor principal que você quer transmitir? ✨", type: "input", placeholder: "Coragem, bondade, autenticidade…", minLength: 3, metadata: { fieldName: "lyricDetails.coreValue", required: true } },
-    { step: 408, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "life_song", question: "Qual é um detalhe simbólico importante? 🌟", type: "input", placeholder: "Lugar, frase, objeto, música…", minLength: 3, metadata: { fieldName: "lyricDetails.symbolicDetail", required: true } },
-    { step: 409, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "life_song", question: "Qual estilo musical combina mais com essa música? 🎸", type: "select", options: [
+    { step: 403, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "life_song", question: "Qual o nome ou apelido? 🎤", type: "input", placeholder: "Como chamam?", minLength: 1, metadata: { fieldName: "recipient.babyName", required: true } },
+    { step: 404, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "life_song", question: "O que você sentiu ao descobrir? 💭", type: "textarea", placeholder: "Emoções naquele momento…", minLength: 15, metadata: { fieldName: "lyricDetails.firstFeeling", required: true } },
+    { step: 405, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "life_song", question: "Conte uma cena marcante dessa fase (teste, ultrassom, abraço, etc.). 🎬", type: "textarea", placeholder: "Teste, ultrassom, abraço…", minLength: 15, metadata: { fieldName: "lyricDetails.markantScene", required: true } },
+    { step: 406, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "life_song", question: "Se fosse uma carta para o futuro dessa criança, o que precisaria dizer? 📜", type: "textarea", placeholder: "O que essa criança deve saber aos 15…", minLength: 20, metadata: { fieldName: "lyricDetails.letterToFuture", required: true } },
+    { step: 407, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "life_song", question: "Qual é o valor principal que você quer transmitir? ✨", type: "input", placeholder: "Coragem, bondade, autenticidade…", minLength: 3, metadata: { fieldName: "lyricDetails.coreValue", required: true } },
+    { step: 408, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "life_song", question: "Qual é um detalhe simbólico importante? 🌟", type: "input", placeholder: "Lugar, frase, objeto, música…", minLength: 3, metadata: { fieldName: "lyricDetails.symbolicDetail", required: true } },
+    { step: 409, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "life_song", question: "Qual estilo musical combina mais com essa música? 🎸", type: "select", options: [
         { label: "🎸 MPB", value: "mpb" }, { label: "🤠 Sertanejo", value: "sertanejo" }, { label: "🎤 Pop", value: "pop" },
         { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" },
         { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }
     ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
     { step: "409.5", section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_409 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
-    { step: 410, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "life_song", question: "Qual impacto emocional você quer que essa música cause? 💖", type: "select", options: [
+    { step: 410, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "life_song", question: "Qual impacto emocional você quer que essa música cause? 💖", type: "select", options: [
         { label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" },
         { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }
     ], metadata: { fieldName: "musicStyle.mood", required: true } },
-    { step: 411, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "life_song", question: "Qual tipo de movimento você prefere? ⚡", type: "select", options: [
+    { step: 411, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "life_song", question: "Qual tipo de movimento você prefere? ⚡", type: "select", options: [
         { label: "🌊 Calma", value: "calm" }, { label: "⚖️ Equilibrada", value: "balanced" }, { label: "📈 Intensa", value: "intense" }, { label: "🧘 Meditativa", value: "meditative" }
     ], metadata: { fieldName: "musicStyle.tempo", required: true } },
-    { step: 412, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "life_song", question: "Em qual idioma você prefere a letra? 🌍", type: "select", options: [
+    { step: 412, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "life_song", question: "Em qual idioma você prefere a letra? 🌍", type: "select", options: [
         { label: "🇧🇷 PT-BR", value: "pt_br" }, { label: "🇺🇸 EN", value: "en" }, { label: "🇪🇸 ES", value: "es" },
         { label: "🇮🇹 IT", value: "it" }, { label: "🌍 Outro", value: "other" }
     ], metadata: { fieldName: "lyricDetails.language", required: true } },
     { step: "412.5", section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_412 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
-    { step: 413, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "life_song", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
+    { step: 413, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "life_song", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
         { label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" },
         { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" },
         { label: "🎵 Dueto", value: "duo" }, { label: "👥 Coral", value: "choir" }
     ], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
-    { step: 414, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "life_song", question: "O que você prefere evitar nessa música? 🚫", type: "textarea", placeholder: "Evitar…", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } },
+    { step: 414, section: "FILHO", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "life_song", question: "O que você prefere evitar nessa música? 🚫", type: "textarea", placeholder: "Evitar…", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } },
 
     // ===== TEMA 4B: NASCIMENTO DE FILHO(A) - CANÇÃO DE NINAR (13 perguntas) =====
-    { step: 401, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "lullaby", question: "Quem canta? 👥", type: "select", options: [
+    { step: 401, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "lullaby", question: "Quem canta? 👥", type: "select", options: [
         { label: "👨 Pai", value: "father" }, { label: "👩 Mãe", value: "mother" }, { label: "👨‍👩‍👧 Ambos", value: "both" }, { label: "🎭 Outro", value: "other" }
     ], metadata: { fieldName: "ai_metadata.creatorRole", required: true } },
-    { step: 402, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "lullaby", question: "Já nasceu? 👶", type: "select", options: [
+    { step: 402, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "lullaby", question: "Já nasceu? 👶", type: "select", options: [
         { label: "✅ Já", value: "born" }, { label: "⏳ Ainda não", value: "not_born" }
     ], metadata: { fieldName: "ai_metadata.birthStatus", required: true } },
-    { step: 403, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "lullaby", question: "Nome do bebê? 🎤", type: "input", placeholder: "Como chamam?", minLength: 1, metadata: { fieldName: "recipient.babyName", required: true } },
-    { step: 415, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "lullaby", question: "Apelido carinhoso? 💕", type: "input", placeholder: "Bebê, neném, filho(a)…", minLength: 1, metadata: { fieldName: "recipient.babyNickname", required: true } },
-    { step: 416, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "lullaby", question: "Qual sensação você quer que predomine? 🛡️", type: "select", options: [
+    { step: 403, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "lullaby", question: "Nome do bebê? 🎤", type: "input", placeholder: "Como chamam?", minLength: 1, metadata: { fieldName: "recipient.babyName", required: true } },
+    { step: 415, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "lullaby", question: "Apelido carinhoso? 💕", type: "input", placeholder: "Bebê, neném, filho(a)…", minLength: 1, metadata: { fieldName: "recipient.babyNickname", required: true } },
+    { step: 416, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "lullaby", question: "Qual sensação você quer que predomine? 🛡️", type: "select", options: [
         { label: "🛡️ Segurança", value: "security" }, { label: "☮️ Paz", value: "peace" }, { label: "🤗 Aconchego", value: "warmth" }
     ], metadata: { fieldName: "lyricDetails.sensation", required: true } },
-    { step: 417, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "lullaby", question: "Que sensação essa música deve trazer na hora de dormir? 😴", type: "textarea", placeholder: "Protegida, tudo bem, amada…", minLength: 15, metadata: { fieldName: "lyricDetails.sleepPurpose", required: true } },
-    { step: 418, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "lullaby", question: "Qual palavra-chave pode ser um mantra de calma na música? 🔄", type: "input", placeholder: "Paz, luz, sonho, amor…", minLength: 2, metadata: { fieldName: "lyricDetails.anchorWord", required: true } },
-    { step: 419, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "lullaby", question: "Qual estilo musical combina mais? 🎸", type: "select", options: [
+    { step: 417, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "lullaby", question: "Que sensação essa música deve trazer na hora de dormir? 😴", type: "textarea", placeholder: "Protegida, tudo bem, amada…", minLength: 15, metadata: { fieldName: "lyricDetails.sleepPurpose", required: true } },
+    { step: 418, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "lullaby", question: "Qual palavra-chave pode ser um mantra de calma na música? 🔄", type: "input", placeholder: "Paz, luz, sonho, amor…", minLength: 2, metadata: { fieldName: "lyricDetails.anchorWord", required: true } },
+    { step: 419, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "lullaby", question: "Qual estilo musical combina mais? 🎸", type: "select", options: [
         { label: "🎸 MPB", value: "mpb" }, { label: "🤠 Sertanejo", value: "sertanejo" }, { label: "🎤 Pop", value: "pop" },
         { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" },
         { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }
     ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
     { step: "419.5", section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_419 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
-    { step: 420, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "lullaby", question: "Qual impacto emocional você quer? 💖", type: "select", options: [
+    { step: 420, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "lullaby", question: "Qual impacto emocional você quer? 💖", type: "select", options: [
         { label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" },
         { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }
     ], metadata: { fieldName: "musicStyle.mood", required: true } },
-    { step: 421, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "lullaby", question: "Qual tipo de movimento você prefere? ⚡", type: "select", options: [
+    { step: 421, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "lullaby", question: "Qual tipo de movimento você prefere? ⚡", type: "select", options: [
         { label: "🌊 Calma", value: "calm" }, { label: "⚖️ Equilibrada", value: "balanced" }, { label: "📈 Intensa", value: "intense" }, { label: "🧘 Meditativa", value: "meditative" }
     ], metadata: { fieldName: "musicStyle.tempo", required: true } },
-    { step: 422, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "lullaby", question: "Em qual idioma você prefere a letra? 🌍", type: "select", options: [
+    { step: 422, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "lullaby", question: "Em qual idioma você prefere a letra? 🌍", type: "select", options: [
         { label: "🇧🇷 PT-BR", value: "pt_br" }, { label: "🇺🇸 EN", value: "en" }, { label: "🇪🇸 ES", value: "es" },
         { label: "🇮🇹 IT", value: "it" }, { label: "🌍 Outro", value: "other" }
     ], metadata: { fieldName: "lyricDetails.language", required: true } },
     { step: "422.5", section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_422 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
-    { step: 423, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "lullaby", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
+    { step: 423, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "lullaby", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
         { label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" },
         { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" },
         { label: "🎵 Dueto", value: "duo" }, { label: "👥 Coral", value: "choir" }
     ], metadata: { fieldName: "productionDetails.vocalApproach", required: true } },
-    { step: 424, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_4 === "lullaby", question: "O que você prefere evitar? 🚫", type: "textarea", placeholder: "Evitar…", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } },
+    { step: 424, section: "NINAR", condition: (d) => d.step_0 === "birth_child" && d.step_400 === "lullaby", question: "O que você prefere evitar? 🚫", type: "textarea", placeholder: "Evitar…", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } },
 
     // ===== TEMA 5: NASCIMENTO DE NETO(A) (14 perguntas) =====
     { step: 500, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Quem vai falar nessa música? 👥", type: "select", options: [
@@ -227,7 +227,7 @@ elaboratedChatFlow = [
         { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" },
         { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }
     ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "508.5", section: "NETO", condition: (d) => d.step_0 === "birth_child" && d.step_508 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: "508.5", section: "NETO", condition: (d) => d.step_0 === "birth_grandchild" && d.step_508 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
     { step: 509, section: "NETO", condition: (d) => d.step_0 === "birth_grandchild", question: "Qual impacto emocional você quer? 💖", type: "select", options: [
         { label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" },
         { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }
@@ -442,9 +442,9 @@ elaboratedChatFlow = [
     { step: 1101, section: "OUTRO", condition: (d) => d.step_0 === "other", question: "Existe uma pessoa central nessa história? 👤", type: "select", options: [
         { label: "✅ Sim", value: "yes" }, { label: "❌ Não", value: "no" }
     ], metadata: { fieldName: "ai_metadata.hasCentralPerson", required: true } },
-    { step: 1102, section: "OUTRO", condition: (d) => d.step_0 === "other" && d.step_11_1 === "yes", question: "Conte a história da relação com essa pessoa 📖", type: "textarea", placeholder: "Como se conheceram…", minLength: 15, metadata: { fieldName: "lyricDetails.relationshipHistory", required: true } },
-    { step: 1103, section: "OUTRO", condition: (d) => d.step_0 === "other" && d.step_11_1 === "yes", question: "Como você a chama? 👤", type: "input", placeholder: "Como chama…", minLength: 2, metadata: { fieldName: "recipient.name", required: true } },
-    { step: 1104, section: "OUTRO", condition: (d) => d.step_0 === "other" && d.step_11_1 === "yes", question: "De que ponto de vista você quer contar essa história? 🎤", type: "select", options: [
+    { step: 1102, section: "OUTRO", condition: (d) => d.step_0 === "other" && d.step_1101 === "yes", question: "Conte a história da relação com essa pessoa 📖", type: "textarea", placeholder: "Como se conheceram…", minLength: 15, metadata: { fieldName: "lyricDetails.relationshipHistory", required: true } },
+    { step: 1103, section: "OUTRO", condition: (d) => d.step_0 === "other" && d.step_1101 === "yes", question: "Como você a chama? 👤", type: "input", placeholder: "Como chama…", minLength: 2, metadata: { fieldName: "recipient.name", required: true } },
+    { step: 1104, section: "OUTRO", condition: (d) => d.step_0 === "other" && d.step_1101 === "yes", question: "De que ponto de vista você quer contar essa história? 🎤", type: "select", options: [
         { label: "💬 Para essa pessoa", value: "second_person" }, { label: "🌍 Sobre essa pessoa", value: "third_person" }, { label: "🔄 Misto", value: "mixed" }
     ], metadata: { fieldName: "ai_metadata.pov", required: true } },
     { step: 1105, section: "OUTRO", condition: (d) => d.step_0 === "other", question: "Descreva uma cena real que represente bem essa situação. 🎬", type: "textarea", placeholder: "Momento importante…", minLength: 15, metadata: { fieldName: "lyricDetails.scene", required: true } },
