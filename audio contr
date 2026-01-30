@@ -927,6 +927,142 @@ body{
 ::-webkit-scrollbar-thumb{ background: rgba(148,163,184,0.22); border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover{ background: rgba(148,163,184,0.35); }
 
+
+    /* ===========================
+   ✅ TUNECRAFT AUDIO PLAYER
+=========================== */
+.tc-player{
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(148,163,184,.18);
+  border-radius: 14px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.tc-btn{
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(148,163,184,.22);
+  background: rgba(11,18,32,.9);
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  transition: 0.2s;
+}
+.tc-btn:hover{ transform: translateY(-1px); border-color: rgba(0,217,255,.45); }
+
+.tc-btn.play{
+  border: none;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  color: #fff;
+  box-shadow: 0 12px 24px rgba(0,217,255,0.14);
+}
+
+.tc-main{
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.tc-top{
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+  min-width: 0;
+}
+
+.tc-title{
+  font-weight: 900;
+  color: var(--text);
+  font-size: 0.95rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tc-time{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.82rem;
+  color: var(--muted);
+  flex: 0 0 auto;
+}
+
+.tc-bar{
+  position: relative;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(148,163,184,.16);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.tc-progress{
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+}
+
+.tc-dot{
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px; height: 12px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(0,217,255,0.18);
+  left: 0%;
+  pointer-events: none;
+}
+
+.tc-actions{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tc-mini{
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(148,163,184,.22);
+  background: rgba(11,18,32,.85);
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s;
+}
+.tc-mini:hover{ border-color: rgba(0,217,255,.45); transform: translateY(-1px); }
+
+.tc-vol{
+  width: 92px;
+  accent-color: var(--brand);
+}
+
+/* Mobile: deixa mais compacto */
+@media (max-width: 768px){
+  .tc-player{
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+  }
+  .tc-actions{
+    grid-column: 1 / -1;
+    justify-content: space-between;
+  }
+  .tc-vol{ width: 120px; }
+}
+
 </style>
 
 </head>
@@ -1445,27 +1581,97 @@ else if (order.status === "completed") {
       </div>
 
       <div class="action-row" style="margin-bottom:12px;">
-        <button class="btn btn-revise" onclick="openLyricsModal(\`${lyrics.replaceAll("`","\\`")}\`)">📄 Letra</button>
+  <button class="btn btn-revise" onclick="openLyricsModal(\`${lyrics.replaceAll("`","\\`")}\`)">📄 Letra</button>
+</div>
+
+${
+  urls.length >= 2
+    ? `
+      <div style="margin-top:6px;">
+        <div class="tc-player" data-audio="${urls[0].audio_url || urls[0]}">
+          <button class="tc-btn play" type="button" aria-label="Play/Pause">▶</button>
+
+          <div class="tc-main">
+            <div class="tc-top">
+              <div class="tc-title">🎧 Versão A</div>
+              <div class="tc-time"><span class="cur">0:00</span> / <span class="dur">0:00</span></div>
+            </div>
+
+            <div class="tc-bar" role="slider" aria-label="Progresso">
+              <div class="tc-progress"></div>
+              <div class="tc-dot"></div>
+            </div>
+          </div>
+
+          <div class="tc-actions">
+            <input class="tc-vol" type="range" min="0" max="1" step="0.01" value="0.9" aria-label="Volume">
+            <a class="tc-mini" href="${urls[0].audio_url || urls[0]}" download title="Baixar">⬇</a>
+          </div>
+
+          <audio preload="metadata" style="display:none;"></audio>
+        </div>
+
+        <div style="height:10px;"></div>
+
+        <div class="tc-player" data-audio="${urls[1].audio_url || urls[1]}">
+          <button class="tc-btn play" type="button" aria-label="Play/Pause">▶</button>
+
+          <div class="tc-main">
+            <div class="tc-top">
+              <div class="tc-title">🎧 Versão B</div>
+              <div class="tc-time"><span class="cur">0:00</span> / <span class="dur">0:00</span></div>
+            </div>
+
+            <div class="tc-bar" role="slider" aria-label="Progresso">
+              <div class="tc-progress"></div>
+              <div class="tc-dot"></div>
+            </div>
+          </div>
+
+          <div class="tc-actions">
+            <input class="tc-vol" type="range" min="0" max="1" step="0.01" value="0.9" aria-label="Volume">
+            <a class="tc-mini" href="${urls[1].audio_url || urls[1]}" download title="Baixar">⬇</a>
+          </div>
+
+          <audio preload="metadata" style="display:none;"></audio>
+        </div>
       </div>
+    `
+    : urls.length === 1
+    ? `
+      <div style="margin-top:6px;">
+        <div class="tc-player" data-audio="${urls[0].audio_url || urls[0]}">
+          <button class="tc-btn play" type="button" aria-label="Play/Pause">▶</button>
 
-      ${
-        urls.length >= 2
-          ? `
-            <strong>🎧 Versão A</strong>
-            <audio controls src="${urls[0].audio_url || urls[0]}" style="width:100%; margin:10px 0;"></audio>
+          <div class="tc-main">
+            <div class="tc-top">
+              <div class="tc-title">🎧 Áudio</div>
+              <div class="tc-time"><span class="cur">0:00</span> / <span class="dur">0:00</span></div>
+            </div>
 
-            <strong>🎧 Versão B</strong>
-            <audio controls src="${urls[1].audio_url || urls[1]}" style="width:100%; margin:10px 0;"></audio>
-          `
-          : urls.length === 1
-          ? `
-            <strong>🎧 Áudio</strong>
-            <audio controls src="${urls[0].audio_url || urls[0]}" style="width:100%; margin:10px 0;"></audio>
-            <a class="btn btn-download" href="${urls[0].audio_url || urls[0]}" download>⬇️ Baixar</a>
-          `
-          : `<p>Sua música foi finalizada e está sendo preparada para audição.</p>`
-      }
-    </div>
+            <div class="tc-bar" role="slider" aria-label="Progresso">
+              <div class="tc-progress"></div>
+              <div class="tc-dot"></div>
+            </div>
+          </div>
+
+          <div class="tc-actions">
+            <input class="tc-vol" type="range" min="0" max="1" step="0.01" value="0.9" aria-label="Volume">
+            <a class="tc-mini" href="${urls[0].audio_url || urls[0]}" download title="Baixar">⬇</a>
+          </div>
+
+          <audio preload="metadata" style="display:none;"></audio>
+        </div>
+
+        <div style="height:10px;"></div>
+
+        <!-- mantém também o botão de download “grande”, se você quiser -->
+        <a class="btn btn-download" href="${urls[0].audio_url || urls[0]}" download>⬇️ Baixar</a>
+      </div>
+    `
+    : `<p>Sua música foi finalizada e está sendo preparada para audição.</p>`
+}
+
   `;
 }
 
@@ -2319,9 +2525,101 @@ async function saveEditDraftNew() {
     </div>
   </div>
 </div>
-  
+
+<script>
+  function tcFormatTime(sec){
+    if (!isFinite(sec) || sec < 0) sec = 0;
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m}:${String(s).padStart(2,'0')}`;
+  }
+
+  function tcInitPlayers(){
+    const players = document.querySelectorAll('.tc-player');
+    players.forEach((wrap) => {
+      const src = wrap.getAttribute('data-audio');
+      const audio = wrap.querySelector('audio');
+      const btn = wrap.querySelector('.tc-btn.play');
+      const bar = wrap.querySelector('.tc-bar');
+      const prog = wrap.querySelector('.tc-progress');
+      const dot = wrap.querySelector('.tc-dot');
+      const curEl = wrap.querySelector('.cur');
+      const durEl = wrap.querySelector('.dur');
+      const vol = wrap.querySelector('.tc-vol');
+
+      if (!src || !audio || !btn || !bar) return;
+
+      audio.src = src;
+      audio.volume = vol ? Number(vol.value || 0.9) : 0.9;
+
+      function setUI(){
+        const dur = audio.duration || 0;
+        const cur = audio.currentTime || 0;
+        const pct = dur ? (cur / dur) * 100 : 0;
+        prog.style.width = `${pct}%`;
+        dot.style.left = `${pct}%`;
+        if (curEl) curEl.textContent = tcFormatTime(cur);
+        if (durEl) durEl.textContent = tcFormatTime(dur);
+      }
+
+      function setBtn(){
+        btn.textContent = audio.paused ? '▶' : '⏸';
+      }
+
+      // play/pause
+      btn.addEventListener('click', () => {
+        // pausa os outros players
+        document.querySelectorAll('.tc-player audio').forEach(a => {
+          if (a !== audio) a.pause();
+        });
+        if (audio.paused) audio.play();
+        else audio.pause();
+      });
+
+      audio.addEventListener('play', setBtn);
+      audio.addEventListener('pause', setBtn);
+      audio.addEventListener('timeupdate', setUI);
+      audio.addEventListener('loadedmetadata', setUI);
+      audio.addEventListener('ended', () => { audio.currentTime = 0; audio.pause(); setUI(); });
+
+      // seek
+      bar.addEventListener('click', (e) => {
+        const rect = bar.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const pct = Math.max(0, Math.min(1, x / rect.width));
+        if (audio.duration) audio.currentTime = pct * audio.duration;
+        setUI();
+      });
+
+      // volume
+      if (vol){
+        vol.addEventListener('input', () => {
+          audio.volume = Number(vol.value);
+        });
+      }
+
+      // init
+      setBtn();
+      setUI();
+    });
+  }
+
+  // Re-init quando você re-renderiza os cards
+  const _origRenderSections = window.renderSections;
+  if (typeof _origRenderSections === 'function'){
+    window.renderSections = function(){
+      _origRenderSections();
+      tcInitPlayers();
+    }
+  } else {
+    document.addEventListener('DOMContentLoaded', tcInitPlayers);
+  }
+</script>
+
+
 </body>
 </html>
+
 
 
 
