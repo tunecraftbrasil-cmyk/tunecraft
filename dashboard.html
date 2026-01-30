@@ -1588,53 +1588,71 @@ ${
   urls.length >= 2
     ? `
       <div style="margin-top:6px;">
-        <div class="tc-player" data-audio="${urls[0].audio_url || urls[0]}">
-          <button class="tc-btn play" type="button" aria-label="Play/Pause">▶</button>
+        <div class="tc-player" data-audio="${urls[0].audio_url || urls[0]}" data-title="${title || 'Minha música'} - Versão A">
+  <button class="tc-btn play" type="button" aria-label="Play/Pause">▶</button>
 
-          <div class="tc-main">
-            <div class="tc-top">
-              <div class="tc-title">🎧 Versão A</div>
-              <div class="tc-time"><span class="cur">0:00</span> / <span class="dur">0:00</span></div>
-            </div>
+  <div class="tc-main">
+    <div class="tc-top">
+      <div class="tc-title">🎧 Versão A</div>
+      <div class="tc-time"><span class="cur">0:00</span> / <span class="dur">0:00</span></div>
+    </div>
 
-            <div class="tc-bar" role="slider" aria-label="Progresso">
-              <div class="tc-progress"></div>
-              <div class="tc-dot"></div>
-            </div>
-          </div>
+    <div class="tc-bar" role="slider" aria-label="Progresso">
+      <div class="tc-progress"></div>
+      <div class="tc-dot"></div>
+    </div>
+  </div>
 
-          <div class="tc-actions">
-            <input class="tc-vol" type="range" min="0" max="1" step="0.01" value="0.9" aria-label="Volume">
-            <a class="tc-mini" href="${urls[0].audio_url || urls[0]}" download title="Baixar">⬇</a>
-          </div>
+  <div class="tc-actions">
+    <input class="tc-vol" type="range" min="0" max="1" step="0.01" value="0.9" aria-label="Volume">
 
-          <audio preload="metadata" style="display:none;"></audio>
-        </div>
+    <!-- ✅ DOWNLOAD FORÇADO (não abre outra aba) -->
+    <button class="tc-mini" type="button"
+      onclick="downloadAudio('${urls[0].audio_url || urls[0]}', '${title || "musica"}-versao-a')"
+      title="Baixar">⬇</button>
 
-        <div style="height:10px;"></div>
+    <!-- ✅ COMPARTILHAR (nativo; fallback WhatsApp) -->
+    <button class="tc-mini" type="button"
+      onclick="shareNative('${urls[0].audio_url || urls[0]}', '${title || "Minha música"} - Versão A')"
+      title="Compartilhar">📤</button>
+  </div>
 
-        <div class="tc-player" data-audio="${urls[1].audio_url || urls[1]}">
-          <button class="tc-btn play" type="button" aria-label="Play/Pause">▶</button>
+  <audio preload="metadata" style="display:none;"></audio>
+</div>
 
-          <div class="tc-main">
-            <div class="tc-top">
-              <div class="tc-title">🎧 Versão B</div>
-              <div class="tc-time"><span class="cur">0:00</span> / <span class="dur">0:00</span></div>
-            </div>
+<div style="height:10px;"></div>
 
-            <div class="tc-bar" role="slider" aria-label="Progresso">
-              <div class="tc-progress"></div>
-              <div class="tc-dot"></div>
-            </div>
-          </div>
+<div class="tc-player" data-audio="${urls[1].audio_url || urls[1]}" data-title="${title || 'Minha música'} - Versão B">
+  <button class="tc-btn play" type="button" aria-label="Play/Pause">▶</button>
 
-          <div class="tc-actions">
-            <input class="tc-vol" type="range" min="0" max="1" step="0.01" value="0.9" aria-label="Volume">
-            <a class="tc-mini" href="${urls[1].audio_url || urls[1]}" download title="Baixar">⬇</a>
-          </div>
+  <div class="tc-main">
+    <div class="tc-top">
+      <div class="tc-title">🎧 Versão B</div>
+      <div class="tc-time"><span class="cur">0:00</span> / <span class="dur">0:00</span></div>
+    </div>
 
-          <audio preload="metadata" style="display:none;"></audio>
-        </div>
+    <div class="tc-bar" role="slider" aria-label="Progresso">
+      <div class="tc-progress"></div>
+      <div class="tc-dot"></div>
+    </div>
+  </div>
+
+  <div class="tc-actions">
+    <input class="tc-vol" type="range" min="0" max="1" step="0.01" value="0.9" aria-label="Volume">
+
+    <!-- ✅ DOWNLOAD FORÇADO -->
+    <button class="tc-mini" type="button"
+      onclick="downloadAudio('${urls[1].audio_url || urls[1]}', '${title || "musica"}-versao-b')"
+      title="Baixar">⬇</button>
+
+    <!-- ✅ COMPARTILHAR -->
+    <button class="tc-mini" type="button"
+      onclick="shareNative('${urls[1].audio_url || urls[1]}', '${title || "Minha música"} - Versão B')"
+      title="Compartilhar">📤</button>
+  </div>
+
+  <audio preload="metadata" style="display:none;"></audio>
+</div>
       </div>
     `
     : urls.length === 1
@@ -2616,9 +2634,76 @@ async function saveEditDraftNew() {
   }
 </script>
 
+   function safeFilename(name) {
+    return (name || "musica")
+      .toString()
+      .trim()
+      .toLowerCase()
+      .replace(/[^\w\-]+/g, "-")
+      .replace(/\-+/g, "-")
+      .replace(/^\-|\-$/g, "");
+  }
 
+  async function downloadAudio(url, baseName = "musica") {
+    try {
+      if (!url) return;
+
+      const filename = `${safeFilename(baseName)}.mp3`;
+
+      // tenta baixar como blob (força download)
+      const res = await fetch(url, { mode: "cors" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      URL.revokeObjectURL(blobUrl);
+
+      if (typeof showToast === "function") showToast("✅ Download iniciado", "success");
+    } catch (err) {
+      console.warn("downloadAudio falhou:", err);
+
+      // fallback: abre em nova aba
+      window.open(url, "_blank", "noopener,noreferrer");
+      if (typeof showToast === "function") showToast("⚠️ Não foi possível forçar download aqui", "info");
+    }
+  }
+
+    function shareWhatsApp(audioUrl, title = "Minha música") {
+    if (!audioUrl) return;
+    const msg = `🎵 ${title}\nOuça aqui: ${audioUrl}`;
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+    window.open(waUrl, "_blank", "noopener,noreferrer");
+  }
+
+  async function shareNative(audioUrl, title = "Minha música") {
+    try {
+      if (!audioUrl) return;
+
+      if (!navigator.share) {
+        return shareWhatsApp(audioUrl, title);
+      }
+
+      await navigator.share({
+        title,
+        text: `🎵 ${title}\nOuça aqui: ${audioUrl}`,
+        url: audioUrl
+      });
+    } catch (e) {
+      // usuário cancelou ou falhou — fallback opcional
+      // shareWhatsApp(audioUrl, title);
+    }
+  }
 </body>
 </html>
+
 
 
 
