@@ -1345,10 +1345,7 @@ draftsContainer.innerHTML += `
                       <strong>🎧 Versão B</strong>
                       <audio controls src="${urls[1].audio_url || urls[1]}" style="width:100%; margin:10px 0;"></audio>
 
-                      <div class="action-row" style="margin-top:10px">
-                        <a class="btn btn-download" href="${urls[0].audio_url || urls[0]}" download>⬇️ Baixar A</a>
-                        <a class="btn btn-download" href="${urls[1].audio_url || urls[1]}" download>⬇️ Baixar B</a>
-                      </div>
+                      
                     `
                     : urls.length === 1
                     ? `
@@ -2165,6 +2162,7 @@ async function saveEditDraftNew() {
 
 </body>
 </html>
+
 
 
 
