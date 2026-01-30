@@ -997,6 +997,110 @@ body{
   resize: vertical;
 }
 
+/* ===========================
+   ÍCONES TUNECRAFT (SEM EMOJI)
+=========================== */
+:root{
+  --tc-grad: linear-gradient(135deg, #00d9ff, #6366f1);
+}
+
+/* o "slot" do ícone */
+.menu-icon{
+  width: 26px;
+  height: 26px;
+  display: inline-block;
+  flex: 0 0 auto;
+
+  background: #fff;              /* usado pelo mask */
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+
+  /* cor padrão (inativo) */
+  opacity: 0.85;
+  filter: grayscale(0);
+}
+
+/* inativo: tom mais neutro */
+.menu-item .menu-icon{
+  background: rgba(203,213,225,0.72);
+}
+
+/* ativo: usa gradiente da marca */
+.menu-item.active .menu-icon{
+  background: none;
+  background-image: var(--tc-grad);
+}
+
+/* aplica o gradiente "por dentro" via mask */
+.menu-item.active .menu-icon{
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+/* ========== mapeia cada ícone para o arquivo ========== */
+.menu-icon.drafts{
+  -webkit-mask-image: url("assets/icons/drafts.svg");
+  mask-image: url("assets/icons/drafts.svg");
+}
+.menu-icon.approve{
+  -webkit-mask-image: url("assets/icons/approve.svg");
+  mask-image: url("assets/icons/approve.svg");
+}
+.menu-icon.music{
+  -webkit-mask-image: url("assets/icons/music.svg");
+  mask-image: url("assets/icons/music.svg");
+}
+
+/* ===========================
+   MOBILE TABBAR: ícones maiores
+=========================== */
+@media (max-width: 768px){
+  .menu-item{ gap: 6px; }
+  .menu-icon{ width: 30px; height: 30px; }
+  .menu-item span{ display:none; } /* você já quer só ícone */
+}
+
+    /* ===========================
+   WEB COMPACT SIDEBAR (NÃO ESTOURA O + NOVA MÚSICA)
+=========================== */
+@media (min-width: 769px) and (max-width: 1100px){
+  .sidebar{
+    width: 92px;
+    padding: 18px 10px;
+    align-items: center;
+  }
+
+  /* esconde textos e centraliza */
+  .menu-item{
+    justify-content: center;
+    padding: 14px 10px;
+  }
+  .menu-item span:last-child{
+    display: none; /* o label */
+  }
+
+  /* botão vira circular e não ocupa largura */
+  .new-music-btn{
+    width: 56px;
+    height: 56px;
+    border-radius: 999px;
+    padding: 0;
+    font-size: 0; /* esconde o texto */
+    margin: 14px 0 0 0;
+  }
+  .new-music-btn::before{
+    content:"+";
+    font-size: 30px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+  }
+}
+
 
 </style>
 
@@ -1100,18 +1204,20 @@ body{
     </div>
 
     <nav style="flex: 1;">
-  <div class="menu-item active" onclick="showSection('drafts', this)" aria-label="Rascunhos" title="Rascunhos">
-    <span class="tab-ico">📋</span>
-  </div>
+  <div class="menu-item active" onclick="showSection('drafts', this)">
+  <span class="menu-icon drafts" aria-hidden="true"></span>
+  <span>Meus Rascunhos</span>
+</div>
 
-  <div class="menu-item" onclick="showSection('pending', this)" aria-label="Aprovar Letra" title="Aprovar">
-    <span class="tab-ico">📝</span>
-  </div>
+  <div class="menu-item" onclick="showSection('pending', this)">
+  <span class="menu-icon approve" aria-hidden="true"></span>
+  <span>Aprovar Letra</span>
+</div>
 
-  <div class="menu-item" onclick="showSection('received', this)" aria-label="Músicas Recebidas" title="Recebidas">
-    <span class="tab-ico">🎵</span>
-  </div>
-</nav>
+<div class="menu-item" onclick="showSection('received', this)">
+  <span class="menu-icon music" aria-hidden="true"></span>
+  <span>Músicas</span>
+</div>
 
 
     <button class="new-music-btn" onclick="openChat()">
@@ -2389,6 +2495,7 @@ async function saveEditDraftNew() {
   
 </body>
 </html>
+
 
 
 
