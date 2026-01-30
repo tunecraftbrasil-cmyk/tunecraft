@@ -879,7 +879,7 @@ body{
   .sidebar nav{
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     align-items: center;
     gap: 0;
     padding: 0;
@@ -987,6 +987,17 @@ body{
   }
 }
 
+    #lyricsModalText{
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  border: 2px solid rgba(148,163,184,.18);
+  border-radius: 10px;
+  padding: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  resize: vertical;
+}
+
+
 </style>
 
 </head>
@@ -1089,22 +1100,19 @@ body{
     </div>
 
     <nav style="flex: 1;">
-      <div class="menu-item active" onclick="showSection('drafts', this)">
-        📋 <span>Meus Rascunhos</span>
-      </div>
-      <div class="menu-item" onclick="showSection('pending', this)">
-        📝 <span>Aprovar Letra</span>
-      </div>
-      <div class="menu-item" onclick="showSection('approved', this)">
-        🎹 <span>Letras Aprovadas</span>
-      </div>
-      <div class="menu-item" onclick="showSection('received', this)">
-        🎵 <span>Músicas Recebidas</span>
-      </div>
-      <div class="menu-item" onclick="showSection('profile', this)">
-        👤 <span>Minha Conta</span>
-      </div>
-    </nav>
+  <div class="menu-item active" onclick="showSection('drafts', this)" aria-label="Rascunhos" title="Rascunhos">
+    <span class="tab-ico">📋</span>
+  </div>
+
+  <div class="menu-item" onclick="showSection('pending', this)" aria-label="Aprovar Letra" title="Aprovar">
+    <span class="tab-ico">📝</span>
+  </div>
+
+  <div class="menu-item" onclick="showSection('received', this)" aria-label="Músicas Recebidas" title="Recebidas">
+    <span class="tab-ico">🎵</span>
+  </div>
+</nav>
+
 
     <button class="new-music-btn" onclick="openChat()">
       + Nova Música
@@ -1116,7 +1124,7 @@ body{
       <h2 id="pageTitle">Meus Rascunhos</h2>
       <div class="user-profile">
         <span id="userName">Usuário</span>
-        <div class="avatar">U</div>
+        <button class="avatar avatar-btn" onclick="openProfile()" aria-label="Minha Conta" title="Minha Conta">U</button>
         <button onclick="logout()" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:0.9rem; margin-left:10px;">Sair</button>
       </div>
     </div>
@@ -1125,11 +1133,7 @@ body{
 
     <div id="pending" class="section"></div>
 
-    <div id="approved" class="section">
-      <h2>Em Produção</h2>
-      <p style="color:#64748b; margin-bottom: 20px;">Nossos artistas estão gravando essas músicas agora.</p>
-      <div id="approved-list"></div>
-    </div>
+  
 
     <div id="received" class="section">
       <h2>Músicas Prontas</h2>
@@ -1320,7 +1324,6 @@ body{
       const titles = {
         drafts: "Meus Rascunhos",
         pending: "Aprovar Letra",
-        approved: "Letras Aprovadas",
         received: "Músicas Recebidas",
         profile: "Minha Conta"
       };
@@ -1330,20 +1333,49 @@ body{
       document.getElementById(id).classList.add("active");
     }
 
+function openProfile(){
+  showSection('profile', null); // abre a seção
+}
+
+
+function openLyricsModal(text){
+  const modal = document.getElementById("lyricsModal");
+  const box = document.getElementById("lyricsModalText");
+  box.value = text || "";
+  modal.classList.add("active");
+}
+
+function closeLyricsModal(){
+  document.getElementById("lyricsModal").classList.remove("active");
+}
+
+async function copyLyrics(){
+  const text = document.getElementById("lyricsModalText").value || "";
+  try{
+    await navigator.clipboard.writeText(text);
+    showToast("✅ Letra copiada!", "success");
+  }catch(e){
+    // fallback
+    document.getElementById("lyricsModalText").select();
+    document.execCommand("copy");
+    showToast("✅ Letra copiada!", "success");
+  }
+}
+
+    
     function renderSections() {
       const draftsContainer = document.getElementById("drafts");
       const pendingContainer = document.getElementById("pending");
-      const approvedContainer = document.getElementById("approved-list");
       const receivedContainer = document.getElementById("received-list");
 
       draftsContainer.innerHTML = "";
       pendingContainer.innerHTML = "";
-      approvedContainer.innerHTML = "";
+  
       receivedContainer.innerHTML = "";
 
       let hasDrafts = false;
       let hasPending = false;
-      let hasApproved = false;
+    
       let hasReceived = false;
 
       if (userData.orders && userData.orders.length > 0) {
@@ -1453,17 +1485,57 @@ draftsContainer.innerHTML += `
             `;
           }
           else if (order.status === "production") {
-            hasApproved = true;
-            approvedContainer.innerHTML += `
-              <div class="card">
-                <div class="card-header">
-                  <h3>${title}</h3>
-                  <span class="status-badge status-production">Em Produção</span>
-                </div>
-                <p>Letra aprovada! Estamos trabalhando no áudio.</p>
-              </div>
-            `;
-          }
+  hasReceived = true;
+
+  receivedContainer.innerHTML += `
+    <div class="card">
+      <div class="card-header">
+        <h3>${title}</h3>
+        <span class="status-badge status-production">Em Produção</span>
+      </div>
+      <p style="color:#cbd5e1;">Estamos gerando seu áudio. Isso pode levar alguns minutos.</p>
+      <div class="action-row">
+        <button class="btn btn-revise" onclick="openLyricsModal(\`${lyrics.replaceAll("`","\\`")}\`)">📄 Ver letra</button>
+      </div>
+    </div>
+  `;
+}
+else if (order.status === "completed") {
+  hasReceived = true;
+  const urls = Array.isArray(order.audio_urls) ? order.audio_urls : [];
+
+  receivedContainer.innerHTML += `
+    <div class="card">
+      <div class="card-header">
+        <h3>${title}</h3>
+        <span class="status-badge status-completed">Pronta</span>
+      </div>
+
+      <div class="action-row" style="margin-bottom:12px;">
+        <button class="btn btn-revise" onclick="openLyricsModal(\`${lyrics.replaceAll("`","\\`")}\`)">📄 Letra</button>
+      </div>
+
+      ${
+        urls.length >= 2
+          ? `
+            <strong>🎧 Versão A</strong>
+            <audio controls src="${urls[0].audio_url || urls[0]}" style="width:100%; margin:10px 0;"></audio>
+
+            <strong>🎧 Versão B</strong>
+            <audio controls src="${urls[1].audio_url || urls[1]}" style="width:100%; margin:10px 0;"></audio>
+          `
+          : urls.length === 1
+          ? `
+            <strong>🎧 Áudio</strong>
+            <audio controls src="${urls[0].audio_url || urls[0]}" style="width:100%; margin:10px 0;"></audio>
+            <a class="btn btn-download" href="${urls[0].audio_url || urls[0]}" download>⬇️ Baixar</a>
+          `
+          : `<p>Sua música foi finalizada e está sendo preparada para audição.</p>`
+      }
+    </div>
+  `;
+}
+
           else if (order.status === "completed") {
             hasReceived = true;
             const urls = Array.isArray(order.audio_urls) ? order.audio_urls : [];
@@ -2299,8 +2371,25 @@ async function saveEditDraftNew() {
 
   </script>
 
+<div class="alterar-modal" id="lyricsModal">
+  <div class="alterar-content">
+    <div class="alterar-header">
+      <h2>📄 Letra</h2>
+      <button class="alterar-close" onclick="closeLyricsModal()">×</button>
+    </div>
+
+    <textarea id="lyricsModalText" readonly style="width:100%; min-height: 320px;"></textarea>
+
+    <div class="alterar-buttons" style="margin-top:14px;">
+      <button class="btn-alterar-cancel" onclick="closeLyricsModal()">Fechar</button>
+      <button class="btn-alterar-submit" onclick="copyLyrics()">Copiar letra</button>
+    </div>
+  </div>
+</div>
+  
 </body>
 </html>
+
 
 
 
