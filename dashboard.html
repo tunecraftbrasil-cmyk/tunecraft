@@ -848,6 +848,145 @@ body{
 ::-webkit-scrollbar-track{ background: rgba(255,255,255,0.03); }
 ::-webkit-scrollbar-thumb{ background: rgba(148,163,184,0.22); border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover{ background: rgba(148,163,184,0.35); }
+
+/* ===== MOBILE: TAB BAR REAL (sem scroll) ===== */
+@media (max-width: 768px) {
+
+  /* Sidebar vira tab bar fixa */
+  .sidebar{
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    height: 74px;
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+    z-index: 9998;
+
+    /* visual de app */
+    background: rgba(10, 14, 39, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255,255,255,0.08);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    overflow: hidden; /* sem barra de rolagem */
+  }
+
+  .logo-container { display:none; }
+
+  /* 5 abas = 5 colunas (sem scroll) */
+  .sidebar nav{
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    align-items: center;
+    gap: 0;
+    padding: 0;
+    overflow: hidden; /* mata a rolagem lateral */
+  }
+
+  /* Cada item vira “ícone em cima + texto embaixo” */
+  .menu-item{
+    margin: 0;
+    padding: 8px 4px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;   /* empilha */
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+
+    text-align: center;
+    white-space: nowrap;
+    min-width: 0;
+
+    color: rgba(203,213,225,0.72);
+    background: transparent;
+  }
+
+  /* Emoji (ícone) maior */
+  .menu-item{
+    font-size: 20px;  /* controla o emoji */
+    line-height: 1;
+  }
+
+  /* Label menor, estilo tab bar */
+  .menu-item span{
+    display: block;
+    font-size: 11px;
+    line-height: 1.05;
+    opacity: 0.92;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ativo como app: leve “pill” + pontinho */
+  .menu-item.active{
+    color: #ffffff;
+    background: rgba(0,217,255,0.12);
+    outline: none;
+    border-left: none;
+    position: relative;
+  }
+  .menu-item.active::after{
+    content:"";
+    position:absolute;
+    top: 6px;
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: #00d9ff;
+    box-shadow: 0 0 14px rgba(0,217,255,0.55);
+  }
+
+  /* ===== FAB CENTRAL (padrão apps) ===== */
+  .new-music-btn{
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(74px + env(safe-area-inset-bottom) + 14px);
+    width: 60px;
+    height: 60px;
+    border-radius: 999px;
+    padding: 0;
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(135deg, #00d9ff, #6366f1);
+    box-shadow: 0 18px 40px rgba(0,217,255,0.18);
+  }
+
+  /* deixa o botão “+” apenas, sem texto (cara nativa) */
+  .new-music-btn{
+    font-size: 0; /* esconde texto sem mexer no HTML */
+  }
+  .new-music-btn::before{
+    content:"+";
+    font-size: 30px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+  }
+
+  /* garante que conteúdo não fique atrás da tab bar */
+  .main-content{
+    padding-bottom: calc(74px + env(safe-area-inset-bottom) + 90px);
+  }
+
+  /* toast sobe um pouco pra não ficar escondido */
+  .toast-message{
+    bottom: calc(74px + env(safe-area-inset-bottom) + 18px);
+    right: 14px;
+    left: 14px;
+    max-width: calc(100vw - 28px);
+  }
+}
+
 </style>
 
 </head>
@@ -2162,6 +2301,7 @@ async function saveEditDraftNew() {
 
 </body>
 </html>
+
 
 
 
