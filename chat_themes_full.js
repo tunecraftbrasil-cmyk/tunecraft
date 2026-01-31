@@ -313,7 +313,7 @@ elaboratedChatFlow = [
         { label: "🇧🇷 PT-BR", value: "pt_br" }, { label: "🇺🇸 EN", value: "en" }, { label: "🇪🇸 ES", value: "es" },
         { label: "🇮🇹 IT", value: "it" }, { label: "🌍 Outro", value: "other" }
     ], metadata: { fieldName: "lyricDetails.language", required: true } },
-    { step: "711.5", section: "FILHO", condition: (d) => d.step_0 === "friendship" && d.step_711 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
+    { step: "711.5", section: "AMIZADE", condition: (d) => d.step_0 === "friendship" && d.step_711 === "other", question: "Qual outro idioma?", type: "input", placeholder: "Ex: Idioma...", minLength: 2, metadata: { fieldName: "lyricDetails.languageOther", required: true } },
     { step: 712, section: "AMIZADE", condition: (d) => d.step_0 === "friendship", question: "Qual tipo de voz você prefere ouvir? 🎙️", type: "select", options: [
         { label: "🎙️ Masc. suave", value: "male_soft" }, { label: "🎙️ Masc. intensa", value: "male_strong" },
         { label: "🎤 Fem. delicada", value: "female_soft" }, { label: "🎤 Fem. poderosa", value: "female_strong" },
@@ -400,7 +400,7 @@ elaboratedChatFlow = [
         { label: "Esposo(a)/parceiro(a)", value: "spouse" }, { label: "Meus pais", value: "parents" }, { label: "Sogros", value: "in_laws" },
         { label: "Família toda", value: "family" }, { label: "Amigos(as)", value: "friends" }, { label: "Outro", value: "other" }
     ], metadata: { fieldName: "ai_metadata.audience", required: true } },
-    { step: 1001, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement" && d.step_10 === "other", question: "Para quem especificamente? 🎯", type: "input", placeholder: "Irmãos, chefe, grupo…", minLength: 3, metadata: { fieldName: "ai_metadata.audienceOther", required: true } },
+    { step: 1001, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement" && d.step_1000 === "other", question: "Para quem especificamente? 🎯", type: "input", placeholder: "Irmãos, chefe, grupo…", minLength: 3, metadata: { fieldName: "ai_metadata.audienceOther", required: true } },
     { step: 1002, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Quem fala nessa música? 🎤", type: "select", options: [
         { label: "Gestante", value: "pregnant" }, { label: "Parceiro(a)", value: "partner" }, { label: "Casal", value: "couple" }, { label: "Outro", value: "other" }
     ], metadata: { fieldName: "ai_metadata.narratorRole", required: true } },
@@ -418,7 +418,7 @@ elaboratedChatFlow = [
         { label: "🎺 Acústico", value: "acoustic" }, { label: "🎸 Rock", value: "rock" }, { label: "✨ Gospel", value: "gospel" },
         { label: "🎙️ Rap", value: "rap" }, { label: "🌌 Outro", value: "other" }
     ], metadata: { fieldName: "musicStyle.primaryGenre", required: true } },
-    { step: "1010.5", section: "FILGRAVIDEZHO", condition: (d) => d.step_0 === "pregnancy_announcement" && d.step_1010 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
+    { step: "1010.5", section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement" && d.step_1010 === "other", question: "Qual outro estilo?", type: "input", placeholder: "Ex: Estilo...", minLength: 2, metadata: { fieldName: "musicStyle.primaryGenreOther", required: true } },
     { step: 1011, section: "GRAVIDEZ", condition: (d) => d.step_0 === "pregnancy_announcement", question: "Qual impacto emocional você quer? 💖", type: "select", options: [
         { label: "😭 Emocionar", value: "emotional" }, { label: "☮️ Paz", value: "peace" }, { label: "✨ Arrepio", value: "goosebumps" },
         { label: "😊 Sorriso", value: "smile" }, { label: "🌅 Esperança", value: "hope" }, { label: "💪 Força", value: "strength" }
@@ -477,9 +477,9 @@ elaboratedChatFlow = [
     { step: 1114, section: "OUTRO", condition: (d) => d.step_0 === "other", question: "O que você prefere evitar? 🚫", type: "textarea", placeholder: "Evitar…", minLength: 5, metadata: { fieldName: "lyricDetails.avoid", required: false } },
 
 
-    // ===== TEMA 1: PET 
+    // ===== TEMA 12: PET 
     { step: 1200, section: "PET", condition: (d) => d.step_0 === "pet", question: "Qual é o nome do seu pet?", type: "input", placeholder: "Ex: Nome...", minLength: 1, metadata: { fieldName: "recipient.name", required: true } },
-    { step: 1201, section: "PET", condition: (d) => d.step_0 === "pet", question: "Que animal é seu pet?", type: "input", placeholder: "Ex: Cachorro, gato, etc...", minLength: 2, metadata: { fieldName: "ai_metadata.relationship", required: true } },
+    { step: 1201, section: "PET", condition: (d) => d.step_0 === "pet", question: "Que animal é seu pet?", type: "input", placeholder: "Ex: Cachorro, gato, etc...", minLength: 2, metadata: { fieldName: "ai_metadata.petType", required: true } },
     { step: 1202, section: "PET", condition: (d) => d.step_0 === "pet", question: "Cite algumas características especiais do seu pet.", type: "textarea", placeholder: "Ex: Personalidade...", minLength: 15, metadata: { fieldName: "lyricDetails.specialMentions", required: true } },
     { step: 1203, section: "PET", condition: (d) => d.step_0 === "pet", question: "Conte algumas memórias marcantes sua com seu pet?", type: "textarea", placeholder: "Ex: Momentos...", minLength: 15, metadata: { fieldName: "lyricDetails.mainMessage", required: true } },
     { step: 1204, section: "PET", condition: (d) => d.step_0 === "pet", question: "Escreva uma mensagem pro seu pet.", type: "textarea", placeholder: "Ex: O que quer dizer...", minLength: 15, metadata: { fieldName: "lyricDetails.withYouI", required: true } },
