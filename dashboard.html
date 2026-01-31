@@ -392,6 +392,95 @@ body{
 }
 .empty-icon{ font-size: 3rem; margin-bottom: 10px; display: block; }
 
+/* =========================================
+   ✅ EMPTY STATE PREMIUM (TuneCraft)
+   - glass card + diamante + copy emocional
+========================================= */
+.tc-empty{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 44px 16px;
+}
+
+.tc-empty-card{
+  width: min(560px, 100%);
+  background: rgba(15,26,46,.65);
+  border: 1px solid rgba(148,163,184,.18);
+  border-radius: 18px;
+  padding: 26px 22px;
+  text-align: center;
+  box-shadow: 0 18px 60px rgba(0,0,0,.35);
+  backdrop-filter: blur(10px);
+}
+
+.tc-empty-logo{
+  width: 76px;
+  height: 76px;
+  margin: 6px auto 14px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: radial-gradient(circle at 30% 20%, rgba(0,217,255,.18), transparent 55%),
+              radial-gradient(circle at 70% 80%, rgba(99,102,241,.18), transparent 55%),
+              rgba(255,255,255,0.03);
+  border: 1px solid rgba(148,163,184,.16);
+}
+
+.tc-empty-logo img{
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 20px rgba(0,217,255,.15));
+}
+
+.tc-empty-title{
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--text);
+  margin-bottom: 6px;
+  letter-spacing: .2px;
+}
+
+.tc-empty-sub{
+  color: rgba(203,213,225,0.80);
+  font-size: 0.98rem;
+  line-height: 1.35;
+  margin-bottom: 18px;
+}
+
+.tc-empty-cta{
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
+  border: none;
+  cursor: pointer;
+  font-weight: 900;
+  font-size: 1rem;
+  padding: 14px 16px;
+  border-radius: 14px;
+  color: #061018;
+  background: linear-gradient(135deg, var(--brand), var(--brand-2));
+  box-shadow: 0 14px 30px rgba(0,217,255,0.16);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: .2s ease;
+}
+
+.tc-empty-cta:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 18px 38px rgba(0,217,255,0.22);
+}
+
+.tc-empty-hint{
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: rgba(148,163,184,0.85);
+}
+
+
 /* ========== TOAST ========== */
 .toast-message{
   position: fixed;
@@ -2667,6 +2756,7 @@ async function saveEditDraftNew() {
 
 </body>
 </html>
+
 
 
 
