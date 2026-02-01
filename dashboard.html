@@ -1185,7 +1185,11 @@ body{
 
   
 
-    
+    <div id="received" class="section">
+      <h2>Músicas Prontas</h2>
+      <p style="color:#64748b; margin-bottom: 20px;">Baixe e compartilhe suas criações.</p>
+      <div id="received-list"></div>
+    </div>
 
     <div id="profile" class="section">
       <h2>Meus Dados</h2>
@@ -1370,7 +1374,7 @@ body{
       const titles = {
         drafts: "Meus Rascunhos",
         pending: "Aprovar Letra",
-        received: "Músicas",
+        received: "Músicas Recebidas",
         profile: "Minha Conta"
       };
       document.getElementById("pageTitle").innerText = titles[id] || "Painel";
