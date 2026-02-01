@@ -1787,26 +1787,46 @@ ${
       }
 
       if (!hasDrafts) {
-        draftsContainer.innerHTML = `
-          <div class="empty-state">
-            <span class="empty-icon">📋</span>
-            <h3>Sem rascunhos no momento</h3>
-            <p>Crie uma nova música para começar!</p>
-            <button class="btn btn-approve" onclick="openChat()" style="margin-top:20px;">Criar Nova Música</button>
-          </div>
-        `;
-      }
+  draftsContainer.innerHTML = `
+    <div class="tc-empty">
+      <div class="tc-empty-card">
+        <div class="tc-empty-logo">
+          <img src="./images/diamante.png" alt="TuneCraft">
+        </div>
+
+        <div class="tc-empty-title">Toda música começa com uma história</div>
+        <div class="tc-empty-sub">Crie sua próxima agora — a gente transforma em canção.</div>
+
+        <button class="tc-empty-cta" onclick="openChat()">
+          🎵 Criar Nova Música
+        </button>
+
+        <div class="tc-empty-hint">Dica: quanto mais detalhes, mais única fica a letra.</div>
+      </div>
+    </div>
+  `;
+}
+
 
       if (!hasPending) {
-        pendingContainer.innerHTML = `
-          <div class="empty-state">
-            <span class="empty-icon">✨</span>
-            <h3>Tudo em dia!</h3>
-            <p>Você não tem letras pendentes.</p>
-            <button class="btn btn-approve" onclick="openChat()" style="margin-top:20px;">Criar Nova Música</button>
-          </div>
-        `;
-      }
+  pendingContainer.innerHTML = `
+    <div class="tc-empty">
+      <div class="tc-empty-card">
+        <div class="tc-empty-logo">
+          <img src="./images/diamante.png" alt="TuneCraft">
+        </div>
+
+        <div class="tc-empty-title">Tudo em dia ✨</div>
+        <div class="tc-empty-sub">Sem letras pendentes no momento. Quer criar outra música?</div>
+
+        <button class="tc-empty-cta" onclick="openChat()">
+          ➕ Criar Nova Música
+        </button>
+      </div>
+    </div>
+  `;
+}
+
 
      
 
@@ -2756,6 +2776,7 @@ async function saveEditDraftNew() {
 
 </body>
 </html>
+
 
 
 
