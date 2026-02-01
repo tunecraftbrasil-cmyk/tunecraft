@@ -237,13 +237,8 @@
       font-size: 0.9rem;
     }
 
-    #card-section {
-      display: block;
-    }
-
-    #pix-section {
-      display: none;
-    }
+    #card-section { display: block; }
+    #pix-section { display: none; }
 
     #form-checkout {
       display: flex;
@@ -328,9 +323,7 @@
       transition: 0.2s;
     }
 
-    .btn-copy-pix:hover {
-      background: #059669;
-    }
+    .btn-copy-pix:hover { background: #059669; }
 
     .error-message {
       color: #ef4444;
@@ -358,10 +351,7 @@
       box-shadow: 0 10px 25px rgba(0, 217, 255, 0.3);
     }
 
-    .btn-pay:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
+    .btn-pay:disabled { opacity: 0.6; cursor: not-allowed; }
 
     .loading {
       display: none;
@@ -400,22 +390,12 @@
       cursor: pointer;
     }
 
-    .back-link:hover {
-      text-decoration: underline;
-    }
+    .back-link:hover { text-decoration: underline; }
 
     @media (max-width: 600px) {
-      .container {
-        padding: 25px;
-      }
-
-      .payment-methods {
-        grid-template-columns: 1fr;
-      }
-
-      .mp-field-group {
-        grid-template-columns: 1fr;
-      }
+      .container { padding: 25px; }
+      .payment-methods { grid-template-columns: 1fr; }
+      .mp-field-group { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -584,6 +564,9 @@
   let pixPaymentId = null;
   let pixCheckInterval = null;
   let cardFormInstance = null;
+
+  // ✅ 1) variável combinada
+  let isFreeByCoupon = false; // ✅ marca quando finalPrice virou 0 por cupom
 
   // ========================
   // INICIALIZAR CARDFORM - SEM IFRAME
@@ -776,9 +759,57 @@
   }
 
   // ========================
+  // ✅ 3) FUNÇÕES (JWT + BYPASS)
+  // ========================
+  async function getUserJwtOrThrow() {
+    const { data, error } = await sb.auth.getSession();
+    if (error) throw error;
+    const token = data?.session?.access_token;
+    if (!token) throw new Error("Sessão expirada. Faça login novamente.");
+    return token;
+  }
+
+  async function redeemFreeCouponBypass() {
+    const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
+    const couponCode = (document.getElementById('coupon-code')?.value || "").trim().toUpperCase();
+
+    if (!pedidoId) throw new Error("Pedido não encontrado no checkout.");
+    if (!couponCode) throw new Error("Cupom não informado.");
+
+    showLoading("Aplicando cupom e iniciando geração...");
+
+    const jwt = await getUserJwtOrThrow();
+
+    const resp = await fetch(`${SUPABASE_URL}/functions/v1/redeem-free-coupon`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${jwt}`
+      },
+      body: JSON.stringify({ pedidoId, couponCode })
+    });
+
+    const out = await resp.json().catch(() => ({}));
+
+    if (!resp.ok || !out.ok) {
+      throw new Error(out?.error || `Falha ao aplicar cupom (${resp.status})`);
+    }
+
+    // ✅ limpa storage igual finalizePurchase
+    localStorage.removeItem('tuneCraft_pendingOrderId');
+    localStorage.removeItem('tuneCraft_checkoutEmail');
+    localStorage.removeItem('tuneCraft_checkoutName');
+
+    showToast("✅ Cupom aplicado! Gerando sua letra...", "success");
+
+    setTimeout(() => {
+      window.location.href = 'dashboard.html?section=pending';
+    }, 900);
+  }
+
+  // ========================
   // APLICAR CUPOM
   // ========================
-
   document.getElementById('apply-coupon-btn').addEventListener('click', async () => {
     const couponCode = document.getElementById('coupon-code').value.trim().toUpperCase();
 
@@ -836,7 +867,14 @@
       finalPrice = Math.max(originalPrice - discount, 0);
       appliedCoupon = data;
 
-      showMessage('coupon-message', `✅ Cupom aplicado! ${data.desconto_percentual > 0 ? data.desconto_percentual + '%' : formatBRL(discount)} de desconto`, 'success');
+      // ✅ 2) marca cupom grátis
+      isFreeByCoupon = (finalPrice === 0);
+
+      showMessage(
+        'coupon-message',
+        `✅ Cupom aplicado! ${data.desconto_percentual > 0 ? data.desconto_percentual + '%' : formatBRL(discount)} de desconto`,
+        'success'
+      );
       updatePriceDisplay();
 
       btn.textContent = '✓ Aplicado';
@@ -853,9 +891,15 @@
   // ========================
   // ALTERNAR MÉTODO
   // ========================
-
   document.querySelectorAll('.payment-method-btn').forEach(btn => {
     btn.addEventListener('click', () => {
+
+      // ✅ 5) BLOQUEIO (opcional) - você pediu para incluir se quisesse
+      if (appliedCoupon && finalPrice === 0) {
+        showToast("✅ Valor zerado pelo cupom. Clique em Pagar para concluir.", "info");
+        return;
+      }
+
       document.querySelectorAll('.payment-method-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
@@ -876,7 +920,6 @@
   // ========================
   // COPIAR PIX
   // ========================
-
   document.getElementById('copy-pix-btn').addEventListener('click', () => {
     const pixCode = document.getElementById('pix-code-text').textContent;
     navigator.clipboard.writeText(pixCode).then(() => {
@@ -885,9 +928,8 @@
   });
 
   // ========================
-  // SUBMIT FORM
+  // ✅ 4) SUBMIT FORM (com bypass quando valor = 0)
   // ========================
-
   document.getElementById('payment-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -899,6 +941,20 @@
       return;
     }
 
+    // ✅ BYPASS: se cupom zerou o valor, não chama MP
+    const amountCentsToPay = appliedCoupon ? finalPrice : originalPrice;
+    if (appliedCoupon && amountCentsToPay === 0) {
+      try {
+        await redeemFreeCouponBypass();
+      } catch (error) {
+        console.error("❌ Bypass cupom grátis falhou:", error);
+        showToast(`❌ ${error.message}`, "error");
+        hideLoading();
+      }
+      return;
+    }
+
+    // fluxo normal
     if (currentPaymentMethod === 'credit_card') {
       await processCardPayment();
     } else {
@@ -909,106 +965,103 @@
   // ========================
   // PAGAMENTO CARTÃO - PRODUÇÃO
   // ========================
-
   async function processCardPayment() {
-  const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
-  const name = document.getElementById('customer-name').value.trim();
-  const email = document.getElementById('customer-email').value.trim();
+    const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
+    const name = document.getElementById('customer-name').value.trim();
+    const email = document.getElementById('customer-email').value.trim();
 
-  showLoading('Processando pagamento com cartão...');
+    showLoading('Processando pagamento com cartão...');
 
-  try {
-    const cardNumber = document.getElementById('form-checkout__cardNumber').value.trim();
-    const cardholderName = document.getElementById('form-checkout__cardholderName').value.trim();
-    const expirationDate = document.getElementById('form-checkout__cardExpirationDate').value.trim();
-    const securityCode = document.getElementById('form-checkout__securityCode').value.trim();
-    const identificationNumber = document.getElementById('form-checkout__identificationNumber').value.trim();
-    const issuer = document.getElementById('form-checkout__issuer').value;
-    const installments = document.getElementById('form-checkout__installments').value;
-    const identificationType = document.getElementById('form-checkout__identificationType').value;
+    try {
+      const cardNumber = document.getElementById('form-checkout__cardNumber').value.trim();
+      const cardholderName = document.getElementById('form-checkout__cardholderName').value.trim();
+      const expirationDate = document.getElementById('form-checkout__cardExpirationDate').value.trim();
+      const securityCode = document.getElementById('form-checkout__securityCode').value.trim();
+      const identificationNumber = document.getElementById('form-checkout__identificationNumber').value.trim();
+      const issuer = document.getElementById('form-checkout__issuer').value;
+      const installments = document.getElementById('form-checkout__installments').value;
+      const identificationType = document.getElementById('form-checkout__identificationType').value;
 
-    if (!cardNumber || !cardholderName || !expirationDate || !securityCode || !identificationNumber) {
-      throw new Error('Preencha todos os campos do cartão');
+      if (!cardNumber || !cardholderName || !expirationDate || !securityCode || !identificationNumber) {
+        throw new Error('Preencha todos os campos do cartão');
+      }
+
+      // ✅ PEGUE O paymentMethodId correto do CardForm
+      const cardFormData = cardFormInstance.getCardFormData();
+      const paymentMethodId = cardFormData.paymentMethodId;
+
+      console.log('📤 Dados capturados:', {
+        cardNumber: cardNumber ? '***' : 'VAZIO',
+        cardholderName,
+        expirationDate,
+        securityCode: securityCode ? '***' : 'VAZIO',
+        paymentMethodId,
+        issuer,
+        installments,
+        identificationType,
+        identificationNumber: identificationNumber ? '***' : 'VAZIO'
+      });
+
+      if (!paymentMethodId) {
+        throw new Error('Tipo de cartão não detectado. Verifique o número do cartão.');
+      }
+
+      const paymentPayload = {
+        paymentData: {
+          cardNumber: cardNumber.replace(/\s/g, ''),
+          expirationDate: expirationDate,
+          securityCode: securityCode,
+          cardholderName: cardholderName,
+          paymentMethodId: paymentMethodId,
+          issuerId: issuer,
+          installments: installments,
+          identificationType: identificationType,
+          identificationNumber: identificationNumber
+        },
+        amount: appliedCoupon ? finalPrice / 100 : originalPrice / 100,
+        customerName: name,
+        customerEmail: email,
+        orderId: pedidoId,
+        couponCode: appliedCoupon?.codigo || null,
+        paymentMethod: 'credit_card'
+      };
+
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/process-mercadopago-payment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify(paymentPayload)
+      });
+
+      const result = await response.json();
+
+      console.log('📥 Resposta pagamento:', {
+        ok: response.ok,
+        status: result.status,
+        id: result.id
+      });
+
+      if (!response.ok || result.status !== 'approved') {
+        throw new Error(result.error || result.status_detail || 'Pagamento recusado');
+      }
+
+      await finalizePurchase(pedidoId, result.id, 'credit_card');
+      hideLoading();
+
+    } catch (error) {
+      console.error("❌ Erro ao processar cartão:", error.message);
+      document.getElementById('card-errors').textContent = error.message;
+      document.getElementById('card-errors').style.display = 'block';
+      showToast(`❌ ${error.message}`, 'error');
+      hideLoading();
     }
-
-    // ✅ PEGUE O paymentMethodId correto do CardForm
-    const cardFormData = cardFormInstance.getCardFormData();
-    const paymentMethodId = cardFormData.paymentMethodId;
-
-    console.log('📤 Dados capturados:', {
-      cardNumber: cardNumber ? '***' : 'VAZIO',
-      cardholderName,
-      expirationDate,
-      securityCode: securityCode ? '***' : 'VAZIO',
-      paymentMethodId,  // ← IMPORTANTE!
-      issuer,
-      installments,
-      identificationType,
-      identificationNumber: identificationNumber ? '***' : 'VAZIO'
-    });
-
-    if (!paymentMethodId) {
-      throw new Error('Tipo de cartão não detectado. Verifique o número do cartão.');
-    }
-
-    const paymentPayload = {
-      paymentData: {
-        cardNumber: cardNumber.replace(/\s/g, ''),
-        expirationDate: expirationDate,
-        securityCode: securityCode,
-        cardholderName: cardholderName,
-        paymentMethodId: paymentMethodId,  // ✅ USA O CORRETO
-        issuerId: issuer,
-        installments: installments,
-        identificationType: identificationType,
-        identificationNumber: identificationNumber
-      },
-      amount: appliedCoupon ? finalPrice / 100 : originalPrice / 100,
-      customerName: name,
-      customerEmail: email,
-      orderId: pedidoId,
-      couponCode: appliedCoupon?.codigo || null,
-      paymentMethod: 'credit_card'
-    };
-
-    const response = await fetch(`${SUPABASE_URL}/functions/v1/process-mercadopago-payment`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-      },
-      body: JSON.stringify(paymentPayload)
-    });
-
-    const result = await response.json();
-
-    console.log('📥 Resposta pagamento:', {
-      ok: response.ok,
-      status: result.status,
-      id: result.id
-    });
-
-    if (!response.ok || result.status !== 'approved') {
-      throw new Error(result.error || result.status_detail || 'Pagamento recusado');
-    }
-
-    await finalizePurchase(pedidoId, result.id, 'credit_card');
-    hideLoading();
-
-  } catch (error) {
-    console.error("❌ Erro ao processar cartão:", error.message);
-    document.getElementById('card-errors').textContent = error.message;
-    document.getElementById('card-errors').style.display = 'block';
-    showToast(`❌ ${error.message}`, 'error');
-    hideLoading();
   }
-}
-
 
   // ========================
   // PAGAMENTO PIX
   // ========================
-
   async function processPixPayment(name, email) {
     const pedidoId = localStorage.getItem('tuneCraft_pendingOrderId');
 
@@ -1060,7 +1113,6 @@
   // ========================
   // VERIFICAR PIX
   // ========================
-
   function startPixPaymentCheck(pedidoId) {
     pixCheckInterval = setInterval(async () => {
       try {
@@ -1088,7 +1140,6 @@
   // ========================
   // FINALIZAR COMPRA
   // ========================
-
   async function finalizePurchase(pedidoId, paymentId, paymentMethod) {
     showLoading('Finalizando compra...');
 
