@@ -431,6 +431,9 @@
 
   <div class="divider"></div>
 
+  <!-- ✅ Wrapper de pagamento (vamos esconder quando grátis) -->
+<div id="payment-ui">
+  
   <form id="payment-form">
     <div class="form-section">
       <label class="form-label">Nome Completo *</label>
@@ -537,7 +540,8 @@
         </div>
       </div>
     </div>
-
+    </div>
+    
     <button type="submit" class="btn-pay" id="pay-button">
       💳 Pagar R$ 49,90
     </button>
@@ -675,6 +679,57 @@
     }
   }
 
+function applyFreeUIState(isFree) {
+  const paymentUI = document.getElementById('payment-ui');
+  const payButton = document.getElementById('pay-button');
+
+  // Campos de cartão (pra garantir que não travem validação)
+  const cardFields = [
+    'form-checkout__cardNumber',
+    'form-checkout__cardholderName',
+    'form-checkout__cardExpirationDate',
+    'form-checkout__securityCode',
+    'form-checkout__issuer',
+    'form-checkout__installments',
+    'form-checkout__identificationType',
+    'form-checkout__identificationNumber'
+  ].map(id => document.getElementById(id)).filter(Boolean);
+
+  if (isFree) {
+    // esconde todo o bloco de pagamento
+    if (paymentUI) paymentUI.style.display = 'none';
+
+    // limpa erros de cartão
+    const ce = document.getElementById('card-errors');
+    if (ce) { ce.textContent = ''; ce.style.display = 'none'; }
+
+    // tira required dos campos (por segurança)
+    cardFields.forEach(el => el.required = false);
+
+    // seta método "free" (não é obrigatório, mas deixa claro)
+    currentPaymentMethod = 'free_coupon';
+
+    // botão vira "concluir grátis"
+    payButton.textContent = `✅ Concluir grátis (${formatBRL(0)})`;
+  } else {
+    // volta ao normal
+    if (paymentUI) paymentUI.style.display = 'block';
+
+    // mantém o fluxo normal baseado no método selecionado
+    if (currentPaymentMethod === 'pix') {
+      document.getElementById('card-section').style.display = 'none';
+      document.getElementById('pix-section').style.display = 'block';
+      payButton.textContent = `🏦 Gerar QR Code PIX (${formatBRL(appliedCoupon ? finalPrice : originalPrice)})`;
+    } else {
+      currentPaymentMethod = 'credit_card';
+      document.getElementById('card-section').style.display = 'block';
+      document.getElementById('pix-section').style.display = 'none';
+      payButton.textContent = `💳 Pagar ${formatBRL(appliedCoupon ? finalPrice : originalPrice)}`;
+    }
+  }
+}
+
+  
   function updatePriceDisplay() {
     const originalPriceEl = document.getElementById('original-price');
     const discountRow = document.getElementById('discount-row');
@@ -690,6 +745,12 @@
       finalPriceEl.textContent = formatBRL(finalPrice);
 
       setTimeout(updateInstallmentOptions, 300);
+
+      if (finalPrice === 0) {
+  payButton.textContent = `✅ Concluir grátis (${formatBRL(0)})`;
+  return;
+}
+
 
       const icon = currentPaymentMethod === 'credit_card' ? '💳' : '🏦';
       payButton.textContent = `${icon} Pagar ${formatBRL(finalPrice)}`;
@@ -869,6 +930,7 @@
 
       // ✅ 2) marca cupom grátis
       isFreeByCoupon = (finalPrice === 0);
+      applyFreeUIState(isFreeByCoupon);
 
       showMessage(
         'coupon-message',
