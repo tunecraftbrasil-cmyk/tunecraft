@@ -1,9 +1,9 @@
 // ============================================
-// CHAT.JS v2 - MAIN (LÃ³gica Principal)
+// CHAT.JS v2 - MAIN (Lógica Principal)
 // ============================================
 
 // ============================================
-// VARIÃVEL GLOBAL: SERÃ DEFINIDA EM chat_themes_full.js
+// VARIÁVEL GLOBAL: SERÁ DEFINIDA EM chat_themes_full.js
 // ============================================
 let elaboratedChatFlow = [];
 
@@ -27,7 +27,7 @@ function getNestedValue(obj, path) {
 }
 
 // ============================================
-// VARIÃVEIS GLOBAIS
+// VARIÁVEIS GLOBAIS
 // ============================================
 
 let currentStep = 0;
@@ -36,7 +36,7 @@ let currentQuestion = null;
 let draftBeingEdited = null;
 
 // ============================================
-// FUNÃ‡Ã•ES DE INTERFACE
+// FUNÇÕES DE INTERFACE
 // ============================================
 
 function scrollToBottom() {
@@ -69,14 +69,14 @@ function initChat() {
     
     // DEBUG: Verificar se elaboratedChatFlow existe
     if (!elaboratedChatFlow || elaboratedChatFlow.length === 0) {
-        console.error("âŒ ERRO: elaboratedChatFlow nÃ£o foi carregado! Verifique se chat_themes_full.js foi importado.");
+        console.error("❌ ERRO: elaboratedChatFlow não foi carregado! Verifique se chat_themes_full.js foi importado.");
         alert("Erro ao carregar o chat. Verifique o console.");
         return;
     }
     
     if (window.draftBeingEdited?.payload) {
         formData = { ...window.draftBeingEdited.payload };
-        console.log("ðŸ“âœ… Editando draft:", formData);
+        console.log("📝✅ Editando draft:", formData);
     } else {
         formData = {
             form_id: "tc_chat_v2",
@@ -84,40 +84,40 @@ function initChat() {
             asked: [],
             answers: {}
         };
-        console.log("ðŸ“âœ… Novo chat");
+        console.log("📝✅ Novo chat");
     }
     
     document.getElementById("chatMessages").innerHTML = "";
-    console.log("ðŸŽ¯ Total de steps disponÃ­veis:", elaboratedChatFlow.length);
+    console.log("🎯 Total de steps disponíveis:", elaboratedChatFlow.length);
     renderQuestion();
 }
 
 // ============================================
-// RENDERIZAÃ‡ÃƒO DAS PERGUNTAS
+// RENDERIZAÇÃO DAS PERGUNTAS
 // ============================================
 
 function renderQuestion() {
     const inputContainer = document.getElementById("inputSection");
     inputContainer.innerHTML = "";
 
-    // ðŸ” DEBUG: Ver estado atual
-    console.log("ðŸ” DEBUG renderQuestion:");
+    // 🔍 DEBUG: Ver estado atual
+    console.log("🔍 DEBUG renderQuestion:");
     console.log("   formData.step_0 =", formData.step_0);
     console.log("   formData.step_100 =", formData.step_100);
     console.log("   formData =", formData);
 
-    // Filtrar apenas steps vÃ¡lidos para este tema
+    // Filtrar apenas steps válidos para este tema
     const validSteps = elaboratedChatFlow.filter((step) => {
         if (step.condition) return step.condition(formData);
         return true;
     });
 
-    console.log("ðŸ“‹ Steps vÃ¡lidos para este tema:", validSteps.length);
-    console.log("ðŸ“ Current step (index):", currentStep);
+    console.log("📋 Steps válidos para este tema:", validSteps.length);
+    console.log("📍 Current step (index):", currentStep);
 
     // Se passou do limite
     if (currentStep >= validSteps.length) {
-        console.log("âœ… Fim do formulÃ¡rio! Mostrando botÃ£o Salvar");
+        console.log("✅ Fim do formulário! Mostrando botão Salvar");
         renderSaveButton(inputContainer);
         scrollToBottom();
         return;
@@ -126,13 +126,13 @@ function renderQuestion() {
     currentQuestion = validSteps[currentStep];
 
     if (!currentQuestion) {
-        console.error("âŒ Erro: currentQuestion Ã© null");
+        console.error("❌ Erro: currentQuestion é null");
         console.log("   validSteps.length =", validSteps.length);
         console.log("   currentStep =", currentStep);
         return;
     }
 
-    console.log("ðŸ“Œ Pergunta atual:", currentQuestion.step, "-", currentQuestion.question);
+    console.log("📌 Pergunta atual:", currentQuestion.step, "-", currentQuestion.question);
 
     const progress = ((currentStep + 1) / (validSteps.length + 1)) * 100;
     const pf = document.getElementById("progressFill");
@@ -148,7 +148,7 @@ function renderQuestion() {
 function addMessage(sender, text) {
     const messagesContainer = document.getElementById("chatMessages");
     if (!messagesContainer) {
-        console.error("âŒ Elemento #chatMessages nÃ£o encontrado!");
+        console.error("❌ Elemento #chatMessages não encontrado!");
         return;
     }
 
@@ -156,7 +156,7 @@ function addMessage(sender, text) {
     messageEl.className = "message";
 
     if (sender === "bot") {
-        messageEl.innerHTML = `<div class="bot-message"><div class="avatar">ðŸŽµ</div><div class="bubble">${text}</div></div>`;
+        messageEl.innerHTML = `<div class="bot-message"><div class="avatar">🎵</div><div class="bubble">${text}</div></div>`;
     } else {
         messageEl.innerHTML = `<div class="user-message">${text}</div>`;
     }
@@ -167,7 +167,7 @@ function addMessage(sender, text) {
 
 function renderInput(question, container) {
     if (!question) {
-        console.error("âŒ Pergunta nÃ£o definida!");
+        console.error("❌ Pergunta não definida!");
         return;
     }
 
@@ -188,7 +188,7 @@ function renderInput(question, container) {
     }
 
     html += `<div class="action-buttons" style="margin-top: 1rem;">
-                ${currentStep > 0 ? '<button class="btn-back" onclick="prevStep()">â† Voltar</button>' : ""}
+                ${currentStep > 0 ? '<button class="btn-back" onclick="prevStep()">← Voltar</button>' : ""}
              </div>`;
 
     container.innerHTML = html;
@@ -204,29 +204,29 @@ function renderInput(question, container) {
 function handleOption(val, label) {
     addMessage("user", label);
     
-    // âœ… PASSO 1: Salvar a resposta IMEDIATAMENTE
+    // ✅ PASSO 1: Salvar a resposta IMEDIATAMENTE
     setNestedValue(formData.answers, currentQuestion.metadata.fieldName, val);
-    formData[`step_${currentQuestion.step}`] = val;  // â† SUPER IMPORTANTE!
+    formData[`step_${currentQuestion.step}`] = val;  // ← SUPER IMPORTANTE!
     
-    // âœ… PASSO 2: Registrar no array asked
+    // ✅ PASSO 2: Registrar no array asked
     formData.asked = formData.asked || [];
     formData.asked.push({
         id: currentQuestion.metadata.fieldName,
         fieldName: currentQuestion.metadata.fieldName,
         section: currentQuestion.section,
-        question: currentQuestion.question.replace(/[^\w\s\.,!?Â¿Â¡Ã¡Ã©Ã­Ã³ÃºÃ£ÃµÃ Ã¢ÃªÃ´Ã§ÃÃ‰ÃÃ“ÃšÃƒÃ•Ã€Ã‚ÃŠÃ”Ã‡]/g, '').trim(),
-        answerLabel: label.replace(/[^\w\s\.,!?Â¿Â¡Ã¡Ã©Ã­Ã³ÃºÃ£ÃµÃ Ã¢ÃªÃ´Ã§ÃÃ‰ÃÃ“ÃšÃƒÃ•Ã€Ã‚ÃŠÃ”Ã‡]/g, '').trim(),
+        question: currentQuestion.question.replace(/[^\w\s\.,!?¿¡áéíóúãõàâêôçÁÉÍÓÚÃÕÀÂÊÔÇ]/g, '').trim(),
+        answerLabel: label.replace(/[^\w\s\.,!?¿¡áéíóúãõàâêôçÁÉÍÓÚÃÕÀÂÊÔÇ]/g, '').trim(),
         answerValue: val,
         timestamp: new Date().toISOString()
     });
     
-    console.log("âœ… Resposta salva:", currentQuestion.step, "=", val);
-    console.log("ðŸ“Š formData agora:", formData);
+    console.log("✅ Resposta salva:", currentQuestion.step, "=", val);
+    console.log("📊 formData agora:", formData);
     
-    // âœ… PASSO 3: DEPOIS incrementar
+    // ✅ PASSO 3: DEPOIS incrementar
     currentStep++;
     
-    // âœ… PASSO 4: DEPOIS renderizar (com dados ATUALIZADOS)
+    // ✅ PASSO 4: DEPOIS renderizar (com dados ATUALIZADOS)
     setTimeout(renderQuestion, 600);
 }
 
@@ -241,29 +241,29 @@ function handleInput() {
 
     addMessage("user", val);
     
-    // âœ… PASSO 1: Salvar IMEDIATAMENTE
+    // ✅ PASSO 1: Salvar IMEDIATAMENTE
     setNestedValue(formData.answers, currentQuestion.metadata.fieldName, val);
-    formData[`step_${currentQuestion.step}`] = val;  // â† SUPER IMPORTANTE!
+    formData[`step_${currentQuestion.step}`] = val;  // ← SUPER IMPORTANTE!
     
-    // âœ… PASSO 2: Registrar
+    // ✅ PASSO 2: Registrar
     formData.asked = formData.asked || [];
     formData.asked.push({
         id: currentQuestion.metadata.fieldName,
         fieldName: currentQuestion.metadata.fieldName,
         section: currentQuestion.section,
-        question: currentQuestion.question.replace(/[^\w\s\.,!?Â¿Â¡Ã¡Ã©Ã­Ã³ÃºÃ£ÃµÃ Ã¢ÃªÃ´Ã§ÃÃ‰ÃÃ“ÃšÃƒÃ•Ã€Ã‚ÃŠÃ”Ã‡]/g, '').trim(),
+        question: currentQuestion.question.replace(/[^\w\s\.,!?¿¡áéíóúãõàâêôçÁÉÍÓÚÃÕÀÂÊÔÇ]/g, '').trim(),
         answerLabel: val,
         answerValue: val,
         timestamp: new Date().toISOString()
     });
     
-    console.log("âœ… Resposta salva:", currentQuestion.step, "=", val);
-    console.log("ðŸ“Š formData agora:", formData);
+    console.log("✅ Resposta salva:", currentQuestion.step, "=", val);
+    console.log("📊 formData agora:", formData);
     
-    // âœ… PASSO 3: DEPOIS incrementar
+    // ✅ PASSO 3: DEPOIS incrementar
     currentStep++;
     
-    // âœ… PASSO 4: DEPOIS renderizar
+    // ✅ PASSO 4: DEPOIS renderizar
     setTimeout(renderQuestion, 600);
 }
 
@@ -282,11 +282,11 @@ function renderSaveButton(container) {
     const pf = document.getElementById("progressFill");
     if (pf) pf.style.width = "100%";
 
-    addMessage("bot", "Perfeito! Tenho todas as informaÃ§Ãµes. Vou salvar seu formulÃ¡rio para vocÃª revisar e pagar quando quiser. ðŸ’¾");
+    addMessage("bot", "Perfeito! Tenho todas as informações. Vou salvar seu formulário para você revisar e pagar quando quiser. 💾");
     
     container.innerHTML = `
-        <div class="input-label">FINALIZAR FORMULÃRIO</div>
-        <button class="btn-chat-action" onclick="saveDraftOnly()">âœ… Salvar FormulÃ¡rio</button>
+        <div class="input-label">FINALIZAR FORMULÁRIO</div>
+        <button class="btn-chat-action" onclick="saveDraftOnly()">✅ Salvar Formulário</button>
     `;
     
     scrollToBottom();
@@ -294,16 +294,16 @@ function renderSaveButton(container) {
 
 async function saveDraftOnly() {
     try {
-        console.log("ðŸ” DEBUG: ComeÃ§ando salvamento...");
-        console.log("ðŸ“Š formData completo:", formData);
-        console.log("ðŸ“‹ Array asked:", formData.asked);
-        console.log("ðŸ’¾ Objeto answers:", formData.answers);
+        console.log("🔍 DEBUG: Começando salvamento...");
+        console.log("📊 formData completo:", formData);
+        console.log("📋 Array asked:", formData.asked);
+        console.log("💾 Objeto answers:", formData.answers);
 
-        showToast("ðŸ’¾ Salvando formulÃ¡rio...", "info");
+        showToast("💾 Salvando formulário...", "info");
 
         const session = await getSessionOrRedirect();
         if (!session) {
-            alert("VocÃª precisa estar logado. Redirecionando...");
+            alert("Você precisa estar logado. Redirecionando...");
             window.location.href = "login.html";
             return;
         }
@@ -318,23 +318,23 @@ async function saveDraftOnly() {
             return h;
         }
 
-        // âš ï¸ IMPORTANTE: Verificar que formData tem tudo
+        // ⚠️ IMPORTANTE: Verificar que formData tem tudo
         const payloadToSave = {
             form_id: formData.form_id || "tc_chat_v2",
             form_version: formData.form_version || 2,
             asked: formData.asked || [],
             answers: formData.answers || {},
-            // Adicionar informaÃ§Ãµes de meta
+            // Adicionar informações de meta
             total_questions_answered: (formData.asked || []).length,
             created_at: new Date().toISOString()
         };
 
-        console.log("âœ… Payload pronto para salvar:", payloadToSave);
+        console.log("✅ Payload pronto para salvar:", payloadToSave);
 
         let pedidoId = draftBeingEdited?.pedidoId;
 
         if (draftBeingEdited && pedidoId) {
-            console.log("âœï¸ Atualizando draft existente:", pedidoId);
+            console.log("✏️ Atualizando draft existente:", pedidoId);
 
             const updateResponse = await fetch(`${SUPABASE_URL}/rest/v1/musicas_pedidos?id=eq.${pedidoId}`, {
                 method: 'PATCH',
@@ -352,15 +352,15 @@ async function saveDraftOnly() {
             }
 
             const updatedData = await updateResponse.json();
-            console.log('âœ… Draft atualizado com sucesso:', updatedData);
-            showToast("âœ… FormulÃ¡rio atualizado!", "success");
+            console.log('✅ Draft atualizado com sucesso:', updatedData);
+            showToast("✅ Formulário atualizado!", "success");
 
         } else {
-            console.log("ðŸ“ Criando novo draft...");
-            console.log("ðŸ“¤ POST Body:", JSON.stringify({
+            console.log("📝 Criando novo draft...");
+            console.log("📤 POST Body:", JSON.stringify({
                 user_id: session.user.id,
                 user_email: session.user.email,
-                user_name: session.user.user_metadata?.full_name || "UsuÃ¡rio",
+                user_name: session.user.user_metadata?.full_name || "Usuário",
                 payload: payloadToSave,
                 status: 'draft'
             }, null, 2));
@@ -371,7 +371,7 @@ async function saveDraftOnly() {
                 body: JSON.stringify({
                     user_id: session.user.id,
                     user_email: session.user.email,
-                    user_name: session.user.user_metadata?.full_name || "UsuÃ¡rio",
+                    user_name: session.user.user_metadata?.full_name || "Usuário",
                     payload: payloadToSave,
                     status: 'draft'
                 })
@@ -384,46 +384,46 @@ async function saveDraftOnly() {
             }
 
             const data = await insertResponse.json();
-            console.log('ðŸ“¥ Resposta do servidor:', data);
+            console.log('📥 Resposta do servidor:', data);
             
             pedidoId = data?.[0]?.id;
 
             if (!pedidoId) {
-                console.warn("âš ï¸ Aviso: ID nÃ£o retornado. Procurando em data...", data);
-                throw new Error('Draft criado, mas ID nÃ£o foi retornado');
+                console.warn("⚠️ Aviso: ID não retornado. Procurando em data...", data);
+                throw new Error('Draft criado, mas ID não foi retornado');
             }
 
-            console.log('âœ… Draft criado com ID:', pedidoId);
-            showToast("âœ… FormulÃ¡rio salvo!", "success");
+            console.log('✅ Draft criado com ID:', pedidoId);
+            showToast("✅ Formulário salvo!", "success");
         }
 
         localStorage.setItem('tuneCraft_lastDraftId', pedidoId);
-        console.log("ðŸ’¾ ID salvo em localStorage:", pedidoId);
+        console.log("💾 ID salvo em localStorage:", pedidoId);
         
         closeChat();
         window.draftBeingEdited = null;
         draftBeingEdited = null;
 
         setTimeout(() => {
-            console.log("ðŸ”„ Redirecionando para dashboard...");
+            console.log("🔄 Redirecionando para dashboard...");
             window.location.href = 'dashboard.html';
         }, 1000);
 
     } catch (error) {
-        console.error('âŒ ERRO FATAL ao salvar draft:', error);
+        console.error('❌ ERRO FATAL ao salvar draft:', error);
         console.error('Stack trace:', error.stack);
-        showToast(`âŒ Erro: ${error.message}`, "error");
+        showToast(`❌ Erro: ${error.message}`, "error");
     }
 }
 
 
 // ============================================
-// HELPER: VALIDAR SESSÃƒO
+// HELPER: VALIDAR SESSÃO
 // ============================================
 
 async function getSessionOrRedirect() {
     if (!window.supabase) {
-        console.error("Supabase JS nÃ£o estÃ¡ carregado");
+        console.error("Supabase JS não está carregado");
         return null;
     }
 
@@ -439,7 +439,7 @@ async function getSessionOrRedirect() {
     const session = data?.session;
 
     if (!session?.access_token || !session?.user?.id) {
-        console.warn("[TuneCraft] Sem sessÃ£o vÃ¡lida");
+        console.warn("[TuneCraft] Sem sessão válida");
         return null;
     }
 
@@ -477,7 +477,7 @@ function showToast(message, type = 'info') {
 }
 
 // ============================================
-// ESTILOS DE ANIMAÃ‡ÃƒO
+// ESTILOS DE ANIMAÇÃO
 // ============================================
 
 if (!document.getElementById('chat-animations')) {
@@ -498,6 +498,6 @@ if (!document.getElementById('chat-animations')) {
 }
 
 // ============================================
-// LOG: Verificar quando elaboratedChatFlow Ã© carregado
+// LOG: Verificar quando elaboratedChatFlow é carregado
 // ============================================
-console.log("âœ… chat.js carregado. Aguardando chat_themes_full.js...");
+console.log("✅ chat.js carregado. Aguardando chat_themes_full.js...");
