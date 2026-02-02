@@ -1764,7 +1764,7 @@
             `VALOR: ${tituloValor || '(vazio)'}`,
             '',
             '=== TRECHOS ===',
-            trechos.flatMap(tr => ([
+            ...trechos.flatMap(tr => ([
               `--- TRECHO ${tr.idx} ${tr.tag ? tr.tag : `(${tr.label})`} ---`,
               `ACAO: ${String(tr.action).toUpperCase()}`,
               tr.suggestion ? `SUGESTAO: ${tr.suggestion}` : 'SUGESTAO: (nenhuma)',
