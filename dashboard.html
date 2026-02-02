@@ -1460,6 +1460,25 @@ draftsContainer.innerHTML += `
            else if (order.status === "pending_approval" && !order.versao_modificada) {
             hasPending = true;
             const podeAlterar = !order.alteracao_usada;
+            
+            // Extrair dados do payload
+            const payload = order.payload || {};
+            const answers = payload.answers || {};
+            const lyricDetails = answers.lyricDetails || {};
+            const musicStyle = answers.musicStyle || {};
+            const aiMetadata = answers.ai_metadata || {};
+            
+            // Mapear tema e gênero
+            const themeOption = FORM_OPTIONS?.themes?.find(t => t.value === aiMetadata.themeId) || {};
+            const genreOption = FORM_OPTIONS?.genres?.find(g => g.value === musicStyle.primaryGenre) || {};
+            const themeLabel = themeOption.label || aiMetadata.themeId || "Indefinido";
+            const genreLabel = genreOption.label || musicStyle.primaryGenre || "Não definido";
+            
+            const hook = lyricDetails.mainMessage || "Seu refrão aqui";
+            const emotion = musicStyle.emotion || "Indefinida";
+            const evita = Array.isArray(lyricDetails.avoidThemes) 
+              ? lyricDetails.avoidThemes.join(", ") 
+              : (lyricDetails.avoidThemes || "Nenhum");
 
             pendingContainer.innerHTML += `
               <div class="card">
@@ -1468,7 +1487,63 @@ draftsContainer.innerHTML += `
                   <span class="status-badge status-pending">Aguardando Aprovação</span>
                 </div>
                 
-                <!-- ✅ NOVO: Box com título "Letra" e botões horizontais -->
+                <!-- ✅ CARD PRINCIPAL COM CHECKLIST E HOOK -->
+                <div style="margin: 20px 0;">
+                  <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(148, 163, 184, 0.22); border-radius: 12px; padding: 16px; margin-bottom: 16px; border-left: 4px solid #10b981;">
+                    <div style="font-size: 14px; color: var(--muted); margin-bottom: 12px; font-weight: 600;">Verificamos tudo com suas respostas:</div>
+                    
+                    <!-- Checklist Items -->
+                    <div style="display: grid; gap: 10px;">
+                      <!-- Tema -->
+                      <div style="display: flex; gap: 10px; font-size: 13px; align-items: center;">
+                        <span style="font-size: 16px;">🙏</span>
+                        <div style="flex: 1;">
+                          <div style="font-size: 11px; color: var(--muted); font-weight: 500;">Tema</div>
+                          <div style="font-size: 13px; color: var(--text); font-weight: 500;">${escapeHtml(themeLabel)}</div>
+                        </div>
+                        <span style="color: #10b981; font-weight: 600; background: rgba(236, 253, 245, 0.8); padding: 3px 8px; border-radius: 4px; font-size: 11px;">✓</span>
+                      </div>
+                      
+                      <!-- Estilo -->
+                      <div style="display: flex; gap: 10px; font-size: 13px; align-items: center;">
+                        <span style="font-size: 16px;">🎤</span>
+                        <div style="flex: 1;">
+                          <div style="font-size: 11px; color: var(--muted); font-weight: 500;">Estilo</div>
+                          <div style="font-size: 13px; color: var(--text); font-weight: 500;">${escapeHtml(genreLabel)}</div>
+                        </div>
+                        <span style="color: #10b981; font-weight: 600; background: rgba(236, 253, 245, 0.8); padding: 3px 8px; border-radius: 4px; font-size: 11px;">✓</span>
+                      </div>
+                      
+                      <!-- Emoção -->
+                      <div style="display: flex; gap: 10px; font-size: 13px; align-items: center;">
+                        <span style="font-size: 16px;">💫</span>
+                        <div style="flex: 1;">
+                          <div style="font-size: 11px; color: var(--muted); font-weight: 500;">Emoção</div>
+                          <div style="font-size: 13px; color: var(--text); font-weight: 500;">${escapeHtml(emotion)}</div>
+                        </div>
+                        <span style="color: #10b981; font-weight: 600; background: rgba(236, 253, 245, 0.8); padding: 3px 8px; border-radius: 4px; font-size: 11px;">✓</span>
+                      </div>
+                      
+                      <!-- Evita -->
+                      <div style="display: flex; gap: 10px; font-size: 13px; align-items: center;">
+                        <span style="font-size: 16px;">🚫</span>
+                        <div style="flex: 1;">
+                          <div style="font-size: 11px; color: var(--muted); font-weight: 500;">Evita</div>
+                          <div style="font-size: 13px; color: var(--text); font-weight: 500;">${escapeHtml(evita)}</div>
+                        </div>
+                        <span style="color: #10b981; font-weight: 600; background: rgba(236, 253, 245, 0.8); padding: 3px 8px; border-radius: 4px; font-size: 11px;">✓</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Hook Highlight -->
+                  <div style="background: linear-gradient(135deg, rgba(254, 243, 199, 0.3), rgba(253, 230, 138, 0.3)); padding: 14px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #f59e0b;">
+                    <span style="display: block; font-size: 11px; color: #92400e; font-weight: 600; margin-bottom: 6px;">🎶 Refrão Principal:</span>
+                    <div style="font-style: italic; font-weight: 500; color: #78350f; font-size: 15px;">"${escapeHtml(hook)}"</div>
+                  </div>
+                </div>
+                
+                <!-- ✅ BOX COM LETRA -->
                 <div style="margin: 20px 0; border: 1px solid rgba(148, 163, 184, 0.22); border-radius: 12px; overflow: hidden;">
                   
                   <!-- Header com título e ícone -->
@@ -1478,7 +1553,7 @@ draftsContainer.innerHTML += `
                   </div>
                   
                   <!-- Conteúdo da letra -->
-                  <div class="lyrics-box" style="border: none; border-radius: 0; margin: 0; max-height: 250px;">${lyrics}</div>
+                  <div class="lyrics-box" style="border: none; border-radius: 0; margin: 0; max-height: 250px; padding: 20px;">${lyrics}</div>
                   
                   <!-- Botões de ação -->
                   <div style="padding: 14px 16px; border-top: 1px solid rgba(148, 163, 184, 0.22); background: rgba(255, 255, 255, 0.02); display: flex; gap: 10px; flex-wrap: wrap;">
@@ -1496,7 +1571,7 @@ draftsContainer.innerHTML += `
                       onclick="aprovarLetraOriginal('${order.id}')" 
                       style="flex: 1; min-width: 160px;"
                     >
-                      ✅ Aprovar
+                      ✅ Aprovar e Gerar Áudio
                     </button>
                   </div>
                 </div>
@@ -1504,6 +1579,7 @@ draftsContainer.innerHTML += `
               </div>
             `;
           }
+
           else if (order.status === "aguardando_aprovacao" && order.versao_modificada) {
             hasPending = true;
 
@@ -2663,6 +2739,179 @@ async function saveEditDraftNew() {
     window.open(waUrl, "_blank", "noopener,noreferrer");
   }
 
+   // ✅ FUNÇÃO PARA ABRIR MODAL COM EDIÇÃO COMPLETA
+    async function abrirModalAlteracao(pedidoId) {
+      try {
+        // Pegar dados do order
+        const order = userData.orders.find(o => o.id === pedidoId);
+        if (!order) {
+          showToast('❌ Pedido não encontrado', 'error');
+          return;
+        }
+
+        // Extrair dados
+        const payload = order.payload || {};
+        const answers = payload.answers || {};
+        const lyricDetails = answers.lyricDetails || {};
+        const musicStyle = answers.musicStyle || {};
+        const aiMetadata = answers.ai_metadata || {};
+        
+        // Mapear labels
+        const themeOption = FORM_OPTIONS?.themes?.find(t => t.value === aiMetadata.themeId) || {};
+        const genreOption = FORM_OPTIONS?.genres?.find(g => g.value === musicStyle.primaryGenre) || {};
+        
+        // Abrir modal e preencher dados
+        const modal = document.getElementById('alterarModal');
+        
+        // Preencher campos
+        document.getElementById('mudancasDesejadas').value = '';
+        document.getElementById('manterElementos').value = '';
+        document.getElementById('observacoesFinais').value = '';
+        
+        // Adicionar data do pedido
+        const createdDate = new Date(order.created_at).toLocaleDateString('pt-BR');
+        
+        modal.innerHTML = `
+          <div class="alterar-content">
+            <div class="alterar-header">
+              <div>
+                <h2>✏️ Alterar Letra: ${escapeHtml(order.title)}</h2>
+                <p style="font-size: 0.85rem; color: var(--muted); margin-top: 6px;">Criada em ${createdDate}</p>
+              </div>
+              <button class="alterar-close" onclick="fecharAlterarModal()">×</button>
+            </div>
+
+            <div style="margin-bottom: 20px; padding: 14px; background: rgba(255, 255, 255, 0.03); border-radius: 10px; border-left: 4px solid var(--brand);">
+              <div style="font-size: 13px; color: var(--text); margin-bottom: 8px;"><strong>📋 Informações Originais:</strong></div>
+              <div style="font-size: 12px; color: var(--muted); line-height: 1.6;">
+                <div>🎤 Estilo: ${escapeHtml(genreOption.label || musicStyle.primaryGenre)}</div>
+                <div>💫 Emoção: ${escapeHtml(musicStyle.emotion)}</div>
+                <div>🎶 Mensagem: "${escapeHtml(lyricDetails.mainMessage?.substring(0, 50))}"</div>
+              </div>
+            </div>
+
+            <div class="alterar-step">
+              <h3>O que você gostaria de mudar na letra? 🎵</h3>
+              <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 10px;">
+                💡 Exemplos: "Tornar o refrão mais animado", "Adicionar menção a...", "Mudar o tom"
+              </p>
+              <textarea
+                id="mudancasDesejadas"
+                placeholder="Ex: Gostaria que o refrão fosse mais energético..."
+                maxlength="500"
+                oninput="updateAlterarCharCount('mudancasDesejadas', 'count1')"
+                style="width: 100%; min-height: 100px; padding: 12px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 10px; font-family: inherit; resize: vertical; background: rgba(255, 255, 255, 0.04); color: var(--text);"
+              ></textarea>
+              <div class="char-count"><span id="count1">0</span>/500</div>
+            </div>
+
+            <div class="alterar-step">
+              <h3>Há algo específico que DEVE permanecer? 🔒</h3>
+              <textarea
+                id="manterElementos"
+                placeholder="Ex: Mantenha as referências a..."
+                maxlength="300"
+                oninput="updateAlterarCharCount('manterElementos', 'count2')"
+                style="width: 100%; min-height: 80px; padding: 12px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 10px; font-family: inherit; resize: vertical; background: rgba(255, 255, 255, 0.04); color: var(--text);"
+              ></textarea>
+              <div class="char-count"><span id="count2">0</span>/300</div>
+            </div>
+
+            <div class="alterar-step">
+              <h3>Observações finais sobre o tom ou estilo? 🎨 (Opcional)</h3>
+              <textarea
+                id="observacoesFinais"
+                placeholder="Ex: Quero que seja mais emocionante, menos melancólica..."
+                maxlength="200"
+                oninput="updateAlterarCharCount('observacoesFinais', 'count3')"
+                style="width: 100%; min-height: 80px; padding: 12px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 10px; font-family: inherit; resize: vertical; background: rgba(255, 255, 255, 0.04); color: var(--text);"
+              ></textarea>
+              <div class="char-count"><span id="count3">0</span>/200</div>
+            </div>
+
+            <div class="alterar-buttons">
+              <button class="btn-alterar-cancel" onclick="fecharAlterarModal()">Cancelar</button>
+              <button class="btn-alterar-submit" onclick="submitAlteracao('${pedidoId}')">
+                Enviar Alterações ✨
+              </button>
+            </div>
+          </div>
+        `;
+        
+        modal.classList.add('active');
+        currentAlterandoId = pedidoId;
+        
+        console.log('✅ Modal de alteração aberto para:', pedidoId);
+      } catch (error) {
+        console.error('❌ Erro:', error);
+        showToast('❌ Erro ao abrir modal', 'error');
+      }
+    }
+
+    // ✅ FECHAR MODAL
+    function fecharAlterarModal() {
+      document.getElementById('alterarModal').classList.remove('active');
+      currentAlterandoId = null;
+    }
+
+    // ✅ CONTAR CARACTERES
+    function updateAlterarCharCount(fieldId, countId) {
+      const field = document.getElementById(fieldId);
+      const count = document.getElementById(countId);
+      if (field && count) {
+        count.textContent = field.value.length;
+      }
+    }
+
+    // ✅ ENVIAR ALTERAÇÕES
+    async function submitAlteracao(pedidoId) {
+      try {
+        const mudancas = document.getElementById('mudancasDesejadas')?.value || '';
+        const manter = document.getElementById('manterElementos')?.value || '';
+        const observacoes = document.getElementById('observacoesFinais')?.value || '';
+
+        if (!mudancas.trim()) {
+          showToast('⚠️ Descreva o que deseja alterar', 'error');
+          return;
+        }
+
+        showToast('⏳ Enviando alterações...', 'info');
+
+        // Atualizar no Supabase
+        const { error } = await sb
+          .from('musicas_pedidos')
+          .update({
+            alteracao_solicitada: {
+              mudancas_desejadas: mudancas,
+              elementos_manter: manter,
+              observacoes: observacoes,
+              data_solicitacao: new Date().toISOString()
+            },
+            status: 'aguardando_aprovacao'
+          })
+          .eq('id', pedidoId);
+
+        if (error) {
+          console.error('❌ Erro:', error);
+          showToast(`❌ Erro: ${error.message}`, 'error');
+          return;
+        }
+
+        showToast('✅ Alteração enviada! Você receberá a nova versão em breve.', 'success');
+        fecharAlterarModal();
+        
+        // Recarregar dados
+        setTimeout(() => {
+          initDashboard();
+        }, 1500);
+
+      } catch (error) {
+        console.error('❌ Erro:', error);
+        showToast('❌ Erro ao enviar alteração', 'error');
+      }
+    }
+
+  
   async function shareNative(audioUrl, title = "Minha música") {
     try {
       if (!audioUrl) return;
@@ -2686,4 +2935,5 @@ async function saveEditDraftNew() {
 
 </body>
 </html>
+
 
