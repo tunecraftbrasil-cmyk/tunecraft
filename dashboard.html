@@ -1683,6 +1683,12 @@
           tcTrechosCache = [];
         }
 
+        function fecharAlterarModalCancelar() {
+  // se quiser, você pode confirmar aqui (opcional)
+  fecharAlterarModal();
+}
+
+        
         function updateAlterarCharCount(fieldId, countId) {
           const field = document.getElementById(fieldId);
           const count = field.value.length;
@@ -1995,3 +2001,4 @@
     </script>
 </body>
 </html>
+
