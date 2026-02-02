@@ -2035,16 +2035,270 @@
             }
         }
 
-        function abrirModalAlteracao(pedidoId) {
-            currentAlterandoId = pedidoId;
-            document.getElementById('alterarModal').classList.add('active');
-            document.getElementById('mudancasDesejadas').value = '';
-            document.getElementById('manterElementos').value = '';
-            document.getElementById('observacoesFinais').value = '';
-            document.getElementById('count1').innerText = '0';
-            document.getElementById('count2').innerText = '0';
-            document.getElementById('count3').innerText = '0';
+        // ✅ FUNÇÃO: Extrair versos dinâmicamente da letra
+    function parseVersesFromLyrics(lyrics) {
+      const verses = {};
+      const lines = lyrics.split('\n');
+      let currentVerse = null;
+      let currentContent = [];
+
+      lines.forEach(line => {
+        // Detectar cabeçalho de seção [Verso], [Refrão], [Ponte], etc
+        const sectionMatch = line.match(/^\[([^\]]+)\]/i);
+        
+        if (sectionMatch) {
+          // Salvar seção anterior se existir
+          if (currentVerse && currentContent.length > 0) {
+            verses[currentVerse] = currentContent
+              .filter(l => l.trim()) // Remove linhas vazias
+              .join('\n')
+              .trim();
+          }
+          
+          // Iniciar nova seção
+          currentVerse = sectionMatch[1].trim();
+          currentContent = [];
+        } else if (line.trim() && currentVerse) {
+          // Adicionar conteúdo à seção atual
+          currentContent.push(line);
         }
+      });
+
+      // Salvar última seção
+      if (currentVerse && currentContent.length > 0) {
+        verses[currentVerse] = currentContent
+          .filter(l => l.trim())
+          .join('\n')
+          .trim();
+      }
+
+      return verses;
+    }
+
+    // ✅ FUNÇÃO: Abrir modal com campos POR VERSO
+    async function abrirModalAlteracao(pedidoId) {
+      try {
+        const order = userData.orders.find(o => o.id === pedidoId);
+        if (!order) {
+          showToast('❌ Pedido não encontrado', 'error');
+          return;
+        }
+
+        // Extrair versos da letra
+        const verses = parseVersesFromLyrics(order.lyrics || "");
+        
+        if (Object.keys(verses).length === 0) {
+          showToast('⚠️ Não foi possível extrair versos da letra', 'error');
+          return;
+        }
+
+        const createdDate = new Date(order.created_at).toLocaleDateString('pt-BR');
+        
+        // Construir HTML do modal com campos por verso
+        let versesHtml = '';
+        
+        Object.entries(verses).forEach((entry, index) => {
+          const [sectionName, content] = entry;
+          const fieldId = `verse_${index}`;
+          const charCountId = `charCount_${index}`;
+          
+          versesHtml += `
+            <div class="alterar-step" style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 2px solid rgba(148, 163, 184, 0.16);">
+              <!-- Header da seção -->
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                <span style="font-size: 20px;">📝</span>
+                <h3 style="margin: 0; color: var(--text); font-weight: 900; font-size: 16px;">${escapeHtml(sectionName)}</h3>
+              </div>
+              
+              <!-- Conteúdo do verso (somente leitura) -->
+              <div style="background: rgba(255, 255, 255, 0.03); padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 3px solid var(--brand);">
+                <div class="lyrics-box" style="border: none; border-radius: 0; margin: 0; max-height: 120px; padding: 10px 0; background: transparent; font-size: 13px;">
+                  ${escapeHtml(content)}
+                </div>
+              </div>
+              
+              <!-- Campo de alteração específica para este verso -->
+              <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text); font-size: 12px;">
+                💡 Sugestões para este verso:
+              </label>
+              <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 8px;">
+                Ex: "Tornar mais alegre", "Adicionar referência a...", "Mudar o tom para..."
+              </p>
+              <textarea 
+                id="${fieldId}"
+                placeholder="Digite suas sugestões para este verso..."
+                maxlength="300"
+                oninput="updateVerseCharCount('${fieldId}', '${charCountId}')"
+                style="width: 100%; min-height: 80px; padding: 10px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--text); font-family: inherit; font-size: 13px; resize: vertical;"
+              ></textarea>
+              <div style="text-align: right; font-size: 0.85rem; color: var(--muted); margin-top: 4px;">
+                <span id="${charCountId}">0</span>/300
+              </div>
+            </div>
+          `;
+        });
+
+        // Montar modal completo
+        const modal = document.getElementById('alterarModal');
+        modal.innerHTML = `
+          <div class="alterar-content" style="max-height: 90vh; overflow-y: auto;">
+            <div class="alterar-header">
+              <div>
+                <h2>✏️ Sugerir Alterações: ${escapeHtml(order.title)}</h2>
+                <p style="font-size: 0.85rem; color: var(--muted); margin-top: 6px;">Criada em ${createdDate}</p>
+              </div>
+              <button class="alterar-close" onclick="fecharAlterarModal()">×</button>
+            </div>
+
+            <!-- Info da música -->
+            <div style="margin-bottom: 20px; padding: 14px; background: rgba(255, 255, 255, 0.03); border-radius: 10px; border-left: 4px solid var(--brand);">
+              <div style="font-size: 13px; color: var(--text); margin-bottom: 8px;"><strong>📋 Sobre sua música:</strong></div>
+              <div style="font-size: 12px; color: var(--muted); line-height: 1.6;">
+                <div>📄 Título: ${escapeHtml(order.title)}</div>
+                <div>🎵 Versos: ${Object.keys(verses).length}</div>
+                <div>📅 Status: Aguardando Aprovação</div>
+              </div>
+            </div>
+
+            <!-- VERSOS COM CAMPOS INDIVIDUAIS -->
+            <div style="background: rgba(255, 255, 255, 0.02); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+              <h3 style="margin-top: 0; margin-bottom: 16px; color: var(--text); font-weight: 900;">🎼 Revise cada verso:</h3>
+              
+              <!-- Todos os versos com campos -->
+              <form id="formAlteracoes">
+                ${versesHtml}
+              </form>
+            </div>
+
+            <!-- Observações gerais (OPCIONAL) -->
+            <div class="alterar-step">
+              <h3 style="margin-bottom: 10px; color: var(--text);">🎨 Observações gerais (Opcional)</h3>
+              <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 10px;">
+                Algo que se aplique a toda a música? Tom, estilo, referências, etc.
+              </p>
+              <textarea
+                id="observacoesGerais"
+                placeholder="Ex: Gostaria que fosse mais emocionante, menos melancólica..."
+                maxlength="250"
+                oninput="updateAlterarCharCount('observacoesGerais', 'countGeral')"
+                style="width: 100%; min-height: 80px; padding: 12px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 12px; font-size: 15px; font-family: inherit; resize: vertical; background: rgba(255, 255, 255, 0.04); color: var(--text);"
+              ></textarea>
+              <div class="char-count"><span id="countGeral">0</span>/250</div>
+            </div>
+
+            <!-- Botões de ação -->
+            <div class="alterar-buttons">
+              <button class="btn-alterar-cancel" onclick="fecharAlterarModal()">Cancelar</button>
+              <button class="btn-alterar-submit" id="btnSubmitAlteracao" onclick="submitAlteracaoPorVerso('${pedidoId}')">
+                Enviar Sugestões ✨
+              </button>
+            </div>
+          </div>
+        `;
+        
+        modal.classList.add('active');
+        currentAlterandoId = pedidoId;
+        
+        console.log('✅ Modal aberto com versos:', Object.keys(verses));
+      } catch (error) {
+        console.error('❌ Erro:', error);
+        showToast('❌ Erro ao abrir modal de edição', 'error');
+      }
+    }
+
+    // ✅ FECHAR MODAL
+    function fecharAlterarModal() {
+      document.getElementById('alterarModal').classList.remove('active');
+      currentAlterandoId = null;
+    }
+
+    // ✅ CONTAR CARACTERES POR VERSO
+    function updateVerseCharCount(fieldId, charCountId) {
+      const field = document.getElementById(fieldId);
+      const count = document.getElementById(charCountId);
+      if (field && count) {
+        count.textContent = field.value.length;
+      }
+    }
+
+    // ✅ CONTAR CARACTERES GERAIS
+    function updateAlterarCharCount(fieldId, countId) {
+      const field = document.getElementById(fieldId);
+      const count = document.getElementById(countId);
+      if (field && count) {
+        count.textContent = field.value.length;
+      }
+    }
+
+    // ✅ ENVIAR ALTERAÇÕES ESPECÍFICAS POR VERSO
+    async function submitAlteracaoPorVerso(pedidoId) {
+      try {
+        // Coletar sugestões por verso
+        const form = document.getElementById('formAlteracoes');
+        const inputs = form?.querySelectorAll('textarea[id^="verse_"]') || [];
+        
+        const sugestoesVersos = [];
+        let temAlgumaSugestao = false;
+        
+        inputs.forEach(input => {
+          const sugestao = input.value.trim();
+          const sectionName = input.closest('.alterar-step')
+            ?.querySelector('h3')?.textContent?.replace(/📝/, '').trim() || 'Verso';
+          
+          if (sugestao) {
+            sugestoesVersos.push({
+              verso: sectionName,
+              sugestao: sugestao
+            });
+            temAlgumaSugestao = true;
+          }
+        });
+
+        const observacoesGerais = document.getElementById('observacoesGerais')?.value?.trim() || '';
+
+        // Validação: pelo menos uma sugestão deve existir
+        if (!temAlgumaSugestao && !observacoesGerais) {
+          showToast('⚠️ Por favor, adicione pelo menos uma sugestão', 'error');
+          return;
+        }
+
+        // Construir objeto de alterações
+        const alteracoes = {
+          sugestoes_por_verso: sugestoesVersos,
+          observacoes_gerais: observacoesGerais,
+          data_solicitacao: new Date().toISOString()
+        };
+
+        showToast('⏳ Enviando alterações...', 'info');
+
+        // Atualizar no Supabase
+        const { error } = await sb
+          .from('musicas_pedidos')
+          .update({
+            alteracao_solicitada: alteracoes,
+            status: 'aguardando_aprovacao'
+          })
+          .eq('id', pedidoId);
+
+        if (error) {
+          console.error('❌ Erro Supabase:', error);
+          showToast(`❌ Erro: ${error.message}`, 'error');
+          return;
+        }
+
+        showToast('✅ Alterações enviadas! Você receberá a nova versão em breve.', 'success');
+        fecharAlterarModal();
+        
+        // Recarregar dados após 1.5s
+        setTimeout(() => {
+          initDashboard();
+        }, 1500);
+
+      } catch (error) {
+        console.error('❌ Erro:', error);
+        showToast('❌ Erro ao enviar alterações', 'error');
+      }
+    }
 
         function fecharAlterarModal() {
             document.getElementById('alterarModal').classList.remove('active');
@@ -2057,51 +2311,7 @@
             document.getElementById(countId).innerText = count;
         }
 
-        async function submitAlteracao() {
-            const mudancas = document.getElementById('mudancasDesejadas').value.trim();
-            const manter = document.getElementById('manterElementos').value.trim();
-            const obs = document.getElementById('observacoesFinais').value.trim();
-
-            if (mudancas.length < 20) {
-                showToast('Por favor, descreva as mudanças com pelo menos 20 caracteres', 'error');
-                return;
-            }
-
-            if (manter.length < 10) {
-                showToast('Por favor, especifique o que deve ser mantido (mínimo 10 caracteres)', 'error');
-                return;
-            }
-
-            const btn = document.getElementById('btnSubmitAlteracao');
-            btn.disabled = true;
-            btn.innerText = 'Processando...';
-
-            const sugestoes = `MUDANÇAS DESEJADAS:\n${mudancas}\n\nELEMENTOS QUE DEVEM PERMANECER:\n${manter}${obs ? `\n\nOBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}`.trim();
-
-            try {
-                const response = await fetch(`${SUPABASE_URL}functions/v1/alterar-letra`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pedidoId: currentAlterandoId, sugestoes })
-                });
-
-                const result = await response.json();
-
-                if (!response.ok) throw new Error(result.error || 'Erro ao processar alterações');
-
-                showToast('Versão modificada criada! Compare as versões.', 'success');
-                fecharAlterarModal();
-
-                userData.orders = await loadOrdersFromSupabase();
-                localStorage.setItem('tuneCraftUser', JSON.stringify(userData));
-                renderSections();
-            } catch (error) {
-                showToast(`Erro: ${error.message}`, 'error');
-            }
-
-            btn.disabled = false;
-            btn.innerText = 'Enviar Alterações';
-        }
+        
 
         async function aprovarLetraOriginal(pedidoId) {
             try {
@@ -2365,3 +2575,4 @@
     </script>
 </body>
 </html>
+
