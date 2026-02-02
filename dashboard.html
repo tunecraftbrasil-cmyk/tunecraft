@@ -1491,34 +1491,83 @@
     </div>
 
     <!-- Modal de Alteração de Letra -->
-    <div class="alterar-modal" id="alterarModal">
-        <div class="alterar-content">
-            <div class="alterar-header">
-                <h2>Alterar Letra</h2>
-                <button class="alterar-close" onclick="fecharAlterarModal()"></button>
-            </div>
-            <div class="alterar-step">
-                <h3>O que você gostaria de mudar na letra?</h3>
-                <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 10px;">Exemplos: Tornar o refrão mais animado, Adicionar menção a Dourados, Mudar o tom de romântico para alegre</p>
-                <textarea id="mudancasDesejadas" placeholder="Ex: Gostaria que o refrão fosse mais energético e mencionasse nossa viagem para o Rio..." maxlength="500" oninput="updateAlterarCharCount('mudancasDesejadas', 'count1')"></textarea>
-                <div class="char-count"><span id="count1">0</span>/500</div>
-            </div>
-            <div class="alterar-step">
-                <h3>Há algo específico que DEVE permanecer?</h3>
-                <textarea id="manterElementos" placeholder="Ex: Mantenha as referências a Dourados e o nome Aline..." maxlength="300" oninput="updateAlterarCharCount('manterElementos', 'count2')"></textarea>
-                <div class="char-count"><span id="count2">0</span>/300</div>
-            </div>
-            <div class="alterar-step">
-                <h3>Observações finais sobre o tom ou estilo? (Opcional)</h3>
-                <textarea id="observacoesFinais" placeholder="Ex: Quero que seja mais emocionante, menos melancólica..." maxlength="200" oninput="updateAlterarCharCount('observacoesFinais', 'count3')"></textarea>
-                <div class="char-count"><span id="count3">0</span>/200</div>
-            </div>
-            <div class="alterar-buttons">
-                <button class="btn-alterar-cancel" onclick="fecharAlterarModalCancelar()">Cancelar</button>
-                <button class="btn-alterar-submit" id="btnSubmitAlteracao" onclick="submitAlteracao()">Enviar Alterações</button>
-            </div>
-        </div>
+    <!-- Modal de Alteração de Letra (por trecho + geral + título) -->
+<div class="alterar-modal" id="alterarModal">
+  <div class="alterar-content">
+    <div class="alterar-header">
+      <div>
+        <h2>Alterar Letra</h2>
+        <p style="font-size:0.9rem;color:#64748b;margin-top:6px;">
+          Você pode pedir alteração no <b>título</b>, em <b>trechos específicos</b>, e também deixar uma direção <b>geral</b>.
+        </p>
+      </div>
+      <button class="alterar-close" onclick="fecharAlterarModal()"></button>
     </div>
+
+    <!-- TÍTULO -->
+    <div class="alterar-step">
+      <h3>Título</h3>
+      <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 10px;">
+        Escolha como quer tratar o título: manter, sugerir ou pedir para regenerar.
+      </p>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+        <label style="display:flex;gap:8px;align-items:center;cursor:pointer;">
+          <input type="radio" name="tc_title_action" value="keep" checked>
+          <span>Manter</span>
+        </label>
+        <label style="display:flex;gap:8px;align-items:center;cursor:pointer;">
+          <input type="radio" name="tc_title_action" value="suggest">
+          <span>Sugerir</span>
+        </label>
+        <label style="display:flex;gap:8px;align-items:center;cursor:pointer;">
+          <input type="radio" name="tc_title_action" value="regen">
+          <span>Regerar</span>
+        </label>
+      </div>
+
+      <input
+        id="tc_title_value"
+        type="text"
+        maxlength="120"
+        placeholder="Se Sugerir: escreva o título ou uma direção (ex: 'mais moderno e curto')"
+        style="width:100%;padding:12px;border:2px solid rgba(148,163,184,0.18);border-radius:12px;background:rgba(255,255,255,0.04);color:var(--text);"
+      />
+      <div class="char-count"><span id="countTitle">0</span>/120</div>
+    </div>
+
+    <!-- TRECHOS -->
+    <div class="alterar-step">
+      <h3>Alteração por trecho</h3>
+      <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 10px;">
+        Para cada trecho: você pode manter, sugerir uma mudança específica, ou pedir para regerar o trecho inteiro.
+      </p>
+
+      <div id="tc_trechos_container"></div>
+    </div>
+
+    <!-- GERAL -->
+    <div class="alterar-step">
+      <h3>Direção geral (opcional)</h3>
+      <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 10px;">
+        Use para ajustes de tom/estilo que se aplicam à música inteira (sem conflitar com trechos marcados como “Manter”).
+      </p>
+      <textarea
+        id="tc_general"
+        placeholder="Ex: mais animada, menos melancólica, mais rimas, etc."
+        maxlength="500"
+        oninput="updateAlterarCharCount('tc_general', 'countGeral')"
+      ></textarea>
+      <div class="char-count"><span id="countGeral">0</span>/500</div>
+    </div>
+
+    <div class="alterar-buttons">
+      <button class="btn-alterar-cancel" onclick="fecharAlterarModalCancelar()">Cancelar</button>
+      <button class="btn-alterar-submit" id="btnSubmitAlteracao" onclick="submitAlteracao()">Enviar Alterações</button>
+    </div>
+  </div>
+</div>
+
 
     <!-- MODAL DE EDIÇÃO DE RASCUNHO -->
     <div class="edit-draft-modal" id="editDraftModal">
@@ -2035,74 +2084,263 @@
             }
         }
 
-        function abrirModalAlteracao(pedidoId) {
-            currentAlterandoId = pedidoId;
-            document.getElementById('alterarModal').classList.add('active');
-            document.getElementById('mudancasDesejadas').value = '';
-            document.getElementById('manterElementos').value = '';
-            document.getElementById('observacoesFinais').value = '';
-            document.getElementById('count1').innerText = '0';
-            document.getElementById('count2').innerText = '0';
-            document.getElementById('count3').innerText = '0';
+        // ====== Helpers para alteração por trecho ======
+function parseLyricsIntoTrechos(raw) {
+  const text = (raw || '').replace(/\r\n/g, '\n').trim();
+  if (!text) return [];
+
+  // Tenta dividir por tags [Verse], [Chorus] etc
+  const lines = text.split('\n');
+  const tagRegex = /^\s*\[(.+?)\]\s*$/;
+
+  let trechos = [];
+  let current = null;
+
+  function push() {
+    if (!current) return;
+    const content = current.lines.join('\n').trim();
+    if (content) trechos.push({ label: current.label, tag: current.tag, text: content });
+  }
+
+  for (const line of lines) {
+    const m = line.match(tagRegex);
+    if (m) {
+      push();
+      const label = m[1].trim();
+      current = { label, tag: `[${label}]`, lines: [] };
+    } else {
+      if (!current) current = { label: 'Trecho 1', tag: '', lines: [] };
+      current.lines.push(line);
+    }
+  }
+  push();
+
+  // Se não tinha tags e só veio um bloco, tenta quebrar por linhas em branco
+  if (trechos.length <= 1) {
+    const blocks = text.split(/\n\s*\n/g).map(b => b.trim()).filter(Boolean);
+    if (blocks.length > 1) {
+      trechos = blocks.map((b, i) => ({ label: `Trecho ${i + 1}`, tag: '', text: b }));
+    }
+  }
+
+  return trechos;
+}
+
+function renderTrechosForm(trechos) {
+  const el = document.getElementById('tc_trechos_container');
+  el.innerHTML = '';
+
+  trechos.forEach((t, i) => {
+    const tagTitle = t.tag ? t.tag : t.label;
+
+    el.innerHTML += `
+      <div style="border:1px solid rgba(148,163,184,0.18);border-radius:14px;padding:14px;margin-bottom:12px;background:rgba(255,255,255,0.03);">
+        <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">
+          <strong style="color:var(--text);">${escapeHtml(tagTitle)}</strong>
+          <span style="font-size:12px;color:rgba(148,163,184,0.9);font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace;">
+            trecho ${i + 1}
+          </span>
+        </div>
+
+        <div style="white-space:pre-wrap;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace;
+                    background:rgba(255,255,255,0.04);border:1px solid rgba(148,163,184,0.18);
+                    padding:12px;border-radius:12px;color:var(--text-2);max-height:180px;overflow:auto;">
+          ${escapeHtml(t.text)}
+        </div>
+
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin:12px 0 10px;">
+          <label style="display:flex;gap:8px;align-items:center;cursor:pointer;">
+            <input type="radio" name="tc_action_${i}" value="keep" checked>
+            <span>Manter</span>
+          </label>
+          <label style="display:flex;gap:8px;align-items:center;cursor:pointer;">
+            <input type="radio" name="tc_action_${i}" value="suggest">
+            <span>Sugerir mudança</span>
+          </label>
+          <label style="display:flex;gap:8px;align-items:center;cursor:pointer;">
+            <input type="radio" name="tc_action_${i}" value="regen">
+            <span>Regerar trecho</span>
+          </label>
+        </div>
+
+        <textarea
+          id="tc_suggestion_${i}"
+          placeholder="Se 'Sugerir' ou 'Regerar': descreva o que quer nesse trecho"
+          maxlength="500"
+          style="display:none;"
+          oninput="updateAlterarCharCount('tc_suggestion_${i}', 'countTrecho_${i}')"
+        ></textarea>
+        <div class="char-count" style="display:none;" id="wrapCountTrecho_${i}">
+          <span id="countTrecho_${i}">0</span>/500
+        </div>
+      </div>
+    `;
+  });
+
+  // listeners: mostrar/esconder textarea por trecho
+  trechos.forEach((_, i) => {
+    document.querySelectorAll(`input[name="tc_action_${i}"]`).forEach(r => {
+      r.addEventListener('change', () => {
+        const v = document.querySelector(`input[name="tc_action_${i}"]:checked`)?.value || 'keep';
+        const ta = document.getElementById(`tc_suggestion_${i}`);
+        const cc = document.getElementById(`wrapCountTrecho_${i}`);
+        if (v === 'suggest' || v === 'regen') {
+          ta.style.display = 'block';
+          cc.style.display = 'block';
+        } else {
+          ta.style.display = 'none';
+          cc.style.display = 'none';
+          ta.value = '';
+          document.getElementById(`countTrecho_${i}`).innerText = '0';
         }
+      });
+    });
+  });
+}
 
-        function fecharAlterarModal() {
-            document.getElementById('alterarModal').classList.remove('active');
-            currentAlterandoId = null;
-        }
+// ====== SUBSTITUIR suas funções abaixo ======
+let tcTrechosCache = [];
 
-        function updateAlterarCharCount(fieldId, countId) {
-            const field = document.getElementById(fieldId);
-            const count = field.value.length;
-            document.getElementById(countId).innerText = count;
-        }
+function abrirModalAlteracao(pedidoId) {
+  currentAlterandoId = pedidoId;
 
-        async function submitAlteracao() {
-            const mudancas = document.getElementById('mudancasDesejadas').value.trim();
-            const manter = document.getElementById('manterElementos').value.trim();
-            const obs = document.getElementById('observacoesFinais').value.trim();
+  // pega a letra atual do pedido para dividir em trechos
+  const order = userData.orders.find(o => o.id === pedidoId);
+  const letraBase =
+    order?.versao_original?.suno_payload?.lyrics ||
+    order?.versao_original?.customerlyrics ||
+    order?.lyrics ||
+    '';
 
-            if (mudancas.length < 20) {
-                showToast('Por favor, descreva as mudanças com pelo menos 20 caracteres', 'error');
-                return;
-            }
+  tcTrechosCache = parseLyricsIntoTrechos(letraBase);
+  renderTrechosForm(tcTrechosCache);
 
-            if (manter.length < 10) {
-                showToast('Por favor, especifique o que deve ser mantido (mínimo 10 caracteres)', 'error');
-                return;
-            }
+  // limpar campos
+  document.getElementById('tc_general').value = '';
+  document.getElementById('countGeral').innerText = '0';
 
-            const btn = document.getElementById('btnSubmitAlteracao');
-            btn.disabled = true;
-            btn.innerText = 'Processando...';
+  document.getElementById('tc_title_value').value = '';
+  document.getElementById('countTitle').innerText = '0';
+  // reset radios título
+  document.querySelectorAll('input[name="tc_title_action"]').forEach(r => r.checked = (r.value === 'keep'));
 
-            const sugestoes = `MUDANÇAS DESEJADAS:\n${mudancas}\n\nELEMENTOS QUE DEVEM PERMANECER:\n${manter}${obs ? `\n\nOBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}`.trim();
+  // contador título
+  document.getElementById('tc_title_value').addEventListener('input', () => {
+    document.getElementById('countTitle').innerText = document.getElementById('tc_title_value').value.length;
+  }, { once: true });
 
-            try {
-                const response = await fetch(`${SUPABASE_URL}functions/v1/alterar-letra`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pedidoId: currentAlterandoId, sugestoes })
-                });
+  document.getElementById('alterarModal').classList.add('active');
+}
 
-                const result = await response.json();
+function fecharAlterarModal() {
+  document.getElementById('alterarModal').classList.remove('active');
+  currentAlterandoId = null;
+  tcTrechosCache = [];
+}
 
-                if (!response.ok) throw new Error(result.error || 'Erro ao processar alterações');
+function updateAlterarCharCount(fieldId, countId) {
+  const field = document.getElementById(fieldId);
+  const count = field.value.length;
+  const el = document.getElementById(countId);
+  if (el) el.innerText = count;
+}
 
-                showToast('Versão modificada criada! Compare as versões.', 'success');
-                fecharAlterarModal();
+async function submitAlteracao() {
+  if (!currentAlterandoId) {
+    showToast('Erro: pedido não definido', 'error');
+    return;
+  }
 
-                userData.orders = await loadOrdersFromSupabase();
-                localStorage.setItem('tuneCraftUser', JSON.stringify(userData));
-                renderSections();
-            } catch (error) {
-                showToast(`Erro: ${error.message}`, 'error');
-            }
+  // título
+  const titleAction = document.querySelector('input[name="tc_title_action"]:checked')?.value || 'keep';
+  const titleValue = document.getElementById('tc_title_value').value.trim();
 
-            btn.disabled = false;
-            btn.innerText = 'Enviar Alterações';
-        }
+  // geral
+  const general = document.getElementById('tc_general').value.trim();
 
+  // trechos
+  const trechos = tcTrechosCache.map((t, i) => {
+    const action = document.querySelector(`input[name="tc_action_${i}"]:checked`)?.value || 'keep';
+    const suggestion = (document.getElementById(`tc_suggestion_${i}`)?.value || '').trim();
+    return { idx: i + 1, label: t.label, tag: t.tag, action, suggestion, current: t.text };
+  });
+
+  // validação mínima (sem mudar suas regras gerais do app)
+  const anyTrechoChange = trechos.some(x => x.action !== 'keep');
+  const anyTitleChange = titleAction !== 'keep';
+  const anyGeneral = general.length >= 10;
+
+  if (!anyTrechoChange && !anyTitleChange && !anyGeneral) {
+    showToast('Peça ao menos 1 mudança: título, um trecho, ou uma direção geral.', 'error');
+    return;
+  }
+
+  // se sugerir título, exigir algo
+  if (titleAction === 'suggest' && titleValue.length < 3) {
+    showToast('No título: escreva o título ou uma direção (mínimo 3 caracteres).', 'error');
+    return;
+  }
+
+  // se sugerir algum trecho, exigir algo
+  for (const tr of trechos) {
+    if (tr.action === 'suggest' && tr.suggestion.length < 10) {
+      showToast(`No trecho ${tr.idx}: descreva a sugestão (mínimo 10 caracteres).`, 'error');
+      return;
+    }
+  }
+
+  const btn = document.getElementById('btnSubmitAlteracao');
+  btn.disabled = true;
+  btn.innerText = 'Processando...';
+
+  // monta sugestoes estruturadas em TEXTO (pra não mexer em schema)
+  const sugestoes = [
+    '=== TITULO ===',
+    `ACAO: ${titleAction.toUpperCase()}`,
+    `VALOR: ${titleValue || '(vazio)'}`,
+    '',
+    '=== TRECHOS ===',
+    ...trechos.flatMap(tr => ([
+      `--- TRECHO ${tr.idx} ${tr.tag ? tr.tag : `(${tr.label})`} ---`,
+      `ACAO: ${tr.action.toUpperCase()}`,
+      tr.suggestion ? `SUGESTAO: ${tr.suggestion}` : 'SUGESTAO: (nenhuma)',
+      'TEXTO_ATUAL:',
+      tr.current,
+      ''
+    ])),
+    '=== DIRECAO_GERAL ===',
+    general || '(nenhuma)',
+    '',
+    '=== REGRA ===',
+    'TRECHOS COM ACAO KEEP DEVEM PERMANECER IDENTICOS.'
+  ].join('\n').trim();
+
+  try {
+    const response = await fetch(`${SUPABASE_URL}functions/v1/alterar-letra`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pedidoId: currentAlterandoId, sugestoes })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) throw new Error(result.error || 'Erro ao processar alterações');
+
+    showToast('Versão modificada criada! Compare as versões.', 'success');
+    fecharAlterarModal();
+
+    userData.orders = await loadOrdersFromSupabase();
+    localStorage.setItem('tuneCraftUser', JSON.stringify(userData));
+    renderSections();
+  } catch (error) {
+    showToast(`Erro: ${error.message}`, 'error');
+  }
+
+  btn.disabled = false;
+  btn.innerText = 'Enviar Alterações';
+}
+
+        
         async function aprovarLetraOriginal(pedidoId) {
             try {
                 console.log('Aprovando letra original e gerando áudio para', pedidoId);
@@ -2365,3 +2603,4 @@
     </script>
 </body>
 </html>
+
