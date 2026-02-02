@@ -1457,7 +1457,7 @@ draftsContainer.innerHTML += `
     </div>
 `;
           }
-          else if (order.status === "pending_approval" && !order.versao_modificada) {
+           else if (order.status === "pending_approval" && !order.versao_modificada) {
             hasPending = true;
             const podeAlterar = !order.alteracao_usada;
 
@@ -1467,20 +1467,40 @@ draftsContainer.innerHTML += `
                   <h3>${title}</h3>
                   <span class="status-badge status-pending">Aguardando Aprovação</span>
                 </div>
-                <p style="font-size:0.9rem; color:#64748b;">Leia a letra gerada abaixo.</p>
-                <div class="lyrics-box">${lyrics}</div>
-                <div class="action-row">
-                  <button
-                    class="btn btn-revise"
-                    onclick="abrirModalAlteracao('${order.id}')"
-                    ${!podeAlterar ? 'disabled title="Alteração já foi usada"' : ''}
-                  >
-                    ${podeAlterar ? '✏️ Solicitar Alteração (1x)' : '🔒 Alteração Usada'}
-                  </button>
-                  <button class="btn btn-approve" id="btn-${order.id}" onclick="aprovarLetraOriginal('${order.id}')">
-                    ✅ Aprovar e Gerar Áudio
-                  </button>
+                
+                <!-- ✅ NOVO: Box com título "Letra" e botões horizontais -->
+                <div style="margin: 20px 0; border: 1px solid rgba(148, 163, 184, 0.22); border-radius: 12px; overflow: hidden;">
+                  
+                  <!-- Header com título e ícone -->
+                  <div style="background: rgba(255, 255, 255, 0.04); padding: 14px 16px; border-bottom: 1px solid rgba(148, 163, 184, 0.22); display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 18px;">📄</span>
+                    <span style="font-weight: 900; color: var(--text); font-size: 14px;">Letra</span>
+                  </div>
+                  
+                  <!-- Conteúdo da letra -->
+                  <div class="lyrics-box" style="border: none; border-radius: 0; margin: 0; max-height: 250px;">${lyrics}</div>
+                  
+                  <!-- Botões de ação -->
+                  <div style="padding: 14px 16px; border-top: 1px solid rgba(148, 163, 184, 0.22); background: rgba(255, 255, 255, 0.02); display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button 
+                      class="btn btn-revise" 
+                      onclick="abrirModalAlteracao('${order.id}')" 
+                      ${!podeAlterar ? 'disabled title="Alteração já foi usada"' : ''} 
+                      style="flex: 1; min-width: 160px;"
+                    >
+                      ${podeAlterar ? '✏️ Alterar' : '🔒 Alteração Usada'}
+                    </button>
+                    <button 
+                      class="btn btn-approve" 
+                      id="btn-${order.id}" 
+                      onclick="aprovarLetraOriginal('${order.id}')" 
+                      style="flex: 1; min-width: 160px;"
+                    >
+                      ✅ Aprovar
+                    </button>
+                  </div>
                 </div>
+                
               </div>
             `;
           }
@@ -2666,3 +2686,4 @@ async function saveEditDraftNew() {
 
 </body>
 </html>
+
