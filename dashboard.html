@@ -1410,6 +1410,46 @@ async function copyLyrics(){
   }
 }
 
+    <!-- FUNÇÃO AUXILIAR: Extrair dados do Suno Payload -->
+
+    function extractFromSunoPayload(payload) {
+      const sunoPayload = payload.suno_payload || {};
+      const highlights = payload.highlights || {};
+      
+      // ✅ 1. ESTILO - Vem direto de suno_payload.style
+      const style = sunoPayload.style || "Não definido";
+      
+      // ✅ 2. EMOÇÃO - Extrai das tags entre parênteses no prompt
+      let emotions = [];
+      const promptText = sunoPayload.prompt || "";
+      const emotionRegex = /\(([^)]+)\)/g;
+      let match;
+      while ((match = emotionRegex.exec(promptText)) !== null) {
+        const tag = match[1];
+        // Procura por tags que parecem emoções
+        if (tag.includes('emocional') || tag.includes('nostálgico') || tag.includes('íntimo') || 
+            tag.includes('suave') || tag.includes('catarse') || tag.includes('reflexivo')) {
+          if (!emotions.includes(tag)) emotions.push(tag);
+        }
+      }
+      const emotion = emotions.length > 0 ? emotions.join(', ') : "Não especificada";
+      
+      // ✅ 3. EVITA - Vem de suno_payload.negativeTags
+      const evita = sunoPayload.negativeTags || "Nenhum";
+      
+      // ✅ 4. DETALHES MENCIONADOS - Do highlights.mentioned_details
+      const mentionedDetails = Array.isArray(highlights.mentioned_details) 
+        ? highlights.mentioned_details 
+        : [];
+      
+      return {
+        style,
+        emotion,
+        evita,
+        mentionedDetails,
+        hook: highlights.hook || "Não definido"
+      };
+    }
     
     function renderSections() {
       const draftsContainer = document.getElementById("drafts");
@@ -1468,27 +1508,12 @@ draftsContainer.innerHTML += `
             const musicStyle = answers.musicStyle || {};
             const aiMetadata = answers.ai_metadata || {};
             
-            // Dados do Suno (se disponível)
-            const sunoPayload = payload.suno_payload || {};
-            const highlights = payload.highlights || {};
+            // ✅ Extrair dados DO SUNO PAYLOAD
+            const sunoData = extractFromSunoPayload(payload);
             
-            // Mapear tema e gênero com fallback seguro
+            // Mapear tema
             const themeOption = FORM_OPTIONS?.themes?.find(t => t.value === aiMetadata.themeId) || {};
-            const genreOption = FORM_OPTIONS?.genres?.find(g => g.value === musicStyle.primaryGenre) || {};
-            
             const themeLabel = themeOption.label || aiMetadata.themeId || "Indefinido";
-            let genreLabel = genreOption.label || musicStyle.primaryGenre || "Não definido";
-            
-            // Fix para "other" que não tem label
-            if (musicStyle.primaryGenre === "other" || genreLabel === "other") {
-              genreLabel = musicStyle.customGenre || "Personalizado";
-            }
-            
-            const hook = highlights.hook || lyricDetails.mainMessage || sunoPayload.title || "Seu refrão aqui";
-            const emotion = musicStyle.emotion || "Indefinida";
-            const evita = Array.isArray(lyricDetails.avoidThemes) 
-              ? lyricDetails.avoidThemes.join(", ") 
-              : (lyricDetails.avoidThemes || "Nenhum");
 
             pendingContainer.innerHTML += `
               <div class="card">
@@ -1514,34 +1539,34 @@ draftsContainer.innerHTML += `
                         <span style="color: #10b981; font-weight: 600; background: rgba(236, 253, 245, 0.8); padding: 3px 8px; border-radius: 4px; font-size: 11px;">✓</span>
                       </div>
                       
-                      <!-- Estilo -->
-                      <div style="display: flex; gap: 10px; font-size: 13px; align-items: center;">
+                      <!-- Estilo (DO SUNO PAYLOAD) -->
+                      <div style="display: flex; gap: 10px; font-size: 13px; align-items: flex-start;">
                         <span style="font-size: 16px;">🎤</span>
-                        <div style="flex: 1;">
+                        <div style="flex: 1; min-width: 0;">
                           <div style="font-size: 11px; color: var(--muted); font-weight: 500;">Estilo</div>
-                          <div style="font-size: 13px; color: var(--text); font-weight: 500;">${escapeHtml(String(genreLabel))}</div>
+                          <div style="font-size: 13px; color: var(--text); font-weight: 500; word-break: break-word;">${escapeHtml(String(sunoData.style).substring(0, 80))}</div>
                         </div>
-                        <span style="color: #10b981; font-weight: 600; background: rgba(236, 253, 245, 0.8); padding: 3px 8px; border-radius: 4px; font-size: 11px;">✓</span>
+                        <span style="color: #10b981; font-weight: 600; background: rgba(236, 253, 245, 0.8); padding: 3px 8px; border-radius: 4px; font-size: 11px; flex-shrink: 0;">✓</span>
                       </div>
                       
-                      <!-- Emoção -->
+                      <!-- Emoção (DO PROMPT DO SUNO) -->
                       <div style="display: flex; gap: 10px; font-size: 13px; align-items: center;">
                         <span style="font-size: 16px;">💫</span>
                         <div style="flex: 1;">
                           <div style="font-size: 11px; color: var(--muted); font-weight: 500;">Emoção</div>
-                          <div style="font-size: 13px; color: var(--text); font-weight: 500;">${escapeHtml(String(emotion))}</div>
+                          <div style="font-size: 13px; color: var(--text); font-weight: 500;">${escapeHtml(String(sunoData.emotion))}</div>
                         </div>
                         <span style="color: #10b981; font-weight: 600; background: rgba(236, 253, 245, 0.8); padding: 3px 8px; border-radius: 4px; font-size: 11px;">✓</span>
                       </div>
                       
-                      <!-- Evita -->
-                      <div style="display: flex; gap: 10px; font-size: 13px; align-items: center;">
+                      <!-- Evita (DO SUNO PAYLOAD) -->
+                      <div style="display: flex; gap: 10px; font-size: 13px; align-items: flex-start;">
                         <span style="font-size: 16px;">🚫</span>
-                        <div style="flex: 1;">
+                        <div style="flex: 1; min-width: 0;">
                           <div style="font-size: 11px; color: var(--muted); font-weight: 500;">Evita</div>
-                          <div style="font-size: 13px; color: var(--text); font-weight: 500;">${escapeHtml(evita)}</div>
+                          <div style="font-size: 13px; color: var(--text); font-weight: 500; word-break: break-word;">${escapeHtml(String(sunoData.evita))}</div>
                         </div>
-                        <span style="color: #10b981; font-weight: 600; background: rgba(236, 253, 245, 0.8); padding: 3px 8px; border-radius: 4px; font-size: 11px;">✓</span>
+                        <span style="color: #10b981; font-weight: 600; background: rgba(236, 253, 245, 0.8); padding: 3px 8px; border-radius: 4px; font-size: 11px; flex-shrink: 0;">✓</span>
                       </div>
                     </div>
                   </div>
@@ -1549,8 +1574,24 @@ draftsContainer.innerHTML += `
                   <!-- Hook Highlight -->
                   <div style="background: linear-gradient(135deg, rgba(254, 243, 199, 0.3), rgba(253, 230, 138, 0.3)); padding: 14px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #f59e0b;">
                     <span style="display: block; font-size: 11px; color: #92400e; font-weight: 600; margin-bottom: 6px;">🎶 Refrão Principal:</span>
-                    <div style="font-style: italic; font-weight: 500; color: #78350f; font-size: 15px;">"${escapeHtml(String(hook))}"</div>
+                    <div style="font-style: italic; font-weight: 500; color: #78350f; font-size: 15px;">"${escapeHtml(String(sunoData.hook))}"</div>
                   </div>
+                  
+                  <!-- Detalhes Mencionados -->
+                  ${sunoData.mentionedDetails.length > 0 ? `
+                  <div style="background: rgba(99, 102, 241, 0.1); padding: 14px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid var(--brand-2);">
+                    <span style="display: block; font-size: 11px; color: var(--muted); font-weight: 600; margin-bottom: 8px;">✨ Detalhes Inclusos:</span>
+                    <div style="display: grid; gap: 6px; font-size: 12px; color: var(--text-2);">
+                      ${sunoData.mentionedDetails.slice(0, 5).map(detail => `
+                        <div style="display: flex; gap: 8px;">
+                          <span style="color: var(--brand); flex-shrink: 0;">▸</span>
+                          <span>${escapeHtml(detail)}</span>
+                        </div>
+                      `).join('')}
+                      ${sunoData.mentionedDetails.length > 5 ? `<div style="color: var(--muted); font-size: 11px; margin-top: 4px;">... e mais ${sunoData.mentionedDetails.length - 5} detalhes</div>` : ''}
+                    </div>
+                  </div>
+                  ` : ''}
                 </div>
                 
                 <!-- ✅ BOX COM LETRA -->
@@ -1865,91 +1906,7 @@ ${
       }
     }
 
-    function abrirModalAlteracao(pedidoId) {
-      currentAlterandoId = pedidoId;
-      document.getElementById('alterarModal').classList.add('active');
-
-      document.getElementById('mudancasDesejadas').value = '';
-      document.getElementById('manterElementos').value = '';
-      document.getElementById('observacoesFinais').value = '';
-      document.getElementById('count1').innerText = '0';
-      document.getElementById('count2').innerText = '0';
-      document.getElementById('count3').innerText = '0';
-    }
-
-    function fecharAlterarModal() {
-      document.getElementById('alterarModal').classList.remove('active');
-      currentAlterandoId = null;
-    }
-
-    function updateAlterarCharCount(fieldId, countId) {
-      const field = document.getElementById(fieldId);
-      const count = field.value.length;
-      document.getElementById(countId).innerText = count;
-    }
-
-    async function submitAlteracao() {
-      const mudancas = document.getElementById('mudancasDesejadas').value.trim();
-      const manter = document.getElementById('manterElementos').value.trim();
-      const obs = document.getElementById('observacoesFinais').value.trim();
-
-      if (mudancas.length < 20) {
-        showToast("Por favor, descreva as mudanças com pelo menos 20 caracteres", "error");
-        return;
-      }
-
-      if (manter.length < 10) {
-        showToast("Por favor, especifique o que deve ser mantido (mínimo 10 caracteres)", "error");
-        return;
-      }
-
-      const btn = document.getElementById('btnSubmitAlteracao');
-      btn.disabled = true;
-      btn.innerText = "Processando...";
-
-      const sugestoes = `
-MUDANÇAS DESEJADAS:
-${mudancas}
-
-ELEMENTOS QUE DEVEM PERMANECER:
-${manter}
-
-${obs ? `OBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
-      `.trim();
-
-      try {
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/alterar-letra`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            pedidoId: currentAlterandoId,
-            sugestoes: sugestoes
-          })
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-          throw new Error(result.error || 'Erro ao processar alterações');
-        }
-
-        showToast("✅ Versão modificada criada! Compare as versões.", "");
-        fecharAlterarModal();
-
-        userData.orders = await loadOrdersFromSupabase();
-        localStorage.setItem("tuneCraftUser", JSON.stringify(userData));
-        renderSections();
-
-      } catch (error) {
-        showToast(`❌ Erro: ${error.message}`, "error");
-        btn.disabled = false;
-        btn.innerText = "Enviar Alterações ✨";
-      }
-    }
-
-   async function aprovarLetraOriginal(pedidoId) {
+     async function aprovarLetraOriginal(pedidoId) {
   try {
     console.log("✅ Aprovando letra original e gerando áudio para:", pedidoId);
 
@@ -2760,27 +2717,18 @@ async function saveEditDraftNew() {
         }
 
         const payload = order.payload || {};
+        
+        // ✅ Usar a função de extração
+        const sunoData = extractFromSunoPayload(payload);
+        
         const answers = payload.answers || {};
-        const lyricDetails = answers.lyricDetails || {};
-        const musicStyle = answers.musicStyle || {};
         const aiMetadata = answers.ai_metadata || {};
-        const sunoPayload = payload.suno_payload || {};
-        const highlights = payload.highlights || {};
         
-        // Mapear labels
+        // Mapear tema
         const themeOption = FORM_OPTIONS?.themes?.find(t => t.value === aiMetadata.themeId) || {};
-        const genreOption = FORM_OPTIONS?.genres?.find(g => g.value === musicStyle.primaryGenre) || {};
-        
-        let genreLabel = genreOption.label || musicStyle.primaryGenre || "Não definido";
-        if (musicStyle.primaryGenre === "other") {
-          genreLabel = musicStyle.customGenre || "Personalizado";
-        }
-        
         const themeLabel = themeOption.label || aiMetadata.themeId || "Indefinido";
-        const emotion = musicStyle.emotion || "Indefinida";
-        const hook = highlights.hook || lyricDetails.mainMessage || sunoPayload.title || "Seu refrão aqui";
         
-        // Extrair versos da letra (parsing simples)
+        // Extrair versos da letra
         const lyrics = order.lyrics || "";
         const lyricsLines = lyrics.split('\n');
         let verse1 = '', preChorus = '', chorus = '', verse2 = '';
@@ -2802,7 +2750,6 @@ async function saveEditDraftNew() {
         
         const createdDate = new Date(order.created_at).toLocaleDateString('pt-BR');
         
-        // Construir modal COMPLETO e EDITÁVEL
         const modal = document.getElementById('alterarModal');
         modal.innerHTML = `
           <div class="alterar-content" style="max-height: 90vh; overflow-y: auto;">
@@ -2814,17 +2761,18 @@ async function saveEditDraftNew() {
               <button class="alterar-close" onclick="fecharAlterarModal()">×</button>
             </div>
 
-            <!-- Info Box Original -->
+            <!-- Info Box Original COM DADOS DO SUNO -->
             <div style="margin-bottom: 20px; padding: 14px; background: rgba(255, 255, 255, 0.03); border-radius: 10px; border-left: 4px solid var(--brand);">
               <div style="font-size: 13px; color: var(--text); margin-bottom: 8px;"><strong>📋 Informações Originais:</strong></div>
               <div style="font-size: 12px; color: var(--muted); line-height: 1.6;">
-                <div>🎤 Estilo: ${escapeHtml(String(genreLabel))}</div>
-                <div>💫 Emoção: ${escapeHtml(String(emotion))}</div>
-                <div>🎶 Hook: "${escapeHtml(String(hook).substring(0, 60))}"</div>
+                <div>🙏 Tema: ${escapeHtml(themeLabel)}</div>
+                <div>🎤 Estilo: ${escapeHtml(String(sunoData.style).substring(0, 60))}</div>
+                <div>💫 Emoção: ${escapeHtml(String(sunoData.emotion))}</div>
+                <div>🎶 Hook: "${escapeHtml(String(sunoData.hook).substring(0, 50))}"</div>
               </div>
             </div>
 
-            <!-- FORMA EDITÁVEL COM TODOS OS CAMPOS -->
+            <!-- FORMA EDITÁVEL -->
             <form id="formAlteracao" style="display: grid; gap: 16px;">
             
               <!-- Seção 1: Dados Editáveis -->
@@ -2845,24 +2793,29 @@ async function saveEditDraftNew() {
                     style="width: 100%; padding: 10px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--text); font-family: inherit; font-size: 13px;">
                 </div>
                 
-                <!-- Estilo -->
+                <!-- Estilo (DO SUNO) -->
                 <div style="margin-bottom: 12px;">
                   <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text); font-size: 12px;">🎤 Estilo</label>
-                  <input type="text" id="editStyle" value="${escapeHtml(String(genreLabel))}"
+                  <textarea id="editStyle" style="width: 100%; min-height: 60px; padding: 10px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--text); font-family: inherit; font-size: 13px; resize: vertical;">${escapeHtml(String(sunoData.style))}</textarea>
+                </div>
+                
+                <!-- Emoção (DO SUNO) -->
+                <div style="margin-bottom: 12px;">
+                  <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text); font-size: 12px;">💫 Emoção</label>
+                  <input type="text" id="editEmotion" value="${escapeHtml(String(sunoData.emotion))}"
                     style="width: 100%; padding: 10px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--text); font-family: inherit; font-size: 13px;">
                 </div>
                 
-                <!-- Emoção -->
+                <!-- Evita (DO SUNO) -->
                 <div style="margin-bottom: 12px;">
-                  <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text); font-size: 12px;">💫 Emoção</label>
-                  <input type="text" id="editEmotion" value="${escapeHtml(String(emotion))}"
-                    style="width: 100%; padding: 10px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--text); font-family: inherit; font-size: 13px;">
+                  <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text); font-size: 12px;">🚫 Evita</label>
+                  <textarea id="editEvita" style="width: 100%; min-height: 60px; padding: 10px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--text); font-family: inherit; font-size: 13px; resize: vertical;">${escapeHtml(String(sunoData.evita))}</textarea>
                 </div>
                 
                 <!-- Hook -->
                 <div style="margin-bottom: 12px;">
                   <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text); font-size: 12px;">🎶 Refrão Principal</label>
-                  <input type="text" id="editHook" value="${escapeHtml(String(hook))}"
+                  <input type="text" id="editHook" value="${escapeHtml(String(sunoData.hook))}"
                     style="width: 100%; padding: 10px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--text); font-family: inherit; font-size: 13px;">
                 </div>
               </div>
@@ -2934,7 +2887,7 @@ async function saveEditDraftNew() {
             <!-- Botões de Ação -->
             <div class="alterar-buttons" style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
               <button class="btn-alterar-cancel" onclick="fecharAlterarModal()" style="flex: 1; min-width: 140px;">Cancelar</button>
-              <button class="btn-alterar-submit" onclick="submitAlteracao('${pedidoId}')" style="flex: 1.5; min-width: 200px;">Salvar e Enviar Alterações ✨</button>
+              <button class="btn-alterar-submit" onclick="submitAlteracao('${pedidoId}')" style="flex: 1.5; min-width: 200px;">Salvar e Enviar ✨</button>
             </div>
           </div>
         `;
@@ -2942,10 +2895,10 @@ async function saveEditDraftNew() {
         modal.classList.add('active');
         currentAlterandoId = pedidoId;
         
-        console.log('✅ Modal aberto com dados completos:', pedidoId);
+        console.log('✅ Modal aberto com dados do Suno:', sunoData);
       } catch (error) {
-        console.error('❌ Erro ao abrir modal:', error);
-        showToast('❌ Erro ao abrir modal de edição', 'error');
+        console.error('❌ Erro:', error);
+        showToast('❌ Erro ao abrir modal', 'error');
       }
     }
 
@@ -3044,6 +2997,7 @@ async function saveEditDraftNew() {
 
 </body>
 </html>
+
 
 
 
