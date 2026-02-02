@@ -1457,7 +1457,7 @@ draftsContainer.innerHTML += `
     </div>
 `;
           }
-           else if (order.status === "pending_approval" && !order.versao_modificada) {
+            else if (order.status === "pending_approval" && !order.versao_modificada) {
             hasPending = true;
             const podeAlterar = !order.alteracao_usada;
             
@@ -1468,13 +1468,23 @@ draftsContainer.innerHTML += `
             const musicStyle = answers.musicStyle || {};
             const aiMetadata = answers.ai_metadata || {};
             
-            // Mapear tema e gênero
+            // Dados do Suno (se disponível)
+            const sunoPayload = payload.suno_payload || {};
+            const highlights = payload.highlights || {};
+            
+            // Mapear tema e gênero com fallback seguro
             const themeOption = FORM_OPTIONS?.themes?.find(t => t.value === aiMetadata.themeId) || {};
             const genreOption = FORM_OPTIONS?.genres?.find(g => g.value === musicStyle.primaryGenre) || {};
-            const themeLabel = themeOption.label || aiMetadata.themeId || "Indefinido";
-            const genreLabel = genreOption.label || musicStyle.primaryGenre || "Não definido";
             
-            const hook = lyricDetails.mainMessage || "Seu refrão aqui";
+            const themeLabel = themeOption.label || aiMetadata.themeId || "Indefinido";
+            let genreLabel = genreOption.label || musicStyle.primaryGenre || "Não definido";
+            
+            // Fix para "other" que não tem label
+            if (musicStyle.primaryGenre === "other" || genreLabel === "other") {
+              genreLabel = musicStyle.customGenre || "Personalizado";
+            }
+            
+            const hook = highlights.hook || lyricDetails.mainMessage || sunoPayload.title || "Seu refrão aqui";
             const emotion = musicStyle.emotion || "Indefinida";
             const evita = Array.isArray(lyricDetails.avoidThemes) 
               ? lyricDetails.avoidThemes.join(", ") 
@@ -1509,7 +1519,7 @@ draftsContainer.innerHTML += `
                         <span style="font-size: 16px;">🎤</span>
                         <div style="flex: 1;">
                           <div style="font-size: 11px; color: var(--muted); font-weight: 500;">Estilo</div>
-                          <div style="font-size: 13px; color: var(--text); font-weight: 500;">${escapeHtml(genreLabel)}</div>
+                          <div style="font-size: 13px; color: var(--text); font-weight: 500;">${escapeHtml(String(genreLabel))}</div>
                         </div>
                         <span style="color: #10b981; font-weight: 600; background: rgba(236, 253, 245, 0.8); padding: 3px 8px; border-radius: 4px; font-size: 11px;">✓</span>
                       </div>
@@ -1519,7 +1529,7 @@ draftsContainer.innerHTML += `
                         <span style="font-size: 16px;">💫</span>
                         <div style="flex: 1;">
                           <div style="font-size: 11px; color: var(--muted); font-weight: 500;">Emoção</div>
-                          <div style="font-size: 13px; color: var(--text); font-weight: 500;">${escapeHtml(emotion)}</div>
+                          <div style="font-size: 13px; color: var(--text); font-weight: 500;">${escapeHtml(String(emotion))}</div>
                         </div>
                         <span style="color: #10b981; font-weight: 600; background: rgba(236, 253, 245, 0.8); padding: 3px 8px; border-radius: 4px; font-size: 11px;">✓</span>
                       </div>
@@ -1539,7 +1549,7 @@ draftsContainer.innerHTML += `
                   <!-- Hook Highlight -->
                   <div style="background: linear-gradient(135deg, rgba(254, 243, 199, 0.3), rgba(253, 230, 138, 0.3)); padding: 14px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #f59e0b;">
                     <span style="display: block; font-size: 11px; color: #92400e; font-weight: 600; margin-bottom: 6px;">🎶 Refrão Principal:</span>
-                    <div style="font-style: italic; font-weight: 500; color: #78350f; font-size: 15px;">"${escapeHtml(hook)}"</div>
+                    <div style="font-style: italic; font-weight: 500; color: #78350f; font-size: 15px;">"${escapeHtml(String(hook))}"</div>
                   </div>
                 </div>
                 
@@ -2740,100 +2750,191 @@ async function saveEditDraftNew() {
   }
 
    // ✅ FUNÇÃO PARA ABRIR MODAL COM EDIÇÃO COMPLETA
-    async function abrirModalAlteracao(pedidoId) {
+    
+   async function abrirModalAlteracao(pedidoId) {
       try {
-        // Pegar dados do order
         const order = userData.orders.find(o => o.id === pedidoId);
         if (!order) {
           showToast('❌ Pedido não encontrado', 'error');
           return;
         }
 
-        // Extrair dados
         const payload = order.payload || {};
         const answers = payload.answers || {};
         const lyricDetails = answers.lyricDetails || {};
         const musicStyle = answers.musicStyle || {};
         const aiMetadata = answers.ai_metadata || {};
+        const sunoPayload = payload.suno_payload || {};
+        const highlights = payload.highlights || {};
         
         // Mapear labels
         const themeOption = FORM_OPTIONS?.themes?.find(t => t.value === aiMetadata.themeId) || {};
         const genreOption = FORM_OPTIONS?.genres?.find(g => g.value === musicStyle.primaryGenre) || {};
         
-        // Abrir modal e preencher dados
-        const modal = document.getElementById('alterarModal');
+        let genreLabel = genreOption.label || musicStyle.primaryGenre || "Não definido";
+        if (musicStyle.primaryGenre === "other") {
+          genreLabel = musicStyle.customGenre || "Personalizado";
+        }
         
-        // Preencher campos
-        document.getElementById('mudancasDesejadas').value = '';
-        document.getElementById('manterElementos').value = '';
-        document.getElementById('observacoesFinais').value = '';
+        const themeLabel = themeOption.label || aiMetadata.themeId || "Indefinido";
+        const emotion = musicStyle.emotion || "Indefinida";
+        const hook = highlights.hook || lyricDetails.mainMessage || sunoPayload.title || "Seu refrão aqui";
         
-        // Adicionar data do pedido
+        // Extrair versos da letra (parsing simples)
+        const lyrics = order.lyrics || "";
+        const lyricsLines = lyrics.split('\n');
+        let verse1 = '', preChorus = '', chorus = '', verse2 = '';
+        let currentSection = 'verse1';
+        
+        lyricsLines.forEach(line => {
+          const lower = line.toLowerCase();
+          if (lower.includes('[verse 1]') || lower.includes('verso 1')) currentSection = 'verse1';
+          else if (lower.includes('[pre-chorus]') || lower.includes('pré-refrão') || lower.includes('pre-refrao')) currentSection = 'preChorus';
+          else if (lower.includes('[chorus]') || lower.includes('refrão') || lower.includes('refrao')) currentSection = 'chorus';
+          else if (lower.includes('[verse 2]') || lower.includes('verso 2')) currentSection = 'verse2';
+          else if (line.trim()) {
+            if (currentSection === 'verse1' && verse1.length < 500) verse1 += line + '\n';
+            else if (currentSection === 'preChorus' && preChorus.length < 400) preChorus += line + '\n';
+            else if (currentSection === 'chorus' && chorus.length < 500) chorus += line + '\n';
+            else if (currentSection === 'verse2') verse2 += line + '\n';
+          }
+        });
+        
         const createdDate = new Date(order.created_at).toLocaleDateString('pt-BR');
         
+        // Construir modal COMPLETO e EDITÁVEL
+        const modal = document.getElementById('alterarModal');
         modal.innerHTML = `
-          <div class="alterar-content">
+          <div class="alterar-content" style="max-height: 90vh; overflow-y: auto;">
             <div class="alterar-header">
               <div>
-                <h2>✏️ Alterar Letra: ${escapeHtml(order.title)}</h2>
+                <h2>✏️ Editar: ${escapeHtml(order.title)}</h2>
                 <p style="font-size: 0.85rem; color: var(--muted); margin-top: 6px;">Criada em ${createdDate}</p>
               </div>
               <button class="alterar-close" onclick="fecharAlterarModal()">×</button>
             </div>
 
+            <!-- Info Box Original -->
             <div style="margin-bottom: 20px; padding: 14px; background: rgba(255, 255, 255, 0.03); border-radius: 10px; border-left: 4px solid var(--brand);">
               <div style="font-size: 13px; color: var(--text); margin-bottom: 8px;"><strong>📋 Informações Originais:</strong></div>
               <div style="font-size: 12px; color: var(--muted); line-height: 1.6;">
-                <div>🎤 Estilo: ${escapeHtml(genreOption.label || musicStyle.primaryGenre)}</div>
-                <div>💫 Emoção: ${escapeHtml(musicStyle.emotion)}</div>
-                <div>🎶 Mensagem: "${escapeHtml(lyricDetails.mainMessage?.substring(0, 50))}"</div>
+                <div>🎤 Estilo: ${escapeHtml(String(genreLabel))}</div>
+                <div>💫 Emoção: ${escapeHtml(String(emotion))}</div>
+                <div>🎶 Hook: "${escapeHtml(String(hook).substring(0, 60))}"</div>
               </div>
             </div>
 
-            <div class="alterar-step">
-              <h3>O que você gostaria de mudar na letra? 🎵</h3>
-              <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 10px;">
-                💡 Exemplos: "Tornar o refrão mais animado", "Adicionar menção a...", "Mudar o tom"
-              </p>
-              <textarea
-                id="mudancasDesejadas"
-                placeholder="Ex: Gostaria que o refrão fosse mais energético..."
-                maxlength="500"
-                oninput="updateAlterarCharCount('mudancasDesejadas', 'count1')"
-                style="width: 100%; min-height: 100px; padding: 12px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 10px; font-family: inherit; resize: vertical; background: rgba(255, 255, 255, 0.04); color: var(--text);"
-              ></textarea>
-              <div class="char-count"><span id="count1">0</span>/500</div>
-            </div>
+            <!-- FORMA EDITÁVEL COM TODOS OS CAMPOS -->
+            <form id="formAlteracao" style="display: grid; gap: 16px;">
+            
+              <!-- Seção 1: Dados Editáveis -->
+              <div class="alterar-step">
+                <h3 style="margin-bottom: 12px; color: var(--text); font-weight: 900;">📝 Informações Editáveis</h3>
+                
+                <!-- Título -->
+                <div style="margin-bottom: 12px;">
+                  <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text); font-size: 12px;">Título da Música</label>
+                  <input type="text" id="editTitle" value="${escapeHtml(order.title)}" 
+                    style="width: 100%; padding: 10px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--text); font-family: inherit; font-size: 13px;">
+                </div>
+                
+                <!-- Tema -->
+                <div style="margin-bottom: 12px;">
+                  <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text); font-size: 12px;">🙏 Tema</label>
+                  <input type="text" id="editTheme" value="${escapeHtml(themeLabel)}"
+                    style="width: 100%; padding: 10px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--text); font-family: inherit; font-size: 13px;">
+                </div>
+                
+                <!-- Estilo -->
+                <div style="margin-bottom: 12px;">
+                  <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text); font-size: 12px;">🎤 Estilo</label>
+                  <input type="text" id="editStyle" value="${escapeHtml(String(genreLabel))}"
+                    style="width: 100%; padding: 10px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--text); font-family: inherit; font-size: 13px;">
+                </div>
+                
+                <!-- Emoção -->
+                <div style="margin-bottom: 12px;">
+                  <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text); font-size: 12px;">💫 Emoção</label>
+                  <input type="text" id="editEmotion" value="${escapeHtml(String(emotion))}"
+                    style="width: 100%; padding: 10px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--text); font-family: inherit; font-size: 13px;">
+                </div>
+                
+                <!-- Hook -->
+                <div style="margin-bottom: 12px;">
+                  <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text); font-size: 12px;">🎶 Refrão Principal</label>
+                  <input type="text" id="editHook" value="${escapeHtml(String(hook))}"
+                    style="width: 100%; padding: 10px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--text); font-family: inherit; font-size: 13px;">
+                </div>
+              </div>
 
-            <div class="alterar-step">
-              <h3>Há algo específico que DEVE permanecer? 🔒</h3>
-              <textarea
-                id="manterElementos"
-                placeholder="Ex: Mantenha as referências a..."
-                maxlength="300"
-                oninput="updateAlterarCharCount('manterElementos', 'count2')"
-                style="width: 100%; min-height: 80px; padding: 12px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 10px; font-family: inherit; resize: vertical; background: rgba(255, 255, 255, 0.04); color: var(--text);"
-              ></textarea>
-              <div class="char-count"><span id="count2">0</span>/300</div>
-            </div>
+              <!-- Seção 2: Versos Editáveis -->
+              <div class="alterar-step">
+                <h3 style="margin-bottom: 12px; color: var(--text); font-weight: 900;">📚 Editar Versos</h3>
+                
+                <!-- Verso 1 -->
+                <div style="margin-bottom: 12px; padding: 12px; background: rgba(255, 255, 255, 0.03); border-radius: 8px; border-left: 3px solid var(--brand);">
+                  <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text); font-size: 12px;">Verso 1</label>
+                  <textarea id="editVerse1" style="width: 100%; min-height: 80px; padding: 10px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 8px; background: rgba(255, 255, 255, 0.04); color: var(--text); font-family: monospace; font-size: 12px; resize: vertical;">${verse1.trim()}</textarea>
+                </div>
+                
+                <!-- Pré-Refrão -->
+                <div style="margin-bottom: 12px; padding: 12px; background: rgba(255, 255, 255, 0.03); border-radius: 8px; border-left: 3px solid var(--brand);">
+                  <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text); font-size: 12px;">Pré-Refrão</label>
+                  <textarea id="editPreChorus" style="width: 100%; min-height: 60px; padding: 10px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 8px; background: rgba(255, 255, 255, 0.04); color: var(--text); font-family: monospace; font-size: 12px; resize: vertical;">${preChorus.trim()}</textarea>
+                </div>
+                
+                <!-- Refrão -->
+                <div style="margin-bottom: 12px; padding: 12px; background: rgba(255, 255, 255, 0.03); border-radius: 8px; border-left: 3px solid var(--brand);">
+                  <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text); font-size: 12px;">Refrão</label>
+                  <textarea id="editChorus" style="width: 100%; min-height: 100px; padding: 10px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 8px; background: rgba(255, 255, 255, 0.04); color: var(--text); font-family: monospace; font-size: 12px; resize: vertical;">${chorus.trim()}</textarea>
+                </div>
+                
+                <!-- Verso 2 -->
+                <div style="margin-bottom: 12px; padding: 12px; background: rgba(255, 255, 255, 0.03); border-radius: 8px; border-left: 3px solid var(--brand);">
+                  <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text); font-size: 12px;">Verso 2</label>
+                  <textarea id="editVerse2" style="width: 100%; min-height: 80px; padding: 10px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 8px; background: rgba(255, 255, 255, 0.04); color: var(--text); font-family: monospace; font-size: 12px; resize: vertical;">${verse2.trim()}</textarea>
+                </div>
+              </div>
 
-            <div class="alterar-step">
-              <h3>Observações finais sobre o tom ou estilo? 🎨 (Opcional)</h3>
-              <textarea
-                id="observacoesFinais"
-                placeholder="Ex: Quero que seja mais emocionante, menos melancólica..."
-                maxlength="200"
-                oninput="updateAlterarCharCount('observacoesFinais', 'count3')"
-                style="width: 100%; min-height: 80px; padding: 12px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 10px; font-family: inherit; resize: vertical; background: rgba(255, 255, 255, 0.04); color: var(--text);"
-              ></textarea>
-              <div class="char-count"><span id="count3">0</span>/200</div>
-            </div>
+              <!-- Seção 3: Solicitação de Modificações -->
+              <div class="alterar-step">
+                <h3 style="margin-bottom: 12px; color: var(--text); font-weight: 900;">💬 Solicitações de Modificação</h3>
+                
+                <!-- O que mudar -->
+                <div style="margin-bottom: 12px;">
+                  <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text); font-size: 12px;">O que você gostaria de mudar? 🎵</label>
+                  <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 8px;">💡 Ex: "Tornar o refrão mais animado", "Adicionar detalhes sobre..."</p>
+                  <textarea id="mudancasDesejadas" placeholder="Descreva as mudanças..."
+                    maxlength="500" oninput="updateAlterarCharCount('mudancasDesejadas', 'count1')"
+                    style="width: 100%; min-height: 100px; padding: 10px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--text); font-family: inherit; font-size: 13px; resize: vertical;"></textarea>
+                  <div class="char-count" style="text-align: right; font-size: 0.85rem; color: var(--muted); margin-top: 4px;"><span id="count1">0</span>/500</div>
+                </div>
+                
+                <!-- O que manter -->
+                <div style="margin-bottom: 12px;">
+                  <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text); font-size: 12px;">Há algo que DEVE permanecer? 🔒</label>
+                  <textarea id="manterElementos" placeholder="Ex: Mantenha as referências a..."
+                    maxlength="300" oninput="updateAlterarCharCount('manterElementos', 'count2')"
+                    style="width: 100%; min-height: 80px; padding: 10px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--text); font-family: inherit; font-size: 13px; resize: vertical;"></textarea>
+                  <div class="char-count" style="text-align: right; font-size: 0.85rem; color: var(--muted); margin-top: 4px;"><span id="count2">0</span>/300</div>
+                </div>
+                
+                <!-- Observações -->
+                <div style="margin-bottom: 12px;">
+                  <label style="display: block; margin-bottom: 6px; font-weight: 600; color: var(--text); font-size: 12px;">Observações gerais (Opcional) 🎨</label>
+                  <textarea id="observacoesFinais" placeholder="Tom, estilo, referências..."
+                    maxlength="200" oninput="updateAlterarCharCount('observacoesFinais', 'count3')"
+                    style="width: 100%; min-height: 80px; padding: 10px; border: 2px solid rgba(148, 163, 184, 0.18); border-radius: 10px; background: rgba(255, 255, 255, 0.04); color: var(--text); font-family: inherit; font-size: 13px; resize: vertical;"></textarea>
+                  <div class="char-count" style="text-align: right; font-size: 0.85rem; color: var(--muted); margin-top: 4px;"><span id="count3">0</span>/200</div>
+                </div>
+              </div>
 
-            <div class="alterar-buttons">
-              <button class="btn-alterar-cancel" onclick="fecharAlterarModal()">Cancelar</button>
-              <button class="btn-alterar-submit" onclick="submitAlteracao('${pedidoId}')">
-                Enviar Alterações ✨
-              </button>
+            </form>
+
+            <!-- Botões de Ação -->
+            <div class="alterar-buttons" style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+              <button class="btn-alterar-cancel" onclick="fecharAlterarModal()" style="flex: 1; min-width: 140px;">Cancelar</button>
+              <button class="btn-alterar-submit" onclick="submitAlteracao('${pedidoId}')" style="flex: 1.5; min-width: 200px;">Salvar e Enviar Alterações ✨</button>
             </div>
           </div>
         `;
@@ -2841,10 +2942,10 @@ async function saveEditDraftNew() {
         modal.classList.add('active');
         currentAlterandoId = pedidoId;
         
-        console.log('✅ Modal de alteração aberto para:', pedidoId);
+        console.log('✅ Modal aberto com dados completos:', pedidoId);
       } catch (error) {
-        console.error('❌ Erro:', error);
-        showToast('❌ Erro ao abrir modal', 'error');
+        console.error('❌ Erro ao abrir modal:', error);
+        showToast('❌ Erro ao abrir modal de edição', 'error');
       }
     }
 
@@ -2863,51 +2964,59 @@ async function saveEditDraftNew() {
       }
     }
 
-    // ✅ ENVIAR ALTERAÇÕES
+    // ✅ ENVIAR ALTERAÇÕES COMPLETAS
     async function submitAlteracao(pedidoId) {
       try {
-        const mudancas = document.getElementById('mudancasDesejadas')?.value || '';
-        const manter = document.getElementById('manterElementos')?.value || '';
-        const observacoes = document.getElementById('observacoesFinais')?.value || '';
+        // Coletar TODOS os dados editáveis
+        const editedData = {
+          title: document.getElementById('editTitle')?.value || '',
+          theme: document.getElementById('editTheme')?.value || '',
+          style: document.getElementById('editStyle')?.value || '',
+          emotion: document.getElementById('editEmotion')?.value || '',
+          hook: document.getElementById('editHook')?.value || '',
+          verse1: document.getElementById('editVerse1')?.value || '',
+          preChorus: document.getElementById('editPreChorus')?.value || '',
+          chorus: document.getElementById('editChorus')?.value || '',
+          verse2: document.getElementById('editVerse2')?.value || '',
+          mudancas_desejadas: document.getElementById('mudancasDesejadas')?.value || '',
+          elementos_manter: document.getElementById('manterElementos')?.value || '',
+          observacoes: document.getElementById('observacoesFinais')?.value || '',
+          data_solicitacao: new Date().toISOString()
+        };
 
-        if (!mudancas.trim()) {
+        if (!editedData.mudancas_desejadas.trim()) {
           showToast('⚠️ Descreva o que deseja alterar', 'error');
           return;
         }
 
-        showToast('⏳ Enviando alterações...', 'info');
+        showToast('⏳ Salvando alterações...', 'info');
 
         // Atualizar no Supabase
         const { error } = await sb
           .from('musicas_pedidos')
           .update({
-            alteracao_solicitada: {
-              mudancas_desejadas: mudancas,
-              elementos_manter: manter,
-              observacoes: observacoes,
-              data_solicitacao: new Date().toISOString()
-            },
+            alteracao_solicitada: editedData,
             status: 'aguardando_aprovacao'
           })
           .eq('id', pedidoId);
 
         if (error) {
-          console.error('❌ Erro:', error);
+          console.error('❌ Erro Supabase:', error);
           showToast(`❌ Erro: ${error.message}`, 'error');
           return;
         }
 
-        showToast('✅ Alteração enviada! Você receberá a nova versão em breve.', 'success');
+        showToast('✅ Alterações salvas! Você receberá a nova versão em breve.', 'success');
         fecharAlterarModal();
         
-        // Recarregar dados
+        // Recarregar dados após 1.5s
         setTimeout(() => {
           initDashboard();
         }, 1500);
 
       } catch (error) {
         console.error('❌ Erro:', error);
-        showToast('❌ Erro ao enviar alteração', 'error');
+        showToast('❌ Erro ao salvar alterações', 'error');
       }
     }
 
@@ -2935,5 +3044,6 @@ async function saveEditDraftNew() {
 
 </body>
 </html>
+
 
 
