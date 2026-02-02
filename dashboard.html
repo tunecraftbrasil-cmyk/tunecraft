@@ -1504,37 +1504,44 @@
       <button class="alterar-close" onclick="fecharAlterarModal()"></button>
     </div>
 
-    <!-- TÍTULO -->
-    <div class="alterar-step">
-      <h3>Título</h3>
-      <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 10px;">
-        Escolha como quer tratar o título: manter, sugerir ou pedir para regenerar.
-      </p>
+    <!-- TÍTULO: preview + ação -->
+<div class="alterar-step">
+  <h3>Título da música</h3>
 
-      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
-        <label style="display:flex;gap:8px;align-items:center;cursor:pointer;">
-          <input type="radio" name="tc_title_action" value="keep" checked>
-          <span>Manter</span>
-        </label>
-        <label style="display:flex;gap:8px;align-items:center;cursor:pointer;">
-          <input type="radio" name="tc_title_action" value="suggest">
-          <span>Sugerir</span>
-        </label>
-        <label style="display:flex;gap:8px;align-items:center;cursor:pointer;">
-          <input type="radio" name="tc_title_action" value="regen">
-          <span>Regerar</span>
-        </label>
-      </div>
+  <p style="font-size:0.9rem;color:#64748b;margin-bottom:10px;">
+    <strong>Título atual:</strong>
+    <span id="alterarTituloAtual" style="color:#e5e7eb;"></span>
+  </p>
 
-      <input
-        id="tc_title_value"
-        type="text"
-        maxlength="120"
-        placeholder="Se Sugerir: escreva o título ou uma direção (ex: 'mais moderno e curto')"
-        style="width:100%;padding:12px;border:2px solid rgba(148,163,184,0.18);border-radius:12px;background:rgba(255,255,255,0.04);color:var(--text);"
-      />
-      <div class="char-count"><span id="countTitle">0</span>/120</div>
-    </div>
+  <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+    <label style="display:flex; gap:8px; align-items:center; cursor:pointer; font-weight:900; color:#cbd5e1;">
+      <input type="radio" name="tituloAcao" value="KEEP" checked onchange="onTituloAcaoChange()">
+      Manter
+    </label>
+
+    <label style="display:flex; gap:8px; align-items:center; cursor:pointer; font-weight:900; color:#cbd5e1;">
+      <input type="radio" name="tituloAcao" value="SUGGEST" onchange="onTituloAcaoChange()">
+      Sugerir título
+    </label>
+
+    <label style="display:flex; gap:8px; align-items:center; cursor:pointer; font-weight:900; color:#cbd5e1;">
+      <input type="radio" name="tituloAcao" value="REGEN" onchange="onTituloAcaoChange()">
+      Regerar título
+    </label>
+  </div>
+
+  <div id="tituloValorWrap" style="display:none;">
+    <textarea
+      id="tituloValor"
+      placeholder="Ex: 'Nosso Para Sempre'  (ou: 'curto e moderno, com vibe feliz')"
+      maxlength="120"
+      oninput="updateAlterarCharCount('tituloValor', 'countTitulo')"
+      style="min-height:70px;"
+    ></textarea>
+    <div class="char-count"><span id="countTitulo">0</span>/120</div>
+  </div>
+</div>
+
 
     <!-- TRECHOS -->
     <div class="alterar-step">
@@ -2204,33 +2211,29 @@ let tcTrechosCache = [];
 function abrirModalAlteracao(pedidoId) {
   currentAlterandoId = pedidoId;
 
-  // pega a letra atual do pedido para dividir em trechos
-  const order = userData.orders.find(o => o.id === pedidoId);
-  const letraBase =
-    order?.versao_original?.suno_payload?.lyrics ||
-    order?.versao_original?.customerlyrics ||
-    order?.lyrics ||
-    '';
+  const order = (userData.orders || []).find(o => o.id === pedidoId);
+  const tituloAtual = order?.title || 'Sem título';
 
-  tcTrechosCache = parseLyricsIntoTrechos(letraBase);
-  renderTrechosForm(tcTrechosCache);
+  document.getElementById('alterarTituloAtual').innerText = tituloAtual;
 
-  // limpar campos
-  document.getElementById('tc_general').value = '';
-  document.getElementById('countGeral').innerText = '0';
+  // reset título
+  const keepRadio = document.querySelector('input[name="tituloAcao"][value="KEEP"]');
+  if (keepRadio) keepRadio.checked = true;
 
-  document.getElementById('tc_title_value').value = '';
-  document.getElementById('countTitle').innerText = '0';
-  // reset radios título
-  document.querySelectorAll('input[name="tc_title_action"]').forEach(r => r.checked = (r.value === 'keep'));
+  document.getElementById('tituloValor').value = '';
+  document.getElementById('countTitulo').innerText = '0';
+  document.getElementById('tituloValorWrap').style.display = 'none';
 
-  // contador título
-  document.getElementById('tc_title_value').addEventListener('input', () => {
-    document.getElementById('countTitle').innerText = document.getElementById('tc_title_value').value.length;
-  }, { once: true });
-
+  // reset campos antigos
   document.getElementById('alterarModal').classList.add('active');
+  document.getElementById('mudancasDesejadas').value = '';
+  document.getElementById('manterElementos').value = '';
+  document.getElementById('observacoesFinais').value = '';
+  document.getElementById('count1').innerText = '0';
+  document.getElementById('count2').innerText = '0';
+  document.getElementById('count3').innerText = '0';
 }
+
 
 function fecharAlterarModal() {
   document.getElementById('alterarModal').classList.remove('active');
@@ -2245,6 +2248,24 @@ function updateAlterarCharCount(fieldId, countId) {
   if (el) el.innerText = count;
 }
 
+function onTituloAcaoChange() {
+  const acao = getTituloAcao();
+  const wrap = document.getElementById('tituloValorWrap');
+  // Só mostra o campo quando precisa de VALOR
+  wrap.style.display = (acao === 'SUGGEST' || acao === 'REGEN') ? 'block' : 'none';
+
+  // se voltar pra KEEP, limpa
+  if (acao === 'KEEP') {
+    document.getElementById('tituloValor').value = '';
+    document.getElementById('countTitulo').innerText = '0';
+  }
+}
+
+function getTituloAcao() {
+  const el = document.querySelector('input[name="tituloAcao"]:checked');
+  return el ? el.value : 'KEEP';
+}
+        
 async function submitAlteracao() {
   if (!currentAlterandoId) {
     showToast('Erro: pedido não definido', 'error');
@@ -2293,27 +2314,38 @@ async function submitAlteracao() {
   btn.disabled = true;
   btn.innerText = 'Processando...';
 
+
+  // pega o pedido atual pra mostrar o título que está no banco
+const order = (userData.orders || []).find(o => o.id === currentAlterandoId);
+const tituloAtual = order?.title || 'Sem título';
+
+// ação escolhida no rádio: KEEP | SUGGEST | REGEN
+const tituloAcao = getTituloAcao();
+const tituloValor = document.getElementById('tituloValor').value.trim();
+
+// valida: se for sugerir/regerar, precisa ter algo no campo
+if ((tituloAcao === 'SUGGEST' || tituloAcao === 'REGEN') && tituloValor.length < 3) {
+  showToast('Informe um título ou uma direção para o título (mínimo 3 caracteres).', 'error');
+  return;
+}
+
   // monta sugestoes estruturadas em TEXTO (pra não mexer em schema)
-  const sugestoes = [
-    '=== TITULO ===',
-    `ACAO: ${titleAction.toUpperCase()}`,
-    `VALOR: ${titleValue || '(vazio)'}`,
-    '',
-    '=== TRECHOS ===',
-    ...trechos.flatMap(tr => ([
-      `--- TRECHO ${tr.idx} ${tr.tag ? tr.tag : `(${tr.label})`} ---`,
-      `ACAO: ${tr.action.toUpperCase()}`,
-      tr.suggestion ? `SUGESTAO: ${tr.suggestion}` : 'SUGESTAO: (nenhuma)',
-      'TEXTO_ATUAL:',
-      tr.current,
-      ''
-    ])),
-    '=== DIRECAO_GERAL ===',
-    general || '(nenhuma)',
-    '',
-    '=== REGRA ===',
-    'TRECHOS COM ACAO KEEP DEVEM PERMANECER IDENTICOS.'
-  ].join('\n').trim();
+  const blocoTitulo = `
+=== TITULO ===
+ATUAL: ${tituloAtual}
+ACAO: ${tituloAcao}
+VALOR: ${tituloValor || '(vazio)'}
+`.trim();
+
+const blocoGeral = `
+MUDANÇAS DESEJADAS:
+${mudancas}
+
+ELEMENTOS QUE DEVEM PERMANECER:
+${manter}${obs ? `\n\nOBSERVAÇÕES ADICIONAIS:\n${obs}` : ''}
+`.trim();
+
+const sugestoes = `${blocoTitulo}\n\n${blocoGeral}`.trim();
 
   try {
     const response = await fetch(`${SUPABASE_URL}functions/v1/alterar-letra`, {
@@ -2603,4 +2635,5 @@ async function submitAlteracao() {
     </script>
 </body>
 </html>
+
 
